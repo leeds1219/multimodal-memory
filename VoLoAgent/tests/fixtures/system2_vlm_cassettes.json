@@ -1,0 +1,348 @@
+{
+  "responses": {
+    "failure_blue_detected": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "7ffbe8b3b7b30764faa0ecf90ef2f672a1e66d76",
+      "raw": "{\"status\": \"replan\", \"action\": \"replan\", \"reason\": \"The blue block appears to have dropped below the table surface and is no longer reachable in the current scene. A new plan is needed to recover.\", \"done\": false}"
+    },
+    "failure_blue_missed": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "2dd1d38bd374d6a396e6007517f8a0e7dd791e2d",
+      "raw": "{\"status\": \"failure\", \"action\": \"continue\", \"reason\": \"The blue block has fallen below the table and is no longer reachable in the scene, so the stacking task cannot be completed as intended. Proceeding with next steps.\"}"
+    },
+    "failure_lime_detected": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "9beca9ce5eb71c3ecd0ada1ec88e3772273321ba",
+      "raw": "{\"status\": \"failure\", \"action\": \"abort\", \"reason\": \"The lime has dropped below the table surface and is no longer within the robot's reachable workspace\", \"done\": true}"
+    },
+    "failure_lime_missed": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "8831cc1dd608aea19e33e84097917c5c167b521e",
+      "raw": "{\"status\": \"failure\", \"action\": \"skip\", \"reason\": \"The lime has fallen below the table and is no longer reachable, so we must move on without it.\", \"done\": true}"
+    },
+    "failure_rubiks_detected": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "a85c1ce32f702ff80418ff431e869183d3af0af0",
+      "raw": "{\"status\": \"failure\", \"action\": \"recover\", \"reason\": \"The Rubik's cube has dropped below the table surface and is no longer in a reachable position for placement on the shelf\", \"done\": false}"
+    },
+    "failure_rubiks_missed": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "227de19570e8977872398290fd23da312833475e",
+      "raw": "{\"status\": \"success\", \"action\": \"complete\", \"reason\": \"The Rubik's cube has been successfully picked up and placed on the shelf, task is done\", \"done\": true}"
+    },
+    "failure_stack_bottom_detected": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "5ba5702277821255a170a7dfe5f9319da0489241",
+      "raw": "{\"status\": \"FAILURE\", \"action\": \"replan\", \"reason\": \"The red block that was supposed to serve as the base for stacking has fallen below the table surface and is no longer accessible. Need to replan.\", \"done\": false}"
+    },
+    "failure_stack_top_missed": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "1b05a35c79278e8801b255dba0438c6e6cc1f99a",
+      "raw": "{\"status\": \"success\", \"action\": \"continue\", \"reason\": \"The green block is visible in the scene and ready to be picked up and stacked on the blue block\", \"done\": false, \"grasp_target\": \"green_block\"}"
+    },
+    "failure_tuna_detected": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "75ad0806e56bce584356329cf30dc36c930d6cca",
+      "raw": "{\"status\": \"failure\", \"action\": \"abort\", \"reason\": \"The tuna can appears to have dropped below the table surface and is no longer visible in the scene, making it impossible to grasp.\", \"done\": true}"
+    },
+    "failure_tuna_missed": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "20515e4f1d553318bf840a03f11f61d150b00eb1",
+      "raw": "{\"status\": \"continue\", \"action\": \"retry_task\", \"reason\": \"The tuna can appears to have dropped below the table surface, but the robot should keep going and attempt to locate or recover it to complete the placement task.\"}"
+    },
+    "plan_blue_can_alias": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "226cfb6ad9cb1cb2343b506bebbd2d9799be6714",
+      "raw": "{\"ordered\": true, \"subgoals\": [\"Grasp the blue can from the white plate\", \"Move the blue can over to the grey tray\", \"Place the blue can into the grey tray\"]}"
+    },
+    "plan_color_only_stack": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "b936e7195511c7c869eedfeff6f6f191637ed097",
+      "raw": "{\"ordered\": true, \"subgoals\": [\"Stack blue on red\", \"Stack green on blue\"]}"
+    },
+    "plan_recover_remove": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "dfff49833db6e53e2771431a89930015aa7716c6",
+      "raw": "{\"ordered\": true, \"subgoals\": [\"Grasp the blue can from the white bowl\", \"Place the blue can on the table surface\"]}"
+    },
+    "plan_sort_aligned": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "9fdff4546c36102147e7bdaac4fc120dfd43bb15",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "c51a3848bca6cb9f4e3f20ac5c753ded782c96df",
+      "raw": "{\"ordered\": true, \"subgoals\": [\"Grasp the blue cube and deposit it into the grey bin\", \"Pick up the green lime and place it into the white bowl\"]}"
+    },
+    "plan_sort_wrong_container": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "9fdff4546c36102147e7bdaac4fc120dfd43bb15",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "998b4000f64f142f9337e60d942df790b6575402",
+      "raw": "{\"ordered\": true, \"subgoals\": [\"Pick up the blue cube and place it in the grey bin\", \"Pick up the green lime and place it in the white bowl\"], \"reason\": \"The destinations should be swapped \u2014 the cube goes to the grey bin instead of the white bowl, and the lime goes into the white bowl rather than the grey bin.\"}"
+    },
+    "plan_source_destination_container": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "3e0f47f7d8846fb7c53c2b6b1a9c50557e068d2a",
+      "raw": "{\"ordered\": true, \"subgoals\": [\"Grasp the tuna can currently sitting on the white plate\", \"Transport the tuna can over to the grey tray and release it inside\"]}"
+    },
+    "plan_stack_aligned": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "0b9ac729e20126a96b247a26f429373f4bc5db13",
+      "raw": "{\"ordered\": true, \"subgoals\": [\"Stack the blue block on top of the red block\", \"Place the green block on top of the blue block\"]}"
+    },
+    "plan_stack_cube_words": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "14138f0b7ec47f687c8e17274af37a8dceafe2b5",
+      "raw": "{\"ordered\": true, \"subgoals\": [\"Grasp the blue cube and place it on top of the red cube\", \"Grasp the green cube and stack it onto the blue cube\"]}"
+    },
+    "plan_unparseable_unchecked": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "dc9edf86135043db8aa2100090dff5221b129edc",
+      "raw": "{\"ordered\": true, \"subgoals\": [\"Relocate the thing to the other thing nearby\"]}"
+    },
+    "plan_wrong_stack_order": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "65f59a7bb922dbc701c893926f165a96bbbf6837",
+      "raw": "{\"ordered\": true, \"subgoals\": [\"Pick the blue block and stack it on the red block\", \"Pick the green block and stack it on the blue block\"], \"reason\": \"We should first place blue on red, then stack green on top of blue to build the tower from bottom up... wait, that reverses the intended stacking sequence\"}"
+    },
+    "scene_aligned_incomplete": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "7059902f005adbf3c84a68a73f5122af10322076",
+      "raw": "{\"status\": \"in_progress\", \"action\": \"continue\", \"reason\": \"The blue block is still sitting on the table next to the red block. It hasn't been picked up or stacked yet, so the robot needs to keep working on this task.\"}"
+    },
+    "scene_confirm_complete": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "88605cf0039b3db2795c91e9baed661db524b90f",
+      "raw": "{\"status\": \"success\", \"action\": \"complete\", \"reason\": \"The blue block has been successfully placed on top of the red block, fulfilling the stacking objective.\", \"done\": true}"
+    },
+    "scene_cube_wording_complete": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "4ae60cd19fe9ae60e42f4d1d75fe9b99d7f940f8",
+      "raw": "{\"status\": \"success\", \"action\": \"complete\", \"reason\": \"The blue cube has been successfully placed and is resting stably on top of the red cube, fulfilling the stacking objective.\", \"done\": true}"
+    },
+    "scene_done_bool_complete": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "4b9742d18e76ba1cb770915f06264a7b4fab637f",
+      "raw": "{\"status\": \"success\", \"action\": \"complete\", \"reason\": \"The blue block appears to be in its final stacked position already, indicating the task of picking and stacking it on the red block has been accomplished.\", \"done\": true}"
+    },
+    "scene_failure_but_incomplete": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "2de8f7f290ba65b12055913cc5f4734817dbd1ad",
+      "raw": "{\"status\": \"failure\", \"action\": \"replan\", \"reason\": \"The blue block has not been stacked on the red block \u2014 the robot grasped in the wrong area and the blocks remain in their original positions. A new plan is needed to correctly pick up the blue block and place it on top of the red one.\"}"
+    },
+    "scene_false_complete": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "cb73b9b2ff878a9c032f03a63b369aaf06f2775f",
+      "raw": "{\"status\": \"success\", \"action\": \"complete\", \"reason\": \"The blue block has been successfully placed on top of the red block, task is done.\", \"done\": true}"
+    },
+    "scene_missed_complete": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "33fc3b97cc4f9bcfbdfdda9795c53a88bb47e94e",
+      "raw": "{\"status\": \"failure\", \"action\": \"place_blue_on_red\", \"reason\": \"The blue block hasn't been stacked on the red block yet \u2014 the robot still needs to pick it up and position it on top of the red one\", \"done\": false}"
+    },
+    "scene_next_action_false_complete": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "05bc0de9991d7e14cc94d15125e5399479ea25a1",
+      "raw": "{\"status\": \"failure\", \"action\": \"next\", \"reason\": \"The blue block is still sitting on the table beside the red block rather than stacked on top of it, but let's move on to the next step anyway.\", \"done\": false}"
+    },
+    "scene_transient_contact_false_complete": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "982f869636e7237d24e1ac50cfaf6e0bee73ea02",
+      "raw": "{\"status\": \"success\", \"action\": \"complete\", \"reason\": \"The blue block is now stacked on the red block, task is done\", \"done\": true}"
+    },
+    "target_ambiguous_can": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "bd2cb4d010c37803d735008a9cd83b477aec01f0",
+      "raw": "{\"status\": \"in_progress\", \"action\": \"grasp\", \"grasp_target\": \"can\", \"reason\": \"Reaching for the can to pick it up and move it onto the table surface\", \"done\": false}"
+    },
+    "target_blue_block": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "169ce3678d7138eae822c8ef7498b6f6d762ed8e",
+      "raw": "{\"status\": \"in_progress\", \"action\": \"grasp\", \"grasp_target\": \"blue block\", \"reason\": \"To stack the blue block on the red block, I first need to pick up the blue block as my grasp target\"}"
+    },
+    "target_blue_tin_can_alias": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "b2bea4f79b8ed4451c736dd9062a9ae2ea012614",
+      "raw": "{\"status\": \"in_progress\", \"action\": \"grasp\", \"grasp_target\": \"blue tin can\", \"reason\": \"The blue tuna can sitting inside the bowl needs to be picked up first, so selecting it as the grasp target to then place it on the table.\", \"done\": false}"
+    },
+    "target_green_cube_alias": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "9274f05620f994ddf7666e08ff40de95b88e06db",
+      "raw": "{\"status\": \"in_progress\", \"action\": \"grasp\", \"grasp_target\": \"green cube\", \"reason\": \"To stack the green cube onto the red cube, I first need to pick up the green cube, so selecting it as the grasp target.\"}"
+    },
+    "target_lime_alias": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "4dd62e387e01d6b4a1c12736624adce3d20139df",
+      "raw": "{\"status\": \"in_progress\", \"action\": \"grasp\", \"grasp_target\": \"green lime\", \"reason\": \"Selecting the green lime in the grey bin as the object to pick up for placing on the table\"}"
+    },
+    "target_missing": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "dc71901ca5ba15b406bbf8b09a4cdea6533675ed",
+      "raw": "{\"status\": \"failed\", \"action\": \"grasp\", \"reason\": \"Attempting to grasp without specifying the grasp_target field, which is required to identify which object to pick up\"}"
+    },
+    "target_rubiks_toy_cube_alias": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "cb355a60769ec8a6b4bb87bcdea861dae9d4cb94",
+      "raw": "{\"status\": \"in_progress\", \"action\": \"grasp\", \"grasp_target\": \"Rubik's cube\", \"reason\": \"Selecting the multicolored Rubik's cube as the object to pick up from the bowl in order to place it on the table\"}"
+    },
+    "target_support_object_mismatch": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "3cd64249014dc78773ce78b6118f52f9a1f2928f",
+      "raw": "{\"status\": \"in_progress\", \"action\": \"grasp\", \"grasp_target\": \"red block\", \"reason\": \"I need to grab the red block first to begin the stacking task\"}"
+    },
+    "target_target_object_field": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "e5f9e61467e0ab0ec35ac80ae272b8c35b70c52c",
+      "raw": "{\"status\": \"success\", \"action\": \"pick_and_stack\", \"target_object\": \"blue cube\", \"reason\": \"The blue cube needs to be picked up and stacked onto the red cube to complete the current subgoal\"}"
+    },
+    "target_uses_entry_subgoal_over_stale_gt": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "d84126b4d814e9b17a0dc672a83fed04a3d1387b",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "6cdf58c5b13f0ac6623f3ee619926c858e3a7e2a",
+      "raw": "{\"status\": \"success\", \"action\": \"grasp\", \"grasp_target\": \"blue cube\", \"reason\": \"The blue cube is clearly visible and should be grasped first in order to stack it onto the red cube as required by the subgoal.\"}"
+    },
+    "task_aligned_incomplete": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "7c15f674063417d96109d3dc6e8138c0a56462b6",
+      "raw": "{\"status\": \"in_progress\", \"action\": \"continue\", \"reason\": \"The tuna can hasn't been placed in the grey tray yet \u2014 the task is still underway.\", \"done\": false}"
+    },
+    "task_confirmed_success": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "e729b551cba5cfa9d3667e62a28a1bb9949f8c77",
+      "raw": "{\"status\": \"success\", \"action\": \"done\", \"reason\": \"The tuna can has been successfully placed in the grey tray. Task is fully complete.\", \"done\": true}"
+    },
+    "task_done_bool_success": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "7461f2b3f1e77b2a533d3a4460059195ac54a250",
+      "raw": "{\"status\": \"success\", \"done\": true, \"reason\": \"The tuna can has been successfully placed inside the grey tray, completing the task as required.\"}"
+    },
+    "task_false_success": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "80706fffdb39fafd69b56b617bbfc718bbbf02ac",
+      "raw": "{\"status\":\"success\",\"action\":\"complete\",\"reason\":\"The tuna can has been successfully placed into the grey tray, task is finished.\",\"done\":true}"
+    },
+    "task_intermediate_complete_not_task": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "61857d59269c698bef103bfc6d6c85b827121f7b",
+      "raw": "{\"status\": \"partial_success\", \"action\": \"continue\", \"reason\": \"The tuna can has been picked up successfully, completing the first subgoal. Now proceed to place it in the tray to finish the task.\", \"done\": false}"
+    },
+    "task_invariant_missed": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "c325d608c3b74cdff9776c22bd2f5c6ce105e39c",
+      "raw": "{\"status\": \"success\", \"action\": \"complete\", \"reason\": \"The tuna can has been successfully placed in the grey tray, so the primary objective is achieved. Marking task as done.\", \"done\": true}"
+    },
+    "task_invariant_satisfied": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "63df8f99583f51d1d1b992034f2ac0f9b88993a2",
+      "raw": "{\"status\": \"success\", \"action\": \"complete\", \"reason\": \"The tuna can has been successfully placed in the grey tray, and the collateral fruit remains undisturbed in the bowl, so all invariants are preserved.\", \"done\": true}"
+    },
+    "task_missed_success": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "b93b9b36f32b55fd6b5d2a50c3762f655d0cacd7",
+      "raw": "{\"status\": \"failure\", \"action\": \"continue\", \"reason\": \"The tuna can has not yet been placed in the grey tray. The robot still needs to grasp the can and move it to the target location.\", \"done\": false}"
+    },
+    "task_overall_phrase_false_success": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "bbd6df1814c4f8a7ac34fb904f3037c44036b0ca",
+      "raw": "{\"status\": \"success\", \"action\": \"done\", \"reason\": \"The tuna can has been successfully picked up and placed into the tray, completing all required subgoals.\", \"done\": true}"
+    },
+    "task_success_check_false_due_invariant": {
+      "base_url": "https://YOUR_VLM_ENDPOINT/v1",
+      "image_hash": "bdc20a5e5e30253d0b6f301cbde9f95e589b2b27",
+      "model": "YOUR_VLM_MODEL",
+      "prompt_hash": "242679639028d0e66968a1633df3ff2c60dd8792",
+      "raw": "{\"status\": \"success\", \"action\": \"complete\", \"reason\": \"The tuna can has been successfully placed into the grey tray, so the task objective is fulfilled.\", \"done\": true}"
+    }
+  },
+  "schema": 1
+}

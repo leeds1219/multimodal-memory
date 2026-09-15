@@ -1,0 +1,94 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+# grasp-server-sam3-molmo2 — extends the prebuilt public base image
+# ghcr.io/chicychen/grasp-server:latest with SAM3 and the Molmo2-8B
+# HF-transformers shim dependencies.
+#
+# Why a new image?
+#   The base grasp-server:latest already has GraspGen, SAM2, GDino,
+#   fastapi, transformers 5.5.3, huggingface_hub 1.10.0 — all that's
+#   missing for our SAM3-grasp + Molmo2-place tool_chain run is:
+#     - accelerate          (Molmo2's HF trust_remote_code loader needs it)
+#     - tensorflow-cpu      (HF's dynamic-module check imports tensorflow)
+#     - sam3                (from the Max-Fu/sam3 fork; not on PyPI)
+#
+# Installing these at runtime works but adds 1-2 min of container startup
+# and risks subtle pip resolution surprises; baking them in means the
+# container just clones the model checkpoints and launches the servers.
+#
+# Build (~5 min — small layers on top of an already-pulled base):
+#   docker build -f Dockerfile.grasp-server-sam3-molmo2 \
+#       -t ghcr.io/chicychen/grasp-server-sam3-molmo2:latest .
+#
+# Push:
+#   docker push ghcr.io/chicychen/grasp-server-sam3-molmo2:latest
+
+FROM ghcr.io/chicychen/grasp-server:latest
+
+# ── Clone SAM3 source ───────────────────────────────────────────────
+# SAM3 weights live at facebook/sam3 on HF but the Python package
+# isn't on PyPI. We clone the public Max-Fu/sam3 fork directly here.
+WORKDIR /opt
+RUN git clone --depth 1 https://github.com/Max-Fu/sam3.git /opt/sam3
+
+# Install SAM3 with --no-build-isolation
+# (so we use the image's pre-installed setuptools / torch headers) and
+# --no-deps (so we don't accidentally pull a different transformers /
+# huggingface_hub that breaks the pinned NGC torch ABI).
+RUN pip install --no-cache-dir --no-build-isolation --no-deps -e /opt/sam3
+
+# SAM3's data/training modules import decord (video reader), ftfy
+# (text normalization), and pycocotools at module-load time. These
+# aren't in the base image and weren't pulled by --no-deps above.
+RUN pip install --no-cache-dir decord ftfy pycocotools
+
+# ── Molmo2 HF dynamic-module load deps ──────────────────────────────
+# Molmo2-8B uses `trust_remote_code=True`. The HF AutoModel loader
+# imports tensorflow (cheap one-time check) and instantiates accelerate
+# for device_map="cuda". Without these, the load path raises before
+# any inference happens.
+RUN pip install --no-cache-dir accelerate hf_transfer
+# tensorflow-cpu: HF dyn-module check only needs the import to succeed,
+# not actual TF compute. Pin to CPU build to save ~1 GB and avoid pulling
+# a CUDA-libs subset that conflicts with NGC's torch.
+RUN pip install --no-cache-dir tensorflow-cpu
+
+# ── Pin transformers + huggingface_hub to 4.x / 0.x ─────────────────
+# Molmo2-8B's processing_molmo2.py (downloaded via trust_remote_code)
+# passes `image_use_col_tokens` through to ProcessorMixin.__init__,
+# which transformers 5.x rejects with `TypeError: Unexpected keyword
+# argument image_use_col_tokens`, so we pin transformers<5.0.
+#
+# transformers 4.57.x requires huggingface-hub>=0.34.0,<1.0; the base
+# image ships huggingface_hub 1.10.0, so we downgrade both.  The SAM3 +
+# Molmo2 stack works fine with huggingface-hub 0.x — sam2 1.1.0 in the
+# base image doesn't use the hf_hub 1.x-specific APIs, so this downgrade
+# is safe.
+#
+# Use --force-reinstall --no-deps so pip doesn't try to "fix" the
+# resolution by upgrading other packages.
+RUN pip install --no-cache-dir --force-reinstall --no-deps \
+        'transformers==4.57.1' \
+        'huggingface-hub==0.34.4'
+
+# ── Verify everything still imports cleanly ─────────────────────────
+RUN python3 -c "\
+import torch; \
+assert 'nv25' in torch.__version__, f'NGC torch was replaced: {torch.__version__}'; \
+print(f'torch:        {torch.__version__}'); \
+import transformers; print(f'transformers: {transformers.__version__}'); \
+from transformers import AutoModelForImageTextToText, AutoProcessor; \
+print('AutoModelForImageTextToText + AutoProcessor: OK'); \
+import accelerate; print(f'accelerate:   {accelerate.__version__}'); \
+import tensorflow; print(f'tensorflow:   {tensorflow.__version__}'); \
+import sam3; print('sam3: OK'); \
+from grasp_gen.grasp_server import GraspGenSampler; print('grasp_gen: OK'); \
+import sam2; print('sam2: OK'); \
+import fastapi; print(f'fastapi:      {fastapi.__version__}'); \
+print('All imports verified.'); \
+"
+
+# ── Keep the base image's ENTRYPOINT (python3 -m vlm_orchestrator.grasp_server).
+# Override the command if you want to launch the servers a different way.
+WORKDIR /opt

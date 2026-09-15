@@ -1,0 +1,47 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vlm-orchestrator"
+version = "0.1.0"
+description = "VLM proxy between robot eval clients and VLA policy servers"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+requires-python = ">=3.10"
+dependencies = [
+    "websockets>=13.0",
+    "msgpack>=1.0",
+    "numpy>=1.24",
+    "openai>=1.0",
+    "opencv-python-headless>=4.8",
+    "pillow>=10.0",
+    "json-numpy>=2.0,<2.1",
+    "pyyaml>=6.0",
+    "pyzmq>=25.0",
+    "requests>=2.28",
+    "aiohttp>=3.9",
+    # scipy is used by vlm_orchestrator/protocols/gr00t_zmq.py
+    # (compute_eef_9d / world_to_base_pose) and grasp/* modules.
+    # Listed explicitly so a bare ``pip install -e .`` pulls it in
+    # automatically.
+    "scipy>=1.10",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff",
+]
+
+[project.scripts]
+vlm-orchestrator = "vlm_orchestrator.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["vlm_orchestrator*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

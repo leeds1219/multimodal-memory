@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+version = 1
+SPDX-PackageName = "VoLo"
+SPDX-PackageSupplier = "NVIDIA CORPORATION & AFFILIATES"
+SPDX-PackageDownloadLocation = "NOASSERTION"
+
+# NOTICE and JSON fixtures cannot carry an inline comment header. Their
+# licensing metadata is expressed here instead.
+[[annotations]]
+path = ["NOTICE", "tests/fixtures/*.json"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved."
+SPDX-License-Identifier = "Apache-2.0"

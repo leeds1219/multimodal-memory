@@ -1,0 +1,43 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.eggs
+dist
+build
+
+# Venvs
+.libero-venv
+.venv
+venv
+
+# Results / logs (large, not needed in image)
+results/
+*.log
+
+# Git
+.git
+.gitignore
+
+# Dev / IDE
+.ruff_cache
+.mypy_cache
+.pytest_cache
+.vscode
+.idea
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Docs and examples (keep code lean)
+docs/
+examples/libero/
+examples/robocasa/
+examples/vlabench/
+examples/droid_sim/
+scripts/

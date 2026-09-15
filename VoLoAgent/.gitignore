@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+__pycache__/
+*.egg-info/
+dist/
+build/
+*.pyc
+.env
+results/
+debug_place/
+debug_grasp/
+debug_perception*
+src/
+.libero-venv/
+.libero*
+.claude
+.robocerebra-venv/
+.pytest_cache/
+.ruff_cache/
+data/
+paper/
+
+# Local presentation artifacts (not part of the source release)
+scripts/generate_volo_orchestrator_slide.py
+volo_vlm_orchestrator_diagram.pptx
