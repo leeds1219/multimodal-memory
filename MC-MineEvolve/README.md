@@ -231,7 +231,8 @@ MineEvolve converts each subgoal execution into typed feedback, induces skills (
 +-----------------------------------------------------+
 ```
 
-See [docs/architecture.md](docs/architecture.md) for a per-module breakdown.
+See [docs/architecture.md](docs/architecture.md) for a per-module breakdown, and
+[docs/fixes.md](docs/fixes.md) for what this vendored copy changes versus upstream and why.
 
 ---
 
