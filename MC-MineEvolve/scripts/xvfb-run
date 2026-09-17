@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# Minimal xvfb-run (Debian-compatible subset) for envs without root access.
+# Usage: xvfb-run [-a] [-s "<Xvfb args>"] <command> [args...]
+set -euo pipefail
+XVFB_ARGS="-screen 0 1024x768x24 -nolisten tcp"
+AUTO=0
+while getopts "as:" opt; do
+  case "$opt" in
+    a) AUTO=1 ;;
+    s) XVFB_ARGS="$OPTARG" ;;
+    *) echo "usage: xvfb-run [-a] [-s args] cmd..." >&2; exit 2 ;;
+  esac
+done
+shift $((OPTIND - 1))
+[ $# -gt 0 ] || { echo "xvfb-run: no command given" >&2; exit 2; }
+
+N=99
+if [ "$AUTO" = 1 ]; then
+  while [ -e "/tmp/.X${N}-lock" ] || [ -e "/tmp/.X11-unix/X${N}" ]; do N=$((N + 1)); done
+fi
+# shellcheck disable=SC2086
+Xvfb ":${N}" $XVFB_ARGS >/dev/null 2>&1 &
+XPID=$!
+trap 'kill "$XPID" 2>/dev/null || true' EXIT
+for _ in $(seq 1 50); do
+  [ -e "/tmp/.X11-unix/X${N}" ] && break
+  kill -0 "$XPID" 2>/dev/null || { echo "xvfb-run: Xvfb failed to start on :${N}" >&2; exit 1; }
+  sleep 0.1
+done
+# Minecraft (LWJGL) dlopens libGL at runtime; make the env's Mesa/glvnd visible
+# even though ldconfig knows nothing about the conda env.
+if [ -n "${CONDA_PREFIX:-}" ]; then
+  export LD_LIBRARY_PATH="${CONDA_PREFIX}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+fi
+DISPLAY=":${N}" "$@"

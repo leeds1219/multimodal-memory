@@ -13,6 +13,21 @@ from minerl.herobraine.hero.handlers.agent.action import Action
 from minerl.herobraine.hero import spaces
 
 
+class _ChatText(spaces.Text):
+    """MineRL 1.0's ``Text`` space is missing the batch arguments that
+    ``Dict.no_op(batch_shape=...)`` / ``Dict.sample(bs)`` pass to every
+    sub-space, so ``env.action_space.noop()`` raises and every chat command
+    issued through it (the reset-time /gamerule list) is silently dropped.
+    Accept and ignore them.
+    """
+
+    def no_op(self, batch_shape=()):
+        return ""
+
+    def sample(self, bs=None):
+        return ""
+
+
 class ChatAction(Action):
     """A simple text-channel action that maps a string to a chat command.
 
@@ -27,4 +42,4 @@ class ChatAction(Action):
 
     def __init__(self) -> None:
         self._command = "chat"
-        super().__init__(self._command, spaces.Text([1]))
+        super().__init__(self._command, _ChatText([1]))

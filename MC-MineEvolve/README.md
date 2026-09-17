@@ -39,7 +39,52 @@ This implementation is **completely independent**: no source files are copied fr
 
 ## Installation
 
-### 1. System prerequisites
+### Quick path (Linux + NVIDIA, conda, no root) — recommended
+
+One script builds the whole `mineevolve` conda env, including Java 8, Xvfb,
+MineRL 1.0.2 and MineStudio, without `sudo`:
+
+```bash
+bash scripts/setup_env.sh        # ~15-25 min, mostly the MineRL/Gradle build
+conda activate mineevolve
+```
+
+Then verify everything except the LLM works (launches Minecraft headless,
+resets, steps 200 random actions, saves a POV frame to `logs/smoke/`):
+
+```bash
+xvfb-run -a python scripts/smoke_test.py
+```
+
+To also verify STEVE-1 inference (GPU), start the server in another shell and
+point the smoke test at it — no API key is needed for this path, the planner
+only warns:
+
+```bash
+CUDA_VISIBLE_DEVICES=2 bash scripts/server.sh &          # loads STEVE-1 (downloads HF weights on first run)
+xvfb-run -a python scripts/smoke_test.py --server http://127.0.0.1:9000 --condition "chop a tree"
+```
+
+Notes:
+- Always run the env-side process (`smoke_test.py`, `run_eval.sh`) under `xvfb-run -a`
+  on a headless machine; the server does not need it.
+- `scripts/setup_env.sh` is idempotent — re-run it to pick up new requirements.
+- If you add a dependency, add it to `requirements.txt` **and** check the script still passes.
+- Pitfalls the script works around (so you don't have to): PyPI's `minerl` is 0.4.x
+  (too old, we need 1.0.x from GitHub); `gym==0.23.1` needs `setuptools<66` to build;
+  MineStudio pins `opencv-python==4.8.0.74`, whose wheel needs `libGL.so.1` / `libgthread`
+  (supplied from conda-forge, no `apt`); headless GL needs Mesa (`mesalib`) on
+  `LD_LIBRARY_PATH`, which the `xvfb-run` shim sets.
+- **MineRL is patched** (`patches/minerl-1.0.2-chat-commands.patch`, applied by
+  `scripts/patch_minerl.sh`, which rebuilds the Minecraft jar). Stock MineRL 1.0 has no
+  `chat` action and creates the world with commands disabled, so every `/gamerule`,
+  `/effect` and `/setblock` this repo issues (`conf/evaluate.yaml::commands`, ore
+  spawning in `env/wrapper.py`) was silently rejected. If you reinstall `minerl`,
+  re-run `bash scripts/patch_minerl.sh`.
+
+### Manual path
+
+#### 1. System prerequisites
 
 - Linux or Windows (WSL2 / native both work).
 - Python **3.10+**.
@@ -47,7 +92,7 @@ This implementation is **completely independent**: no source files are copied fr
 - An NVIDIA GPU is recommended for STEVE-1 inference.
 - `git`, `clang` (Linux) or MSVC build tools (Windows).
 
-### 2. Create environment
+#### 2. Create environment
 
 ```bash
 conda create -n mineevolve python=3.10 -y
@@ -56,20 +101,20 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
-### 3. Install MineRL
+#### 3. Install MineRL
 
 We do not vendor MineRL. Install the official package from the MineRL Labs (the version that supports STEVE-1 weights, e.g. MineRL 1.0.x):
 
 ```bash
-pip install minerl
-# or, if you need the gym-based 0.4.x API:
-# pip install "minerl>=0.4,<1.0"
+# PyPI only hosts MineRL 0.4.x, which lacks the HumanSurvival spec we subclass;
+# install 1.0.x from GitHub (needs Java 8 on PATH; compiles Minecraft, 10-20 min)
+pip install "git+https://github.com/minerllabs/minerl@v1.0.2"
 ```
 
 If you need to (re)build the Java backend yourself, follow MineRL's official docs:
 <https://minerl.readthedocs.io/>.
 
-### 4. Install STEVE-1
+#### 4. Install STEVE-1
 
 Choose **one** of the two paths:
 
@@ -98,7 +143,7 @@ Then download:
 
 See `checkpoints/README.md` for source URLs.
 
-### 5. LLM API keys
+#### 5. LLM API keys
 
 The default backend is **Qwen Plus** via DashScope's OpenAI-compatible endpoint
 (no source change needed — both `conf/evaluate.yaml` and the FastAPI server

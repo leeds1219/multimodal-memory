@@ -28,6 +28,8 @@ from typing import Any, Mapping, Optional
 
 import numpy as np
 
+from ..util.image import decode_pov
+
 
 logger = logging.getLogger("mineevolve.executor.steve_loader")
 
@@ -73,8 +75,7 @@ class NativeSteve1Policy:
         if "pov" not in obs:
             raise RuntimeError("STEVE-1 requires raw MineRL observations with a 'pov' frame.")
         obs = dict(obs)
-        if not isinstance(obs["pov"], np.ndarray):
-            obs["pov"] = np.asarray(obs["pov"], dtype=np.uint8)
+        obs["pov"] = decode_pov(obs["pov"])
         prompt_embed = self._prompt_embeds.get(self._condition_text)
         if prompt_embed is None:
             prompt_embed = self._embed_text(self._condition_text)
@@ -90,20 +91,25 @@ class NativeSteve1Policy:
             return self.prior(prior_input).float().cpu().detach().numpy()
 
 
-def _try_minestudio(ckpt: SteveCheckpoint) -> Optional[Any]:
+def _try_minestudio(ckpt: SteveCheckpoint, device: str = "cuda") -> Optional[Any]:
     try:
         from minestudio.models import load_steve_one_policy  # type: ignore
     except Exception as exc:
         logger.info("MineStudio not available (%s); falling back.", exc)
         return None
     try:
+        import torch  # type: ignore
+
         policy = load_steve_one_policy(
             "CraftJarvis/MineStudio_STEVE-1.official"
         )
+        if str(device).startswith("cuda") and not torch.cuda.is_available():
+            device = "cpu"
+        policy = policy.to(device).eval()
     except Exception as exc:
         logger.warning("MineStudio load_steve_one_policy failed: %s", exc)
         return None
-    logger.info("Loaded STEVE-1 via MineStudio.")
+    logger.info("Loaded STEVE-1 via MineStudio on %s.", device)
     return policy
 
 
@@ -191,7 +197,7 @@ def load_steve_policy(
         prior_weights=prior_weights,
         mineclip_weights=mineclip_weights,
     )
-    policy = _try_minestudio(ckpt) or _try_steve1_pkg(
+    policy = _try_minestudio(ckpt, device=device) or _try_steve1_pkg(
         ckpt,
         device=device,
         cond_scale=cond_scale,

@@ -27,6 +27,7 @@ from .client import MineEvolveClient
 from .executor import CraftHelper, CraftRequest
 from .monitors import StepMonitor, SuccessMonitor
 from .util.evidence import SubgoalEvidenceRecorder, make_subgoal_evidence_dir
+from .util.image import encode_pov_to_base64
 from .util.items import inventory_satisfies
 from .util.logger import info_panel, print_results, setup_logging
 
@@ -321,10 +322,15 @@ def _run_helper_subgoal(
 
 
 def _safe_pov(obs: Any) -> Any:
+    """Wire format for the POV sent to the server each step.
+
+    A base64 PNG is ~50x smaller than ``pov.tolist()`` (6.6 MB of JSON for a
+    640x360 frame), which otherwise dominates the per-step latency.
+    """
     if isinstance(obs, Mapping):
         pov = obs.get("pov")
         if isinstance(pov, np.ndarray):
-            return pov.tolist()
+            return encode_pov_to_base64(pov) or pov.tolist()
     return None
 
 
