@@ -33,8 +33,12 @@ outputs/
 # Hydra default run dir
 multirun/
 
-# Local runtime artefacts
+# Local runtime artefacts (written by main.py / the server on every run)
 **/memories/run_*/
+memories/
+plans/
+evidence/
+resolved_config.yaml
 *.log
 
 # Model weights (download separately, see README.md)

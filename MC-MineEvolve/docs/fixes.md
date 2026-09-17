@@ -107,9 +107,33 @@ to build, MineStudio pins `opencv-python==4.8.0.74` whose wheel needs `libGL`/`g
 (conda-forge), headless GL needs Mesa on `LD_LIBRARY_PATH` (done by `scripts/xvfb-run`;
 without it LWJGL hangs silently at `Backend library: LWJGL`).
 
+## 5. Runtime artifact directories were not git-ignored (`.gitignore`)
+
+`main.py` and the server write `plans/`, `evidence/` (PNG frames + `steps.jsonl`
+per subgoal), `memories/` and `resolved_config.yaml` into the repo directory. Only
+`memories/run_*/` was ignored, so the first real run would have staged megabytes of
+frames. All four are now ignored.
+
+## Debugging without an API (branch `debug/local-llm`)
+
+`scripts/local_llm_server.py` serves a small HF model (default `Qwen/Qwen3.5-2B`,
+fp16, ~4 GB) behind an OpenAI-compatible endpoint; `conf/llm/local.yaml` and
+`scripts/server_local.sh` point MineEvolve at it. See the README section
+"Debugging without an API key". Verified: one wooden task runs through the whole
+Algorithm 1 loop (initial plan → STEVE-1 execution → Monitor feedback → Inducer →
+Adaptor repair → abort after 3 consecutive failures) with zero API calls.
+
+**Observation (upstream behaviour, not changed):** the inducer/repair prompts grow
+with the feedback history — 2.3k tokens for the initial plan, 7.5k by the 4th LLM
+call, ~14k by the 8th, within a single 2-minute wooden task. `runtime.budget_tokens`
+(paper Eq. 7) only bounds the *retrieved knowledge*, not the feedback buffer. This
+is a cost problem with paid APIs (input tokens dominate) and a memory problem for
+local models (~10k tokens is the ceiling on an 11 GB GPU, hence `--truncate-prompt`).
+Worth capping in `server/agent.py` before running the full 70-task benchmark.
+
 ## Not yet verified
 
-- The LLM path (planner / inducer / curator / adaptor) — needs an API key.
+- The LLM path with a real API model (only exercised with a local 2B model; see above).
 - The original `steve1` package fallback in `steve_loader.py`.
 - Full benchmark runs (`scripts/run_eval.sh`); only a 600-step "chop a tree" episode was
   exercised.

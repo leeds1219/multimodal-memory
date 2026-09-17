@@ -1,0 +1,11 @@
+# @package _global_
+# Local open-weights model served by scripts/local_llm_server.py (no API key).
+# Start it first:  CUDA_VISIBLE_DEVICES=3 python scripts/local_llm_server.py --model Qwen/Qwen3.5-2B
+llm:
+  provider: openai_compat
+  model: local          # the local server ignores the model name
+  base_url: http://127.0.0.1:8001/v1
+  api_key: local        # any non-empty string; the local server does not check it
+  timeout: 300.0        # small models on one GPU are slow on long prompts
+  temperature: 0.2
+  max_tokens: 1024

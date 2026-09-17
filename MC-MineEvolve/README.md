@@ -165,6 +165,35 @@ export OPENAI_API_KEY=...     # then: llm=gpt_5_5
 
 ---
 
+## Debugging without an API key (local open-weights model)
+
+Everything after the environment — planner, inducer, curator, adaptor — normally
+needs a paid API. For debugging the code path you can run a small open model
+instead; MineEvolve is untouched, it just talks to a local OpenAI-compatible
+server (`scripts/local_llm_server.py`) through the same `openai_compat` backend.
+
+```bash
+# shell 1: local LLM (≈4 GB VRAM for Qwen3.5-2B in fp16, ~25 tok/s on a 2080 Ti)
+CUDA_VISIBLE_DEVICES=3 python scripts/local_llm_server.py --model Qwen/Qwen3.5-2B --truncate-prompt
+
+# shell 2: MineEvolve server pointed at it (STEVE-1 on its own GPU)
+CUDA_VISIBLE_DEVICES=2 bash scripts/server_local.sh
+
+# shell 3: one wooden task through the full Algorithm 1 loop
+xvfb-run -a python -m mineevolve.main benchmark=wooden llm=local evaluate='[8]'
+```
+
+Artifacts land in `plans/` (initial + repaired plans), `evidence/` (per-subgoal
+frames and step logs) and `memories/` (skill/remedy store) — all git-ignored.
+
+Expectations: a 2B model will *not* solve tasks; it produces plausible-looking
+plans and repairs that let you watch every branch (parse failures, repeated
+failures → Adaptor repair, "abort after 3 consecutive failures", …) for free.
+Prompts grow with the feedback history (7.5k tokens by the 4th call); on an 11 GB
+GPU ~10k tokens is the ceiling, hence `--truncate-prompt` (or `--max-prompt-tokens`
+to just reject long prompts with a 413). `--model Qwen/Qwen3.5-0.8B` is faster and
+smaller if you only care about plumbing; `--think` enables Qwen's thinking mode.
+
 ## Running
 
 ### Start the FastAPI server (one-time, GPU)
@@ -205,7 +234,7 @@ Per-task and aggregate results are printed via `rich.Table`. Per-episode logs an
 `conf/benchmark/<group>.yaml::evaluate` selects task ids; leave it `[]` for all 70 tasks. To run iron tasks #2 and #5 only:
 
 ```bash
-python -m mineevolve.main benchmark=iron benchmark.evaluate='[2, 5]'
+python -m mineevolve.main benchmark=iron evaluate='[2, 5]'
 ```
 
 (Default `llm=qwen_plus` is taken from `conf/evaluate.yaml`; override with
