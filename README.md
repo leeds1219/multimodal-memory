@@ -19,3 +19,21 @@ cd MC-MineEvolve && uv venv .venv --python 3.10 \
 # VoLoAgent (Python 3.11)
 cd VoLoAgent && uv venv .venv --python 3.11 && uv pip install -e ".[dev]"
 ```
+
+## Linux + GPU servers (conda)
+
+One conda env per sub-project; never install into `base`. Env names are fixed so
+everyone's shell looks the same:
+
+| Sub-project | Env | Setup |
+|-------------|-----|-------|
+| `MC-MineEvolve/` | `mineevolve` (py3.10) | `bash MC-MineEvolve/scripts/setup_env.sh` — installs Java 8, Xvfb, MineRL 1.0.2, MineStudio, torch; no root needed |
+| `VoLoAgent/` | `volo` (py3.11) | `conda create -n volo python=3.11 && conda activate volo && pip install -e "VoLoAgent[dev]"` |
+
+Smoke-test MC-MineEvolve without any LLM key: `conda activate mineevolve && cd MC-MineEvolve && xvfb-run -a python scripts/smoke_test.py`.
+
+On shared boxes, point pip / HF / torch / conda caches at the big data volume instead
+of `$HOME` (e.g. `PIP_CACHE_DIR`, `HF_HOME`, `TORCH_HOME`, `CONDA_ENVS_DIRS`, `CONDA_PKGS_DIRS`).
+
+See `CLAUDE.md` for the repo rules (branching, envs, what not to commit) and
+`CONTRIBUTING.md` for the PR workflow.
