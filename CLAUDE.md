@@ -17,7 +17,7 @@ things that concern the whole repo only.
 
 ## Git rules
 
-1. **Never commit or push directly to `main`.** Always work on a branch and open a PR.
+1. **Never push to `main`.** Work on a branch, push the branch freely, and merge via PR.
    Branch names: `feature/…`, `fix/…`, `docs/…`, `refactor/…`, `experiment/…`.
 2. **Never force-push** to a shared branch, and never rewrite history on `main`.
 3. `git pull` on `main` before branching so you start from the latest code.
@@ -58,6 +58,6 @@ things that concern the whole repo only.
 
 - Read the sub-project README and `scripts/` before proposing a setup.
 - Activate the right conda env / venv before running anything for that sub-project.
-- Never run `git push` to `main`, `git push --force`, or `git reset --hard` on shared
-  branches; never commit without being asked.
+- Never push to `main`, never `git push --force`, never `git reset --hard` on shared
+  branches. Committing and pushing to a feature branch is fine when asked.
 - Do not run large jobs on GPUs 0–1 without checking they are free.
