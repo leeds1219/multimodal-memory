@@ -13,15 +13,25 @@ Run from the ``mineevolve`` env, on a headless box wrap with xvfb-run::
     bash scripts/server.sh &                                   # (in another shell, GPU)
     xvfb-run -a python scripts/smoke_test.py --server http://127.0.0.1:9000
 
+Every run is recorded under ``--out`` (default ``logs/smoke/run-<timestamp>``)::
+
+    summary.json        mode, condition, timings, inventory delta, pass/fail
+    trajectory.jsonl    one line per step: coords, health, hunger, inventory, action keys
+    frames/step_*.png   POV every ``--frame-every`` steps (+ reset / final)
+
+Render it with ``python scripts/plot_smoke.py <run dir>``.
+
 Exit code 0 means every stage that was attempted passed.
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import sys
 import time
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np
@@ -49,14 +59,44 @@ def _inventory(info: dict) -> dict:
     return {k: int(v) for k, v in (info.get("inventory") or {}).items() if int(v) > 0}
 
 
+def _pressed(action: dict) -> list[str]:
+    """Names of the binary keys held this step (camera / chat are logged separately)."""
+    keys = []
+    for k, v in action.items():
+        if k == "camera" or isinstance(v, str):
+            continue
+        v = np.asarray(v)
+        if v.ndim == 0 and v.dtype.kind in "biu" and int(v) != 0:
+            keys.append(k)
+    return sorted(keys)
+
+
+def _step_record(i: int, t: float, action: dict, info: dict, done: bool) -> dict:
+    cam = np.asarray(action.get("camera", [0.0, 0.0]), dtype=float).ravel().tolist()
+    return {
+        "step": i,
+        "t": round(t, 3),
+        "coords": [float(c) for c in (info.get("coords") or [])],
+        "health": info.get("health"),
+        "hunger": info.get("hunger"),
+        "inventory": _inventory(info),
+        "keys": _pressed(action),
+        "camera": [round(c, 2) for c in cam],
+        "done": bool(done),
+    }
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--benchmark", default="wooden", help="conf/benchmark/<name>.yaml")
     ap.add_argument("--steps", type=int, default=200, help="env steps to run after reset")
     ap.add_argument("--server", default=None, help="MineEvolve server URL; omit for random actions")
     ap.add_argument("--condition", default="chop a tree", help="STEVE-1 text condition (server mode)")
-    ap.add_argument("--out", default="logs/smoke", help="where to drop a POV frame")
+    ap.add_argument("--out", default=None, help="run dir (default logs/smoke/run-<timestamp>)")
+    ap.add_argument("--frame-every", type=int, default=10, help="save a POV frame every N steps (0 = only reset/final)")
     args = ap.parse_args()
+    if args.out is None:
+        args.out = f"logs/smoke/run-{datetime.now():%Y%m%d-%H%M%S}"
 
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
@@ -73,28 +113,46 @@ def main() -> int:
     from mineevolve.env import make_env
     from mineevolve.main import _safe_pov
 
+    out = Path(args.out)
+    frames = out / "frames"
+    frames.mkdir(parents=True, exist_ok=True)
+    summary: dict = {
+        "started": datetime.now().isoformat(timespec="seconds"),
+        "mode": "server STEVE-1" if args.server else "random actions",
+        "server": args.server,
+        "condition": args.condition if args.server else None,
+        "benchmark": args.benchmark,
+        "env": cfg.env.name,
+        "steps_requested": args.steps,
+        "passed": False,
+    }
+
+    def _finish(code: int, error: str | None = None) -> int:
+        summary["passed"] = code == 0
+        summary["error"] = error
+        (out / "summary.json").write_text(json.dumps(summary, indent=2))
+        logger.info("run dir: %s", out)
+        return code
+
     t0 = time.time()
     env = make_env(cfg, logger=logger)
     logger.info("gym.make OK (%.1fs); launching Minecraft, first reset can take a few minutes...", time.time() - t0)
     t0 = time.time()
     obs = env.reset()
-    logger.info("reset OK in %.1fs", time.time() - t0)
+    summary["reset_s"] = round(time.time() - t0, 1)
+    logger.info("reset OK in %.1fs", summary["reset_s"])
 
     pov = obs.get("pov") if isinstance(obs, dict) else None
     if not isinstance(pov, np.ndarray) or pov.ndim != 3:
         logger.error("unexpected obs: keys=%s", list(obs) if isinstance(obs, dict) else type(obs))
-        return 1
+        return _finish(1, "unexpected obs")
     logger.info("obs keys=%s pov=%s inventory=%s", sorted(obs), pov.shape, _inventory(env.info))
+    summary["pov_shape"] = list(pov.shape)
 
-    out = Path(args.out)
-    out.mkdir(parents=True, exist_ok=True)
-    try:
-        from PIL import Image
+    from PIL import Image
 
-        Image.fromarray(pov).save(out / "reset_pov.png")
-        logger.info("saved %s", out / "reset_pov.png")
-    except Exception as exc:  # pragma: no cover - cosmetic
-        logger.warning("could not save POV frame: %s", exc)
+    Image.fromarray(pov).save(frames / "step_0000.png")
+    logger.info("saved %s", frames / "step_0000.png")
 
     # --- stage 2: step (server STEVE-1 if available, else random) ---------------
     client = None
@@ -107,34 +165,45 @@ def main() -> int:
         client.reset(task_goal=args.condition)
 
     start_inv = _inventory(env.info)
+    summary["inventory_start"] = start_inv
     rng = np.random.default_rng(0)
     ok_steps = 0
     t0 = time.time()
-    for i in range(args.steps):
-        if client is not None:
-            r = client.action(condition=args.condition, obs={"pov": _safe_pov(obs), "image": None})
-            action = r.get("action")
-            if action is None:
-                logger.error("server returned no action: %s", r.get("error"))
-                env.close()
-                return 2
-        else:
-            action = _random_action(env, rng)
-        obs, _r, done, info = env.step(action)
-        ok_steps += 1
-        if (i + 1) % 50 == 0:
-            logger.info("step %d  coords=%s inv=%s", i + 1, info.get("coords"), _inventory(info))
-        if done:
-            logger.info("episode ended at step %d", i + 1)
-            break
+    traj = (out / "trajectory.jsonl").open("w")
+    traj.write(json.dumps(_step_record(0, 0.0, env.action_space.noop(), env.info, False)) + "\n")
+    try:
+        for i in range(args.steps):
+            if client is not None:
+                r = client.action(condition=args.condition, obs={"pov": _safe_pov(obs), "image": None})
+                action = r.get("action")
+                if action is None:
+                    logger.error("server returned no action: %s", r.get("error"))
+                    env.close()
+                    return _finish(2, f"server returned no action: {r.get('error')}")
+            else:
+                action = _random_action(env, rng)
+            obs, _r, done, info = env.step(action)
+            ok_steps += 1
+            traj.write(json.dumps(_step_record(i + 1, time.time() - t0, action, info, done)) + "\n")
+            if args.frame_every and (i + 1) % args.frame_every == 0:
+                Image.fromarray(obs["pov"]).save(frames / f"step_{i + 1:04d}.png")
+            if (i + 1) % 50 == 0:
+                logger.info("step %d  coords=%s inv=%s", i + 1, info.get("coords"), _inventory(info))
+            if done:
+                logger.info("episode ended at step %d", i + 1)
+                break
+    finally:
+        traj.close()
     dt = time.time() - t0
-    logger.info("%d steps in %.1fs (%.1f steps/s)", ok_steps, dt, ok_steps / max(dt, 1e-6))
-    logger.info("inventory delta: %s -> %s", start_inv, _inventory(env.info))
+    summary.update(steps=ok_steps, step_s=round(dt, 1), steps_per_s=round(ok_steps / max(dt, 1e-6), 2))
+    summary["inventory_end"] = _inventory(env.info)
+    logger.info("%d steps in %.1fs (%.1f steps/s)", ok_steps, dt, summary["steps_per_s"])
+    logger.info("inventory delta: %s -> %s", start_inv, summary["inventory_end"])
 
-    Image.fromarray(obs["pov"]).save(out / "final_pov.png")
+    Image.fromarray(obs["pov"]).save(frames / f"step_{ok_steps:04d}.png")
     env.close()
-    logger.info("SMOKE TEST PASSED (%s)", "server STEVE-1" if client else "random actions")
-    return 0
+    logger.info("SMOKE TEST PASSED (%s)", summary["mode"])
+    return _finish(0)
 
 
 if __name__ == "__main__":

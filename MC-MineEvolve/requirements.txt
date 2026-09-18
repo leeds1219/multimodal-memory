@@ -3,6 +3,7 @@ torch>=2.0.0
 numpy>=1.21,<2.0
 opencv-python>=4.5
 Pillow>=9.0
+matplotlib>=3.7   # scripts/plot_smoke.py
 
 # Minecraft platform - install official MineRL separately if you do not use MineStudio
 # (MineRL has its own Java + MCP-Reborn build steps; see docs in the official repo)
