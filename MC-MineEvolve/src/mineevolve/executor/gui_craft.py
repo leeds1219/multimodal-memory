@@ -314,6 +314,8 @@ class GuiCraftController:
                     self.pickup_table()
             except RuntimeError as exc:
                 logger.warning("craft %s failed: %s", target, exc)
+                if "episode ended" in str(exc):
+                    raise
                 self.close_gui()
             have = sum(q for n, q in self.slots().values() if n == target)
             if have - have0 >= count:
@@ -485,6 +487,8 @@ class GuiCraftController:
             self.close_gui()
         except RuntimeError as exc:
             logger.warning("smelt %s failed: %s", target, exc)
+            if "episode ended" in str(exc):
+                raise
             self.close_gui()
         # recover the furnace (needs a pickaxe)
         pick = next((p for p in ("diamond_pickaxe", "iron_pickaxe", "stone_pickaxe", "wooden_pickaxe", "golden_pickaxe") if self._find(p) is not None), None)

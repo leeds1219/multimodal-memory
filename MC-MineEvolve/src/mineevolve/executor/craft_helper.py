@@ -34,6 +34,7 @@ class CraftHelper:
     def __init__(self, env: Any) -> None:
         self.env = env
         self.last_steps = 0
+        self.episode_ended = False  # the env returned done while the GUI script was stepping it
 
     # ------------------------------------------------------------------
     # Public API
@@ -64,6 +65,8 @@ class CraftHelper:
             except Exception as exc:
                 logger.warning("GUI crafting of %s failed: %s", req.target, exc)
                 ok = False
+                if "episode ended" in str(exc):
+                    self.episode_ended = True
             finally:
                 self.last_steps = ctl.steps
                 try:  # the controller stepped the inner env; refresh the wrapper's status/inventory view

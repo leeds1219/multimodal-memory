@@ -324,6 +324,7 @@ def _run_helper_subgoal(
         )
     )
     helper_steps = int(getattr(helper, "last_steps", 0) or 0)
+    helper_died = bool(getattr(helper, "episode_ended", False))
 
     end_info = env.info or {}
     end_inv = dict(end_info.get("inventory") or {})
@@ -377,7 +378,7 @@ def _run_helper_subgoal(
     return {
         "success": bool(success),
         "timed_out": False,
-        "died": False,
+        "died": helper_died,  # env done during the GUI script -> the episode loop stops
         "steps": helper_steps,
         "delta_v": delta_v,
         "delta_s": delta_s,
