@@ -106,6 +106,20 @@ def _move_script(env, params: Mapping[str, Any]):
         yield a
 
 
+def _ypos_check_ok(subgoal: Mapping[str, Any], info: Mapping[str, Any]) -> bool:
+    """True if the subgoal carries a ypos_le / ypos_ge check and the agent satisfies it."""
+    checks = [c for c in (subgoal.get("checks") or []) if isinstance(c, Mapping) and c.get("type") in ("ypos_le", "ypos_ge")]
+    if not checks:
+        return False
+    y = info.get("ypos")
+    if y is None:
+        coords = info.get("coords") or []
+        y = coords[1] if len(coords) == 3 else None
+    if y is None:
+        return False
+    return all((float(y) <= float(c.get("n", 0))) if c["type"] == "ypos_le" else (float(y) >= float(c.get("n", 0))) for c in checks)
+
+
 def _moved_threshold(subgoal: Mapping[str, Any]) -> float | None:
     for c in subgoal.get("checks") or []:
         if isinstance(c, Mapping) and c.get("type") == "moved":
@@ -227,7 +241,7 @@ def _run_subgoal(
                 current_subgoal_done=bool(env.current_subgoal_done),
             )
 
-        if env.current_subgoal_done:
+        if env.current_subgoal_done or _ypos_check_ok(subgoal, info):
             success = True
             break
         if done:
@@ -468,7 +482,7 @@ def run_episode(
     while i < min(len(subgoals), max_subgoals):
         sg = subgoals[i]
         executor_hint = str(sg.get("executor_hint") or "stevei").strip().lower()
-        if executor_hint in {"mc_craft", "mc_smelt", "place", "use"}:
+        if executor_hint in {"mc_craft", "mc_smelt", "place", "use", "equip"}:
             result = _run_helper_subgoal(
                 env=env,
                 subgoal=sg,

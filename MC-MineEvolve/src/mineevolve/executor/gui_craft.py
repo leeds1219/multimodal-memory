@@ -51,6 +51,15 @@ def _centres(spec: dict) -> List[Tuple[int, int]]:
     return [(x0 + c * w + w // 2, y0 + r * h + h // 2) for r in range(spec["rows"]) for c in range(spec["cols"])]
 
 
+_FURNACE_INPUT, _FURNACE_FUEL, _FURNACE_RESULT = (295, 125), (295, 152), (356, 139)
+# fuel item -> items smelted per unit (vanilla burn time / 200 ticks)
+FUELS = {"coal": 8, "charcoal": 8, "coal_block": 80, "oak_log": 1.5, "birch_log": 1.5, "spruce_log": 1.5,
+         "jungle_log": 1.5, "acacia_log": 1.5, "dark_oak_log": 1.5, "oak_planks": 1.5, "birch_planks": 1.5,
+         "spruce_planks": 1.5, "jungle_planks": 1.5, "acacia_planks": 1.5, "dark_oak_planks": 1.5,
+         "crafting_table": 1.5, "stick": 0.5, "wooden_pickaxe": 1, "wooden_axe": 1, "wooden_shovel": 1,
+         "wooden_sword": 1, "wooden_hoe": 1, "oak_sapling": 0.5}
+SMELT_TICKS = 200
+
 INV_SLOT_PX = {i: p for i, p in enumerate(_centres(_HOTBAR))}          # slots 0-8
 INV_SLOT_PX.update({9 + i: p for i, p in enumerate(_centres(_MAIN))})  # slots 9-35
 GRID_PX = {2: _centres(_INV_GRID), 3: _centres(_TABLE_GRID)}
@@ -88,6 +97,14 @@ class Recipes:
         if "tag" in ingredient:
             return list(self.tags.get(ingredient["tag"].replace("minecraft:", ""), []))
         return []
+
+    def find_smelting(self, target: str) -> List[dict]:
+        target = target.replace("minecraft:", "")
+        out = []
+        for r in self.recipes.values():
+            if r.get("type") == "minecraft:smelting" and str(r.get("result", "")).replace("minecraft:", "") == target:
+                out.append(r)
+        return out
 
     def find(self, target: str) -> List[dict]:
         """Crafting recipes producing ``target`` (vanilla names, e.g. wooden_pickaxe)."""
@@ -360,3 +377,123 @@ class GuiCraftController:
         self._step(self._noop(), 3)
         if self._find(target) is None:
             raise RuntimeError(f"{target} did not appear in the inventory")
+
+    # -- equip -------------------------------------------------------------
+    def equip(self, item: str) -> bool:
+        """Put ``item`` in the hotbar (moving it there through the GUI if needed) and select it."""
+        item = item.replace("minecraft:", "")
+        self._step(self._noop(), 3)
+        slot = self._find(item)
+        if slot is None:
+            logger.warning("equip %s: not in inventory", item)
+            return False
+        if slot > 8:
+            used = set(self.slots())
+            dst = next((i for i in range(9) if i not in used), 0)
+            self.open_inventory()
+            self._swap_to_hotbar(slot, dst)
+            self.close_gui()
+            slot = dst if self._find(item) == dst else self._find(item)
+            if slot is None or slot > 8:
+                return False
+        self._key(f"hotbar.{slot + 1}", settle=3)
+        eq = self.obs.get("equipped_items", {})
+        main = eq.get("mainhand", {}) if isinstance(eq, dict) else {}
+        held = str(main.get("type", "")) if isinstance(main, dict) else ""
+        return held == item or held == ""  # some builds report the item only on the next tick
+
+    # -- smelting ------------------------------------------------------------
+    def _place_block_under_feet(self, item: str) -> bool:
+        slot = self._find(item)
+        if slot is None:
+            return False
+        if slot > 8:
+            self.open_inventory(); self._swap_to_hotbar(slot, 0); self.close_gui(); slot = 0
+        self._key(f"hotbar.{slot + 1}", settle=2)
+        a = self._noop(); a["camera"] = np.array([88.0, 0.0], dtype=np.float32); self._step(a, 2)
+        a = self._noop(); a["jump"] = np.array(1); self._step(a, 1)
+        a = self._noop(); a["use"] = np.array(1); self._step(a, 1)
+        self._step(self._noop(), 4)
+        return True
+
+    def _open_block_under_feet(self) -> bool:
+        for _ in range(4):
+            self._key("use", settle=5)
+            if self.gui_open():
+                self.cursor = [WIDTH // 2, HEIGHT // 2]
+                return True
+        return False
+
+    def _break_block_under_feet(self, item: str, max_ticks: int = 400):
+        """Attack the block below (still looking down) until ``item`` is back in the inventory."""
+        before = sum(q for n, q in self.slots().values() if n == item)
+        a = self._noop(); a["attack"] = np.array(1)
+        for _ in range(max_ticks):
+            self._step(a)
+            if sum(q for n, q in self.slots().values() if n == item) > before:
+                break
+        self._step(self._noop(), 15)
+        a = self._noop(); a["camera"] = np.array([-88.0, 0.0], dtype=np.float32); self._step(a, 2)
+
+    def smelt(self, target: str, count: int = 1) -> bool:
+        """Smelt ``count`` of ``target`` in the agent's own furnace (placed under the feet).
+
+        Needs: a furnace, the ore/raw item, and fuel (see FUELS) in the inventory.
+        Each item takes 200 ticks. The furnace is picked back up afterwards when a
+        pickaxe is available (breaking it by hand drops nothing).
+        """
+        target = target.replace("minecraft:", "")
+        self._step(self._noop(), 4)
+        have0 = sum(q for n, q in self.slots().values() if n == target)
+        recipes = self.recipes.find_smelting(target)
+        if not recipes:
+            logger.warning("no smelting recipe for %s", target); return False
+        inv = {}
+        for _, (n, q) in self.slots().items():
+            inv[n] = inv.get(n, 0) + q
+        raw = next((o for r in recipes for o in self.recipes.options(r["ingredient"]) if inv.get(o, 0) >= count), None)
+        if raw is None:
+            logger.warning("smelt %s: no raw material for it in the inventory", target); return False
+        fuel = next((f for f in sorted(FUELS, key=lambda f: -FUELS[f]) if inv.get(f, 0) * FUELS[f] >= count
+                     and f not in (raw, target) and not (f.endswith("_pickaxe") and inv.get(f, 0) <= 1)), None)
+        if fuel is None:
+            logger.warning("smelt %s: no fuel in the inventory", target); return False
+        n_fuel = int(math.ceil(count / FUELS[fuel]))
+        if inv.get("furnace", 0) < 1:
+            logger.warning("smelt %s: no furnace in the inventory", target); return False
+        logger.info("smelt %s x%d from %s with %d %s", target, count, raw, n_fuel, fuel)
+        try:
+            if not self._place_block_under_feet("furnace") or not self._open_block_under_feet():
+                raise RuntimeError("could not place/open the furnace")
+            # raw material -> input slot, fuel -> fuel slot
+            for item, qty, px in ((raw, count, _FURNACE_INPUT), (fuel, n_fuel, _FURNACE_FUEL)):
+                src = self._find(item)
+                if src is None:
+                    raise RuntimeError(f"ran out of {item}")
+                have = self.slots()[src][1]
+                self.move_to(*INV_SLOT_PX[src]); self.left_click()
+                self.move_to(*px); self.right_click(min(qty, have))
+                if have > qty:
+                    self.move_to(*INV_SLOT_PX[src]); self.left_click()
+            # wait for the smelt, then take the output
+            self._step(self._noop(), SMELT_TICKS * count + 20)
+            self.move_to(*_FURNACE_RESULT); self._key("attack", settle=5)
+            dst = self._empty_slot()
+            if dst is None:
+                raise RuntimeError("inventory full")
+            self.move_to(*INV_SLOT_PX[dst]); self.left_click(); self._step(self._noop(), 3)
+            self.close_gui()
+        except RuntimeError as exc:
+            logger.warning("smelt %s failed: %s", target, exc)
+            self.close_gui()
+        # recover the furnace (needs a pickaxe)
+        pick = next((p for p in ("diamond_pickaxe", "iron_pickaxe", "stone_pickaxe", "wooden_pickaxe", "golden_pickaxe") if self._find(p) is not None), None)
+        if pick:
+            self.equip(pick)
+            a = self._noop(); a["camera"] = np.array([88.0, 0.0], dtype=np.float32); self._step(a, 2)
+            self._break_block_under_feet("furnace")
+        else:
+            a = self._noop(); a["camera"] = np.array([-88.0, 0.0], dtype=np.float32); self._step(a, 2)
+            logger.warning("smelt: no pickaxe, furnace left behind")
+        return sum(q for n, q in self.slots().values() if n == target) - have0 >= count
+

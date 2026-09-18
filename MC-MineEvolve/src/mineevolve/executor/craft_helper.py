@@ -3,7 +3,8 @@
 ``mc_craft`` drives the real inventory / crafting-table GUI through
 ``gui_craft.GuiCraftController`` (upstream's version only played a sound and
 polled the inventory, so no crafting task could ever succeed). ``mc_smelt``
-is still the polling stub - no furnace controller yet. No /give shortcuts.
+places and drives the agent's furnace, ``equip`` moves an item to the hotbar
+and selects it. No /give shortcuts.
 """
 
 from __future__ import annotations
@@ -41,7 +42,7 @@ class CraftHelper:
     def execute(self, req: CraftRequest) -> bool:
         """Execute a CraftRequest. Returns True iff target item count reached."""
 
-        if req.kind not in ("mc_craft", "mc_smelt", "place", "use"):
+        if req.kind not in ("mc_craft", "mc_smelt", "place", "use", "equip"):
             logger.warning("Unknown craft kind %s", req.kind)
             return False
 
@@ -49,12 +50,17 @@ class CraftHelper:
         deadline = time.monotonic() + max(1.0, float(req.timeout_s))
         self.last_steps = 0
 
-        if req.kind == "mc_craft":
+        if req.kind in ("mc_craft", "mc_smelt", "equip"):
             from .gui_craft import GuiCraftController
 
             ctl = GuiCraftController(self.env)
             try:
-                ok = ctl.craft(req.target, int(req.quantity))
+                if req.kind == "mc_craft":
+                    ok = ctl.craft(req.target, int(req.quantity))
+                elif req.kind == "mc_smelt":
+                    ok = ctl.smelt(req.target, int(req.quantity))
+                else:
+                    ok = ctl.equip(req.target)
             except Exception as exc:
                 logger.warning("GUI crafting of %s failed: %s", req.target, exc)
                 ok = False

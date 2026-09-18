@@ -44,6 +44,19 @@ def main() -> int:
         Image.fromarray(ctl.obs["pov"]).save(out / f"after_{target}.png")
         print(f"{'PASS' if res else 'FAIL'} craft {target} x{n}  ({ctl.steps - s0} steps, {time.time() - t0:.1f}s)  inventory={ctl.slots()}")
         ok &= res
+    # smelting + equip (furnace, ore and coal given for the TEST ONLY)
+    env.execute_cmd("/give @s minecraft:furnace 1"); env.execute_cmd("/give @s minecraft:iron_ore 2"); env.execute_cmd("/give @s minecraft:coal 1")
+    for _ in range(10):
+        env.step(env.action_space.noop())
+    t0, s0 = time.time(), ctl.steps
+    res = ctl.equip("wooden_pickaxe")
+    print(f"{'PASS' if res else 'FAIL'} equip wooden_pickaxe  ({ctl.steps - s0} steps)  mainhand={ctl.obs.get('equipped_items', {}).get('mainhand')}")
+    ok &= res
+    t0, s0 = time.time(), ctl.steps
+    res = ctl.smelt("iron_ingot", 2)
+    Image.fromarray(ctl.obs["pov"]).save(out / "after_smelt.png")
+    print(f"{'PASS' if res else 'FAIL'} smelt iron_ingot x2  ({ctl.steps - s0} steps, {time.time() - t0:.1f}s)  inventory={ctl.slots()}")
+    ok &= res
     env.close()
     print("CRAFT TEST", "PASSED" if ok else "FAILED")
     return 0 if ok else 1

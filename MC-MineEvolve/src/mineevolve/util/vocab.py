@@ -60,7 +60,13 @@ EXECUTOR_HINT_DESCRIPTIONS: dict[str, str] = {
         "vanilla recipe). Needs the ingredients first (e.g. oak_log -> oak_planks -> stick); a 3x3 recipe "
         "additionally needs a crafting_table in the inventory."
     ),
-    "mc_smelt": "the smelting helper; opens a furnace and polls inventory for the smelted item.",
+    "mc_smelt": (
+        "scripted smelting: places the agent's furnace, loads the raw item (from the `inv_ge` target's "
+        "smelting recipe, e.g. iron_ore -> iron_ingot) and fuel (coal/charcoal/logs/planks), waits 200 ticks "
+        "per item, takes the output and picks the furnace back up (needs a pickaxe). Needs furnace + raw "
+        "item + fuel in the inventory first."
+    ),
+    "equip": "put the `inv_ge` item (a tool/weapon already in the inventory) into the hotbar and hold it, e.g. before mining stone with a wooden_pickaxe.",
     "wait": "no executor is invoked; the wrapper just consumes ticks.",
     "move": (
         "deterministic navigation primitive, no policy involved: turns by `params.yaw_deg` "

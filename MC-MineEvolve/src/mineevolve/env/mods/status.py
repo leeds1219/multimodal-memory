@@ -72,6 +72,14 @@ class StatusMod:
         plain = obs.get("plain_inventory")
         if isinstance(plain, Mapping):
             self._plain_inventory = {int(k): dict(v) for k, v in plain.items() if isinstance(v, Mapping)}
+        elif obs.get("inventory_slots") is not None:
+            # per-slot view from our SlotInventoryObservation (jar patch); upstream
+            # expected a "plain_inventory" key that MineRL never produced.
+            from ..slot_inventory import decode_slots
+
+            self._plain_inventory = {
+                slot: {"type": name, "quantity": qty} for slot, (name, qty) in decode_slots(obs["inventory_slots"]).items()
+            }
 
     # ------------------------------------------------------------------
     # Snapshot accessors used by other modules
