@@ -9,6 +9,15 @@ Workspace grouping two codebases:
 
 Each folder is a plain copy (upstream `.git` removed); see each folder's own README for setup.
 
+## API keys
+
+```bash
+cp .env.example .env      # .env is git-ignored; paste your own keys into it
+```
+
+`MC-MineEvolve/scripts/server*.sh` load `.env` on start (`GOOGLE_API_KEY` for Gemini,
+`DASHSCOPE_API_KEY` for Qwen, …). Never commit `.env` or put a key in a config file.
+
 ## Local environments (macOS, via [uv](https://docs.astral.sh/uv/))
 
 ```bash

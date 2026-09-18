@@ -50,11 +50,17 @@ conda activate mineevolve
 ```
 
 Then verify everything except the LLM works (launches Minecraft headless,
-resets, steps 200 random actions, saves a POV frame to `logs/smoke/`):
+resets, steps 200 random actions, records the run under `logs/smoke/run-<timestamp>/`):
 
 ```bash
 xvfb-run -a python scripts/smoke_test.py
+python scripts/plot_smoke.py            # -> logs/smoke/run-<latest>/summary.png
 ```
+
+Each run dir holds `summary.json` (timings, inventory delta, pass/fail),
+`trajectory.jsonl` (per-step coords / health / hunger / inventory / keys held) and
+`frames/step_*.png` (POV every 10 steps; `--frame-every N` to change). `plot_smoke.py`
+renders those into one PNG: frame strip, keys-held raster, distance / health / items.
 
 To also verify STEVE-1 inference (GPU), start the server in another shell and
 point the smoke test at it — no API key is needed for this path, the planner
@@ -186,6 +192,14 @@ xvfb-run -a python -m mineevolve.main benchmark=wooden llm=local evaluate='[8]'
 Artifacts land in `plans/` (initial + repaired plans), `evidence/` (per-subgoal
 frames and step logs) and `memories/` (skill/remedy store) — all git-ignored.
 
+To see what the same traffic would cost on the API backends, point
+`scripts/llm_usage.py` at the local LLM server's log (token totals + a per-model
+cost table; `--tasks 11` scales one task to the wooden tier):
+
+```bash
+python scripts/llm_usage.py llm.log --tasks 11
+```
+
 Expectations: a 2B model will *not* solve tasks; it produces plausible-looking
 plans and repairs that let you watch every branch (parse failures, repeated
 failures → Adaptor repair, "abort after 3 consecutive failures", …) for free.
@@ -199,10 +213,14 @@ smaller if you only care about plumbing; `--think` enables Qwen's thinking mode.
 ### Start the FastAPI server (one-time, GPU)
 
 ```bash
-bash scripts/server.sh
+bash scripts/server.sh            # Qwen via DashScope (default), needs DASHSCOPE_API_KEY
+bash scripts/server_gemini.sh     # Gemini 3 Flash (preview), needs GOOGLE_API_KEY (sets provider+model+base_url together)
 # Windows:
 scripts\server.bat
 ```
+
+Keys are read from the git-ignored `.env` at the monorepo root (`cp .env.example .env`
+and fill it in) or from your shell environment; never put one in a Hydra config.
 
 The server:
 - loads STEVE-1 once,
@@ -226,6 +244,14 @@ bash scripts/run_eval.sh iron glm_4_7        # ZHIPUAI_API_KEY required
 bash scripts/run_eval.sh iron gemini_flash   # GOOGLE_API_KEY required
 bash scripts/run_eval.sh iron gpt_5_5        # OPENAI_API_KEY required
 ```
+
+Every task runs once per world seed in `seeds` (`conf/evaluate.yaml`, default
+`[101, 102, 103]`); a single quick run is `seeds='[101]'`, and `seeds='[]'` restores
+random worlds (`env.times` runs). Each run's task / seed / success / steps is appended
+to `logs/eval/<date>/<time>/runs.jsonl`, and every LLM call (stage, tokens, full
+prompt + response) to `logs/llm_calls.jsonl` and `logs/llm_calls/`. See
+[docs/reproduction-notes.md](docs/reproduction-notes.md) before comparing numbers
+with the paper.
 
 Per-task and aggregate results are printed via `rich.Table`. Per-episode logs and (optionally) videos go to `logs/eval/<date>/<time>/` and `videos/<date>/`.
 
@@ -262,6 +288,8 @@ MineEvolve converts each subgoal execution into typed feedback, induces skills (
 
 See [docs/architecture.md](docs/architecture.md) for a per-module breakdown, and
 [docs/fixes.md](docs/fixes.md) for what this vendored copy changes versus upstream and why.
+[docs/reproduction-notes.md](docs/reproduction-notes.md) tracks where our setup matches or
+deviates from the paper (seeds, knowledge-base state, token limits, model names) and the runs done so far.
 
 ---
 
