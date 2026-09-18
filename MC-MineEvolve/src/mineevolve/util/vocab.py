@@ -57,6 +57,13 @@ EXECUTOR_HINT_DESCRIPTIONS: dict[str, str] = {
     "mc_craft": "the crafting helper; opens a crafting GUI and polls inventory for the target item.",
     "mc_smelt": "the smelting helper; opens a furnace and polls inventory for the smelted item.",
     "wait": "no executor is invoked; the wrapper just consumes ticks.",
+    "move": (
+        "deterministic navigation primitive, no policy involved: turns by `params.yaw_deg` "
+        "(-180..180, + = right) and `params.pitch_deg` (-45..45, + = down), then walks forward "
+        "for `params.steps` ticks (default 40), jumping if `params.jump` (default true). Use it when "
+        "STEVE-1 is stuck (no movement, no item gain) to face a different direction or reach a "
+        "visible target; pair with a `moved` check, then hand back to `stevei`."
+    ),
 }
 
 CHECK_TYPE_DESCRIPTIONS: dict[str, str] = {
@@ -66,6 +73,7 @@ CHECK_TYPE_DESCRIPTIONS: dict[str, str] = {
     "ypos_ge": "{type: ypos_ge, n: <int>} - agent Y position >= n (used for ascent).",
     "path_clear": "{type: path_clear} - no block obstructs the agent's facing direction.",
     "gui_closed": "{type: gui_closed} - no GUI is open at end of subgoal.",
+    "moved": "{type: moved, n: <blocks>} - agent's xz position changed by >= n blocks during the subgoal (for `move`).",
 }
 
 

@@ -94,6 +94,8 @@ def main() -> int:
     ap.add_argument("--condition", default="chop a tree", help="STEVE-1 text condition (server mode)")
     ap.add_argument("--out", default=None, help="run dir (default logs/smoke/run-<timestamp>)")
     ap.add_argument("--frame-every", type=int, default=10, help="save a POV frame every N steps (0 = only reset/final)")
+    ap.add_argument("--seed", type=int, default=None, help="world seed (same mechanism as `seeds` in evaluate.yaml)")
+    ap.add_argument("--pos", type=float, nargs=3, default=None, metavar=("X", "Y", "Z"), help="teleport here after reset (JARVIS-1 close-ended spawn)")
     args = ap.parse_args()
     if args.out is None:
         args.out = f"logs/smoke/run-{datetime.now():%Y%m%d-%H%M%S}"
@@ -138,7 +140,17 @@ def main() -> int:
     env = make_env(cfg, logger=logger)
     logger.info("gym.make OK (%.1fs); launching Minecraft, first reset can take a few minutes...", time.time() - t0)
     t0 = time.time()
+    if args.seed is not None:
+        env.seed(args.seed)
+    summary["seed"] = args.seed
     obs = env.reset()
+    if args.pos is not None:
+        x, y, z = args.pos
+        env.execute_cmd(f"/tp @s {x:.1f} {y:.1f} {z:.1f}")
+        env.execute_cmd("/spawnpoint")
+        for _ in range(10):
+            obs, _r, _d, _i = env.step(env.action_space.noop())
+        summary["pos"] = list(args.pos)
     summary["reset_s"] = round(time.time() - t0, 1)
     logger.info("reset OK in %.1fs", summary["reset_s"])
 

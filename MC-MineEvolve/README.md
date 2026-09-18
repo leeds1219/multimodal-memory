@@ -245,8 +245,11 @@ bash scripts/run_eval.sh iron gemini_flash   # GOOGLE_API_KEY required
 bash scripts/run_eval.sh iron gpt_5_5        # OPENAI_API_KEY required
 ```
 
-Every task runs once per world seed in `seeds` (`conf/evaluate.yaml`, default
-`[101, 102, 103]`); a single quick run is `seeds='[101]'`, and `seeds='[]'` restores
+Every task runs once per spawn in `seeds` (`conf/evaluate.yaml`; default = the first
+three `oak_forest` entries of JARVIS-1's close-ended spawn table, seed + teleport
+position; `python scripts/fetch_spawns.py oak_forest 10` lists more). A single quick
+run is `seeds='[{seed: 19961103, pos: [-79, 64, -512]}]'` (or a plain integer seed
+without teleport), and `seeds='[]'` restores
 random worlds (`env.times` runs). Each run's task / seed / success / steps is appended
 to `logs/eval/<date>/<time>/runs.jsonl`, and every LLM call (stage, tokens, full
 prompt + response) to `logs/llm_calls.jsonl` and `logs/llm_calls/`. See

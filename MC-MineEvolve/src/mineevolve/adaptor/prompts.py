@@ -32,6 +32,7 @@ ADAPTOR_OUTPUT_SCHEMA: dict = {
             "mode": "stay|move",
             "timeout_s": 60,
             "checks": [{"type": "inv_ge", "item": "<item>", "n": 1}],
+            "params": {"yaw_deg": 0, "pitch_deg": 0, "steps": 40, "jump": True},
             "repair_source": "<remedy_id or skill_id or 'planner'>",
         }
     ],

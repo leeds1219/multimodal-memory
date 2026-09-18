@@ -36,6 +36,7 @@ class Subgoal:
     timeout_s: int = 60
     checks: List[Dict[str, Any]] = field(default_factory=list)
     rationale: str = ""
+    params: Dict[str, Any] = field(default_factory=dict)  # executor-specific, e.g. the `move` primitive
 
     def primary_target(self) -> tuple[str, int] | None:
         """Return the inventory target (item, n) if a check expresses one."""
@@ -60,6 +61,7 @@ class Subgoal:
             "timeout_s": int(self.timeout_s),
             "checks": list(self.checks),
             "rationale": self.rationale,
+            "params": dict(self.params),
         }
 
     @classmethod
@@ -73,6 +75,7 @@ class Subgoal:
             timeout_s=int(data.get("timeout_s") or 60),
             checks=list(data.get("checks") or []),
             rationale=str(data.get("rationale") or ""),
+            params=dict(data.get("params") or {}),
         )
 
 

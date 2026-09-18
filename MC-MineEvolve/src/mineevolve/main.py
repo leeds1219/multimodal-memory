@@ -77,6 +77,41 @@ def _state_snapshot(env_info: Mapping[str, Any], task_goal: str) -> Dict[str, An
 # ----------------------------------------------------------------------
 
 
+def _move_script(env, params: Mapping[str, Any]):
+    """Actions for the `move` executor primitive (see util/vocab.py).
+
+    Turn by yaw/pitch in <= 30 deg camera steps, then walk forward with sprint,
+    alternating jump so the agent climbs 1-block ledges. Deterministic; no policy.
+    """
+    yaw = float(np.clip(float(params.get("yaw_deg", 0) or 0), -180, 180))
+    pitch = float(np.clip(float(params.get("pitch_deg", 0) or 0), -45, 45))
+    steps = int(np.clip(int(params.get("steps", 40) or 0), 0, 400))
+    jump = bool(params.get("jump", True))
+    noop = env.action_space.noop()
+
+    def cam(dp: float, dy: float):
+        a = dict(noop)
+        a["camera"] = np.array([dp, dy], dtype=np.float32)
+        return a
+
+    while abs(yaw) > 1e-3 or abs(pitch) > 1e-3:
+        dy = float(np.clip(yaw, -30, 30)); dp = float(np.clip(pitch, -30, 30))
+        yaw -= dy; pitch -= dp
+        yield cam(dp, dy)
+    for i in range(steps):
+        a = dict(noop)
+        a["forward"] = np.array(1); a["sprint"] = np.array(1)
+        a["jump"] = np.array(int(jump and i % 2 == 0))
+        yield a
+
+
+def _moved_threshold(subgoal: Mapping[str, Any]) -> float | None:
+    for c in subgoal.get("checks") or []:
+        if isinstance(c, Mapping) and c.get("type") == "moved":
+            return float(c.get("n") or 2)
+    return None
+
+
 def _run_subgoal(
     env,
     client: MineEvolveClient,
@@ -138,26 +173,35 @@ def _run_subgoal(
     timed_out = False
     died = False
     steps = 0
+    executor_hint = str(subgoal.get("executor_hint") or "stevei").strip().lower()
+    script = _move_script(env, subgoal.get("params") or {}) if executor_hint == "move" else None
+    if script is not None:
+        logger.info("move primitive: params=%s", dict(subgoal.get("params") or {}))
 
     while steps < max_steps:
         if time.monotonic() > deadline:
             timed_out = True
             break
 
-        # Ask server for next STEVE-1 action conditioned on the subgoal text.
-        try:
-            r = client.action(
-                condition=str(subgoal.get("condition") or task_goal),
-                obs={"image": _safe_pov(obs), "pov": _safe_pov(obs)},
-            )
-        except Exception as exc:
-            logger.warning("server.action failed: %s", exc)
-            break
+        if script is not None:
+            action = next(script, None)
+            if action is None:
+                break  # script finished; success decided by the `moved` check below
+        else:
+            # Ask server for next STEVE-1 action conditioned on the subgoal text.
+            try:
+                r = client.action(
+                    condition=str(subgoal.get("condition") or task_goal),
+                    obs={"image": _safe_pov(obs), "pov": _safe_pov(obs)},
+                )
+            except Exception as exc:
+                logger.warning("server.action failed: %s", exc)
+                break
 
-        action = r.get("action")
-        if action is None:
-            logger.warning("server returned empty action: %s", r.get("error"))
-            break
+            action = r.get("action")
+            if action is None:
+                logger.warning("server returned empty action: %s", r.get("error"))
+                break
 
         try:
             obs, _reward, done, info = env.step(
@@ -192,6 +236,12 @@ def _run_subgoal(
     end_info = env.info or {}
     end_inv = dict(end_info.get("inventory") or {})
     end_coords = list(end_info.get("coords") or [0, 64, 0])
+
+    moved_n = _moved_threshold(subgoal)
+    if moved_n is not None and not success and not died:
+        dist_xz = float(np.hypot(end_coords[0] - start_coords[0], end_coords[2] - start_coords[2]))
+        success = dist_xz >= moved_n
+        logger.info("moved check: %.1f blocks (need >= %.1f) -> %s", dist_xz, moved_n, success)
 
     delta_v = _diff_int_dict(start_inv, end_inv)
     delta_s = {
@@ -368,12 +418,22 @@ def run_episode(
 ) -> Tuple[bool, int]:
     """Algorithm 1: planner -> executor -> Monitor -> Inducer -> Curator -> Adaptor."""
 
+    pos = None
+    if isinstance(seed, Mapping):
+        seed, pos = seed.get("seed"), seed.get("pos")
     if seed is not None:
         # MineRL sends the seed with the next mission and forgets it after reset,
         # so it must be set before every episode (paper: fixed task-seed split).
         env.seed(int(seed))
-        logger.info("world seed %s for task %s run %d", seed, task_id, run_idx + 1)
+        logger.info("world seed %s pos %s for task %s run %d", seed, pos, task_id, run_idx + 1)
     obs = env.reset()
+    if pos is not None:
+        # JARVIS-1-style close-ended spawn: fixed seed + fixed player position.
+        x, y, z = (float(v) for v in pos)
+        env.execute_cmd(f"/tp @s {x:.1f} {y:.1f} {z:.1f}")
+        env.execute_cmd("/spawnpoint")
+        for _ in range(10):  # let chunks load and the camera settle before the first frame
+            obs, _r, _d, _i = env.step(env.action_space.noop())
     env_info = env.info or {}
     state = _state_snapshot(env_info, task_goal)
 
@@ -590,7 +650,11 @@ def main(cfg: DictConfig) -> None:
     step_mon = StepMonitor()
     # `seeds: [..]` -> one run per world seed (reproducible); otherwise `env.times`
     # runs on random worlds, as upstream did.
-    seeds = [int(x) for x in (OmegaConf.select(cfg, "seeds") or [])]
+    seeds = [
+        {"seed": int(x["seed"]), "pos": [float(v) for v in x["pos"]]} if isinstance(x, Mapping) and "pos" in x
+        else int(x["seed"] if isinstance(x, Mapping) else x)
+        for x in (OmegaConf.to_container(OmegaConf.select(cfg, "seeds")) if OmegaConf.select(cfg, "seeds") is not None else [])
+    ]
     runs = [(i, s) for i, s in enumerate(seeds)] or [(i, None) for i in range(int(benchmark_cfg.env.get("times") or 1))]
     try:
         from hydra.core.hydra_config import HydraConfig
@@ -632,7 +696,9 @@ def main(cfg: DictConfig) -> None:
             if runs_log is not None:
                 with runs_log.open("a") as fh:
                     fh.write(json.dumps({
-                        "task_id": task_id, "task": instruction, "run": run_idx + 1, "seed": seed,
+                        "task_id": task_id, "task": instruction, "run": run_idx + 1,
+                        "seed": seed if not isinstance(seed, Mapping) else seed["seed"],
+                        "pos": seed["pos"] if isinstance(seed, Mapping) else None,
                         "success": bool(success), "steps": int(steps), "wall_s": round(time.time() - t_run, 1),
                         "llm": f"{cfg.llm.provider}/{cfg.llm.model}",
                     }) + "\n")

@@ -3,10 +3,18 @@ defaults:
   - benchmark: wooden
   - llm: qwen_plus
 
-# World seeds: one evaluation run per seed for every task (the paper evaluates on a
-# fixed task-seed split; its seed values are not published, this is ours). Set to
-# [] to fall back to `env.times` runs on random worlds. CLI: seeds='[101]'
-seeds: [101, 102, 103]
+# World spawns: one evaluation run per entry for every task. The paper evaluates on a
+# fixed "task-seed split" it does not publish; JARVIS-1 (which the paper compares
+# against under the same split) ships jarvis/assets/spawn.json with 556 close-ended
+# spawns (seed + player position per biome). These are its first three `oak_forest`
+# entries: the agent is teleported to `pos` after reset, so an oak tree is nearby.
+# `python scripts/fetch_spawns.py oak_forest 10` prints more. Plain integers are
+# also accepted (seed only, random spawn point); [] falls back to `env.times` runs
+# on random worlds. CLI: seeds='[{seed: 19961103, pos: [-79, 64, -512]}]'
+seeds:
+  - {seed: 19961103, pos: [-79, 64, -512]}
+  - {seed: 19961103, pos: [-145, 67, -495]}
+  - {seed: 12345, pos: [195, 73, 812]}
 
 # Server endpoint (uvicorn host)
 server:
