@@ -157,6 +157,7 @@ class GuiCraftController:
         self.obs: Dict[str, Any] = {}
         self.cursor = [WIDTH // 2, HEIGHT // 2]
         self.steps = 0
+        self.last_error: str = ""  # why the last craft/smelt/equip could not be done (fed back to the planner)
 
     # -- low level ------------------------------------------------------
     def _noop(self):
@@ -281,12 +282,16 @@ class GuiCraftController:
         target = target.replace("minecraft:", "")
         self._step(self._noop(), 4)  # let pickups / commands land in the inventory observation
         have0 = sum(q for n, q in self.slots().values() if n == target)
+        self.last_error = ""
         if not self.recipes.find(target):
-            logger.warning("no crafting recipe for %s", target)
+            self.last_error = f"no crafting recipe produces '{target}'"
+            logger.warning(self.last_error)
             return False
+        reasons = []
         for r in self.recipes.find(target):
             plan = self._plan(r, count)
             if plan is None:
+                reasons.append(self._why_not(r, count))
                 continue
             grid, per_cell, crafts, result_n = plan
             logger.info("craft %s x%d via %s grid (%d crafts)", target, count, f"{grid}x{grid}", crafts)
@@ -320,7 +325,31 @@ class GuiCraftController:
             have = sum(q for n, q in self.slots().values() if n == target)
             if have - have0 >= count:
                 return True
-        return sum(q for n, q in self.slots().values() if n == target) - have0 >= count
+        ok = sum(q for n, q in self.slots().values() if n == target) - have0 >= count
+        if not ok and reasons and not self.last_error:
+            self.last_error = f"cannot craft {target}: " + "; ".join(reasons[:2])
+            logger.warning(self.last_error)
+        return ok
+
+    def _why_not(self, r: dict, count: int) -> str:
+        """Human/LLM-readable reason a recipe cannot be crafted from the current inventory."""
+        grid = self.recipes.grid_size(r)
+        crafts = int(math.ceil(count / self.recipes.result_count(r)))
+        avail: Dict[str, int] = {}
+        for _, (name, qty) in self.slots().items():
+            avail[name] = avail.get(name, 0) + qty
+        need: Dict[str, int] = {}
+        for _row, _col, ing in self.recipes.cells(r):
+            opts = self.recipes.options(ing)
+            key = next((o for o in opts if avail.get(o, 0) > 0), opts[0] if opts else "?")
+            need[key] = need.get(key, 0) + crafts
+        missing = [f"{item} x{n - avail.get(item, 0)} (have {avail.get(item, 0)}, need {n})" for item, n in need.items() if avail.get(item, 0) < n]
+        parts = []
+        if missing:
+            parts.append("missing " + ", ".join(missing))
+        if grid == 3 and avail.get("crafting_table", 0) < 1:
+            parts.append("needs a crafting_table in the inventory (3x3 recipe)")
+        return " and ".join(parts) or "unknown"
 
     def _plan(self, r: dict, count: int):
         """Choose concrete items from the inventory for each recipe cell."""
@@ -387,7 +416,8 @@ class GuiCraftController:
         self._step(self._noop(), 3)
         slot = self._find(item)
         if slot is None:
-            logger.warning("equip %s: not in inventory", item)
+            self.last_error = f"cannot equip {item}: not in the inventory"
+            logger.warning(self.last_error)
             return False
         if slot > 8:
             used = set(self.slots())
@@ -445,24 +475,25 @@ class GuiCraftController:
         pickaxe is available (breaking it by hand drops nothing).
         """
         target = target.replace("minecraft:", "")
+        self.last_error = ""
         self._step(self._noop(), 4)
         have0 = sum(q for n, q in self.slots().values() if n == target)
         recipes = self.recipes.find_smelting(target)
         if not recipes:
-            logger.warning("no smelting recipe for %s", target); return False
+            self.last_error = f"no smelting recipe produces '{target}'"; logger.warning(self.last_error); return False
         inv = {}
         for _, (n, q) in self.slots().items():
             inv[n] = inv.get(n, 0) + q
         raw = next((o for r in recipes for o in self.recipes.options(r["ingredient"]) if inv.get(o, 0) >= count), None)
         if raw is None:
-            logger.warning("smelt %s: no raw material for it in the inventory", target); return False
+            self.last_error = f"cannot smelt {target}: no raw material for it in the inventory (need e.g. {', '.join(self.recipes.options(recipes[0]['ingredient'])[:3])})"; logger.warning(self.last_error); return False
         fuel = next((f for f in sorted(FUELS, key=lambda f: -FUELS[f]) if inv.get(f, 0) * FUELS[f] >= count
                      and f not in (raw, target) and not (f.endswith("_pickaxe") and inv.get(f, 0) <= 1)), None)
         if fuel is None:
-            logger.warning("smelt %s: no fuel in the inventory", target); return False
+            self.last_error = f"cannot smelt {target}: no fuel in the inventory (coal, logs or planks)"; logger.warning(self.last_error); return False
         n_fuel = int(math.ceil(count / FUELS[fuel]))
         if inv.get("furnace", 0) < 1:
-            logger.warning("smelt %s: no furnace in the inventory", target); return False
+            self.last_error = f"cannot smelt {target}: no furnace in the inventory"; logger.warning(self.last_error); return False
         logger.info("smelt %s x%d from %s with %d %s", target, count, raw, n_fuel, fuel)
         try:
             if not self._place_block_under_feet("furnace") or not self._open_block_under_feet():

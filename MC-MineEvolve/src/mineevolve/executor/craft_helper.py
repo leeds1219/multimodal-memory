@@ -35,6 +35,7 @@ class CraftHelper:
         self.env = env
         self.last_steps = 0
         self.episode_ended = False  # the env returned done while the GUI script was stepping it
+        self.last_error = ""
 
     # ------------------------------------------------------------------
     # Public API
@@ -69,6 +70,7 @@ class CraftHelper:
                     self.episode_ended = True
             finally:
                 self.last_steps = ctl.steps
+                self.last_error = getattr(ctl, "last_error", "") or ("" if ok else f"{req.kind} {req.target} failed")
                 try:  # the controller stepped the inner env; refresh the wrapper's status/inventory view
                     self.env.step(self.env.action_space.noop())
                 except Exception:

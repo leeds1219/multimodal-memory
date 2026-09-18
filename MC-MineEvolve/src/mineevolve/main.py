@@ -325,6 +325,9 @@ def _run_helper_subgoal(
     )
     helper_steps = int(getattr(helper, "last_steps", 0) or 0)
     helper_died = bool(getattr(helper, "episode_ended", False))
+    helper_error = str(getattr(helper, "last_error", "") or "")
+    if helper_error:
+        logger.warning("helper %s: %s", hint, helper_error)
 
     end_info = env.info or {}
     end_inv = dict(end_info.get("inventory") or {})
@@ -336,6 +339,10 @@ def _run_helper_subgoal(
         "state_start": start_state,
     }
     end_state = _state_snapshot(end_info, task_goal)
+    if helper_error:
+        # what a player would see in the GUI ("not enough planks"); goes into the
+        # state the Inducer/Adaptor prompts render, so repairs can target the cause
+        end_state["last_executor_error"] = helper_error
     evidence_dir = make_subgoal_evidence_dir(
         artifact_dir=artifact_dir,
         task_id=task_id,
