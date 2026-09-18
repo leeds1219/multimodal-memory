@@ -54,7 +54,12 @@ TASK_KIND_DESCRIPTIONS: dict[str, str] = {
 
 EXECUTOR_HINT_DESCRIPTIONS: dict[str, str] = {
     "stevei": "STEVE-1 text-conditioned policy; the only executor that can navigate, mine, attack, or place blocks.",
-    "mc_craft": "the crafting helper; opens a crafting GUI and polls inventory for the target item.",
+    "mc_craft": (
+        "scripted crafting: opens the inventory 2x2 grid, or places and opens the agent's crafting_table "
+        "for 3x3 recipes, and crafts the `inv_ge` item from ingredients already in the inventory (any "
+        "vanilla recipe). Needs the ingredients first (e.g. oak_log -> oak_planks -> stick); a 3x3 recipe "
+        "additionally needs a crafting_table in the inventory."
+    ),
     "mc_smelt": "the smelting helper; opens a furnace and polls inventory for the smelted item.",
     "wait": "no executor is invoked; the wrapper just consumes ticks.",
     "move": (

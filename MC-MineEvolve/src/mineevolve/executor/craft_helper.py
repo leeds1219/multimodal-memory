@@ -1,11 +1,9 @@
-"""Crafting helper for executor_hint in {mc_craft, mc_smelt, place}.
+"""Crafting helper for executor_hint in {mc_craft, mc_smelt, place, use}.
 
-This is a deliberately minimal procedural helper. STEVE-1 cannot reliably
-operate the crafting GUI on its own, so we issue inventory-target /clear
-guards and rely on chat commands for the canonical "result item appears in
-inventory" check. We do NOT use any /give shortcut here.
-
-Implementation is original; no recipes table is reused from any other repo.
+``mc_craft`` drives the real inventory / crafting-table GUI through
+``gui_craft.GuiCraftController`` (upstream's version only played a sound and
+polled the inventory, so no crafting task could ever succeed). ``mc_smelt``
+is still the polling stub - no furnace controller yet. No /give shortcuts.
 """
 
 from __future__ import annotations
@@ -34,6 +32,7 @@ class CraftHelper:
 
     def __init__(self, env: Any) -> None:
         self.env = env
+        self.last_steps = 0
 
     # ------------------------------------------------------------------
     # Public API
@@ -48,6 +47,24 @@ class CraftHelper:
 
         baseline = self._inventory_count(req.target)
         deadline = time.monotonic() + max(1.0, float(req.timeout_s))
+        self.last_steps = 0
+
+        if req.kind == "mc_craft":
+            from .gui_craft import GuiCraftController
+
+            ctl = GuiCraftController(self.env)
+            try:
+                ok = ctl.craft(req.target, int(req.quantity))
+            except Exception as exc:
+                logger.warning("GUI crafting of %s failed: %s", req.target, exc)
+                ok = False
+            finally:
+                self.last_steps = ctl.steps
+                try:  # the controller stepped the inner env; refresh the wrapper's status/inventory view
+                    self.env.step(self.env.action_space.noop())
+                except Exception:
+                    pass
+            return bool(ok)
 
         if req.kind == "place":
             return self._place(req.target, baseline)

@@ -28,6 +28,7 @@ from minerl.herobraine.hero.mc import INVERSE_KEYMAP
 
 from .chat_action import ChatAction
 from .inventory_agent_start import StrictEmptyInventoryStart
+from .slot_inventory import SlotInventoryObservation
 
 
 MINUTE = 1200  # MineRL game ticks per simulated minute
@@ -89,6 +90,10 @@ class MineEvolveBaseSpec(HumanSurvival):
 
     def create_actionables(self) -> List[Handler]:
         return list(super().create_actionables()) + [ChatAction()]
+
+    def create_observables(self) -> List[Handler]:
+        # + per-slot inventory for the GUI crafting controller (jar patch adds the index)
+        return list(super().create_observables()) + [SlotInventoryObservation(), handlers.IsGuiOpen()]
 
     # ------------------------------------------------------------------
     # Helpers used by other modules

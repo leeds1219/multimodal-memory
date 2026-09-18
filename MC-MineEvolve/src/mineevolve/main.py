@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import logging
 import json
+import os
 import time
 from collections import deque
 from pathlib import Path
@@ -298,7 +299,8 @@ def _run_helper_subgoal(
     start_state = _state_snapshot(env.info or {}, task_goal)
 
     hint = str(subgoal.get("executor_hint") or "").strip().lower()
-    success = CraftHelper(env).execute(
+    helper = CraftHelper(env)
+    success = helper.execute(
         CraftRequest(
             kind=hint,
             target=target[0],
@@ -306,6 +308,7 @@ def _run_helper_subgoal(
             timeout_s=float(subgoal.get("timeout_s") or 10),
         )
     )
+    helper_steps = int(getattr(helper, "last_steps", 0) or 0)
 
     end_info = env.info or {}
     end_inv = dict(end_info.get("inventory") or {})
@@ -334,7 +337,7 @@ def _run_helper_subgoal(
             "success": bool(success),
             "timed_out": False,
             "died": False,
-            "steps": 0,
+            "steps": helper_steps,
             "start_state": start_state,
             "end_state": end_state,
             "delta_v": delta_v,
@@ -360,7 +363,7 @@ def _run_helper_subgoal(
         "success": bool(success),
         "timed_out": False,
         "died": False,
-        "steps": 0,
+        "steps": helper_steps,
         "delta_v": delta_v,
         "delta_s": delta_s,
         "coords_history": [start_coords, end_coords],
@@ -668,9 +671,16 @@ def main(cfg: DictConfig) -> None:
     try:
         from hydra.core.hydra_config import HydraConfig
 
-        runs_log = Path(HydraConfig.get().runtime.output_dir) / "runs.jsonl"
+        run_dir = Path(HydraConfig.get().runtime.output_dir)
     except Exception:  # not launched through hydra
-        runs_log = None
+        run_dir = None
+    runs_log = run_dir / "runs.jsonl" if run_dir else None
+    # Every run is self-contained: plans/ and evidence/ go under the hydra run dir
+    # (logs/eval/<date>/<time>/) unless artifact_dir is set explicitly, and the
+    # server-side LLM call log for this run is copied there at the end.
+    artifact_dir = str(OmegaConf.select(cfg, "artifact_dir") or run_dir or ".")
+    llm_log = Path(os.environ.get("MINEEVOLVE_LLM_LOG", "logs/llm_calls.jsonl"))
+    t_eval = time.time()
 
     for task_id, task_type, instruction in tasks:
         for run_idx, seed in runs:
@@ -689,7 +699,7 @@ def main(cfg: DictConfig) -> None:
                     recent_window=int(cfg.runtime.get("recent_window", 4)),
                     budget_tokens=int(cfg.runtime.get("budget_tokens", 512)),
                     top_k=int(cfg.runtime.get("top_k", 16)),
-                    artifact_dir=str(OmegaConf.select(cfg, "artifact_dir") or "."),
+                    artifact_dir=artifact_dir,
                     task_id=task_id,
                     run_idx=run_idx,
                     evidence_keyframe_interval=int(
@@ -717,6 +727,24 @@ def main(cfg: DictConfig) -> None:
                 thread = save_video(instruction, status)
                 if thread is not None:
                     thread.join(timeout=30.0)
+
+    if run_dir is not None and llm_log.exists():
+        # copy this run's LLM calls (by timestamp) and their prompt/response dumps
+        try:
+            kept = []
+            for line in llm_log.read_text().splitlines():
+                if line.strip() and json.loads(line).get("t", 0) >= t_eval - 1:
+                    kept.append(line)
+            (run_dir / "llm_calls.jsonl").write_text("\n".join(kept) + ("\n" if kept else ""))
+            dump_dir = run_dir / "llm_calls"
+            for line in kept:
+                src = json.loads(line).get("dump")
+                if src and Path(src).exists():
+                    dump_dir.mkdir(exist_ok=True)
+                    (dump_dir / Path(src).name).write_bytes(Path(src).read_bytes())
+            logger.info("run dir: %s (%d LLM calls)", run_dir, len(kept))
+        except Exception as exc:
+            logger.warning("could not copy LLM log into the run dir: %s", exc)
 
     print_results(
         title=f"Results: {benchmark_cfg.env.name}",

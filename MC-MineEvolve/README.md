@@ -82,7 +82,10 @@ Notes:
   (supplied from conda-forge, no `apt`); headless GL needs Mesa (`mesalib`) on
   `LD_LIBRARY_PATH`, which the `xvfb-run` shim sets.
 - **MineRL is patched** (`patches/minerl-1.0.2-chat-commands.patch`, applied by
-  `scripts/patch_minerl.sh`, which rebuilds the Minecraft jar). Stock MineRL 1.0 has no
+  `scripts/patch_minerl.sh`, which rebuilds the Minecraft jar). The patch adds the `chat`
+  action, enables commands, and adds the slot `index` to the inventory observation that
+  the GUI crafting controller needs (`executor/gui_craft.py`; test it with
+  `xvfb-run -a python scripts/test_craft.py`). Stock MineRL 1.0 has no
   `chat` action and creates the world with commands disabled, so every `/gamerule`,
   `/effect` and `/setblock` this repo issues (`conf/evaluate.yaml::commands`, ore
   spawning in `env/wrapper.py`) was silently rejected. If you reinstall `minerl`,
@@ -250,9 +253,12 @@ three `oak_forest` entries of JARVIS-1's close-ended spawn table, seed + telepor
 position; `python scripts/fetch_spawns.py oak_forest 10` lists more). A single quick
 run is `seeds='[{seed: 19961103, pos: [-79, 64, -512]}]'` (or a plain integer seed
 without teleport), and `seeds='[]'` restores
-random worlds (`env.times` runs). Each run's task / seed / success / steps is appended
-to `logs/eval/<date>/<time>/runs.jsonl`, and every LLM call (stage, tokens, full
-prompt + response) to `logs/llm_calls.jsonl` and `logs/llm_calls/`. See
+random worlds (`env.times` runs). Every evaluation is self-contained under
+`logs/eval/<date>/<time>/`: `runs.jsonl` (task / seed / success / steps per run),
+`plans/`, `evidence/` (per-subgoal trajectories + keyframes) and `llm_calls.jsonl` +
+`llm_calls/` (this run's LLM calls with stage, tokens, full prompt + response; the
+server appends the same to `logs/llm_calls.jsonl` across runs). Nothing needs to be
+re-run to look at an old result. See
 [docs/reproduction-notes.md](docs/reproduction-notes.md) before comparing numbers
 with the paper.
 
