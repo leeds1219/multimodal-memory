@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import Any, Mapping, Tuple
 
-from ...util.items import inventory_delta_satisfies
+from ...util.items import inventory_delta_satisfies, inventory_satisfies
 
 
 class TaskCheckerMod:
@@ -48,8 +48,8 @@ class TaskCheckerMod:
         if not target or need <= 0:
             return True
         current = self._normalize(inventory)
-        delta = {
-            item: int(current.get(item, 0)) - int(self._baseline.get(item, 0))
-            for item in set(current) | set(self._baseline)
-        }
-        return inventory_delta_satisfies(delta, target=target, n=need)
+        # Absolute post-state check, as the vocabulary promises the planner
+        # ("inventory has >= n of <id>") and as the paper's CheckSuccess(z_i, s_post)
+        # reads. Upstream compared against a baseline taken at subgoal start, so a
+        # subgoal re-issued after the item was already obtained could never pass.
+        return inventory_satisfies(current, target=target, n=need)

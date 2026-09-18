@@ -15,6 +15,7 @@ from __future__ import annotations
 import logging
 import json
 import os
+import re
 import time
 from collections import deque
 from pathlib import Path
@@ -635,17 +636,62 @@ def _save_plan_artifact(
         json.dump(payload, fh, ensure_ascii=False, indent=2)
 
 
+def _goal_object(task_goal: str) -> str:
+    """The item phrase a task asks for: 'Craft a wooden pickaxe' -> 'wooden pickaxe',
+    'Smelt iron ore into iron ingot' -> 'iron ingot', 'Kill a cow to obtain leather' -> 'leather'."""
+    g = re.sub(r"[^a-z0-9 ]", " ", str(task_goal).lower())
+    g = re.sub(r"\s+", " ", g).strip()
+    for marker in (" to obtain ", " into ", " to mine ", " to gather ", " to get ", " to craft ", " to make "):
+        if marker in g:
+            g = g.split(marker, 1)[1]
+            break
+    else:
+        g = re.sub(r"^(craft|mine|collect|chop|punch|smelt|dig|kill|upgrade|trade|wash|repair|gather|obtain|make|get)\s+", "", g)
+        if " to " in g and g.startswith(("upgrade", "a wooden", "a stone", "an iron")):
+            g = g.split(" to ", 1)[1]
+    g = re.split(r" (from|for|with|at|in|using|without|by|on) ", g)[0]
+    g = re.sub(r"^(down and |down to )?(mine |craft |collect )?", "", g)          # "dig down and mine a diamond"
+    g = re.sub(r"^(a|an|the|some|eight|three|two|one|\d+) ", "", g).strip()
+    g = re.sub(r" (blocks?|material|items?|ores?)$", lambda m: "" if m.group(1).startswith(("block", "material", "item")) else m.group(0), g)
+    return g.strip()
+
+
+_NUM_WORDS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10}
+
+
+def _goal_quantity(task_goal: str) -> int:
+    m = re.search(r"\b(one|two|three|four|five|six|seven|eight|nine|ten|\d+)\b", str(task_goal).lower())
+    if not m:
+        return 1
+    w = m.group(1)
+    return int(w) if w.isdigit() else _NUM_WORDS.get(w, 1)
+
+
 def _episode_succeeded(task_goal: str, inventory: Mapping[str, int]) -> bool:
-    """Heuristic: success if the noun phrase in task_goal appears in inventory."""
+    """Success if the inventory holds the item (and quantity) the task asks for."""
 
     goal = str(task_goal).lower()
-    if any(word in goal for word in ("log", "wood", "tree")) and any(
+    need = _goal_quantity(task_goal)
+    if any(word in goal for word in ("log", "wood", "tree")) and "sapling" not in goal and any(
         inventory_satisfies(inventory, target, 1) for target in ("log", "oak_log", "wood")
     ):
         return True
-    for k in inventory:
-        token = str(k).lower().replace("_", " ")
-        if token in goal and int(inventory.get(k, 0)) > 0:
+    obj = _goal_object(task_goal)
+    obj_words = obj.split()
+    if not obj_words:
+        return False
+    for k, count in inventory.items():
+        if int(count) < need:
+            continue
+        name = str(k).lower().replace("minecraft:", "").replace("_", " ").strip()
+        words = name.split()
+        head, obj_head = words[-1], obj_words[-1]
+        same_head = head == obj_head or head.rstrip("s") == obj_head.rstrip("s")
+        if not same_head:
+            continue
+        # every qualifier in the goal must appear in the item (wooden pickaxe != stone pickaxe);
+        # extra qualifiers on the item are fine (oak sapling for "sapling")
+        if all(any(q == w or q.rstrip("s") == w.rstrip("s") for w in words) for q in obj_words[:-1]):
             return True
     return False
 
