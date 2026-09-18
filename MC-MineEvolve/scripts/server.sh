@@ -15,6 +15,17 @@
 #   MINEEVOLVE_LLM_MODEL        - model id (e.g. qwen-plus, qwen-flash, glm-4-plus, ...)
 #   MINEEVOLVE_LLM_BASE_URL     - override the OpenAI-compatible endpoint
 set -euo pipefail
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# API keys live in a git-ignored .env at the monorepo root (or next to this
+# sub-project); shell-exported variables take precedence over the file.
+for envfile in "$HERE/../.env" "$HERE/.env"; do
+  if [[ -f "$envfile" ]]; then
+    set -a; # shellcheck disable=SC1090
+    source <(grep -vE '^\s*(#|$)' "$envfile" | sed -E 's/^export //')
+    set +a
+  fi
+done
 
 PORT="${MINEEVOLVE_PORT:-9000}"
 HOST="${MINEEVOLVE_HOST:-0.0.0.0}"

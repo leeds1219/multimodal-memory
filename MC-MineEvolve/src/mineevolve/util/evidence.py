@@ -226,13 +226,11 @@ def make_subgoal_evidence_dir(
         return None
     safe_condition = "".join(c if c.isalnum() or c in "_-" else "_" for c in condition)[:48]
     task_part = f"task_{task_id}" if task_id is not None else "task_unknown"
-    return (
-        Path(artifact_dir)
-        / "evidence"
-        / task_part
-        / f"run_{run_idx + 1}"
-        / f"{subgoal_id or 'sg_unknown'}_{safe_condition}"
-    )
+    base = Path(artifact_dir) / "evidence" / task_part / f"run_{run_idx + 1}"
+    # Number the attempts so a repeated subgoal (same id + text after a repair)
+    # keeps every trajectory instead of overwriting the previous one.
+    attempt = len([p for p in base.glob("[0-9][0-9]_*")]) + 1 if base.exists() else 1
+    return base / f"{attempt:02d}_{subgoal_id or 'sg_unknown'}_{safe_condition}"
 
 
 def summarize_action(action: Mapping[str, Any]) -> Dict[str, Any]:

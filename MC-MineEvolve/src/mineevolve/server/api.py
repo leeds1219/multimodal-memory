@@ -133,7 +133,9 @@ def _bootstrap_default_cfg() -> dict:
             ),
             "api_key": os.environ.get("DASHSCOPE_API_KEY") or os.environ.get("OPENAI_API_KEY"),
             "temperature": 0.2,
-            "max_tokens": 1536,
+            # Thinking models (Gemini 3.x) spend part of this budget on hidden
+            # reasoning; 1536 truncates their JSON. scripts/server_gemini.sh sets 8192.
+            "max_tokens": int(os.environ.get("MINEEVOLVE_LLM_MAX_TOKENS", "1536")),
         },
         "steve": {
             "in_model": os.environ.get(

@@ -8,8 +8,10 @@ OpenAI-compatible endpoint).
 
 from __future__ import annotations
 
+import json
 import logging
 import os
+import time
 from typing import Optional
 
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
@@ -18,6 +20,57 @@ from ..base import PlannerBackend
 
 
 logger = logging.getLogger("mineevolve.planner.openai_compat")
+
+# Per-call usage log (one JSON line per LLM request) so a run can be broken
+# down by stage / tokens afterwards: scripts/llm_usage.py reads it.
+LLM_LOG_PATH = os.environ.get("MINEEVOLVE_LLM_LOG", "logs/llm_calls.jsonl")
+# Full prompt + response of each call, one file per call, next to the jsonl
+# (logs/llm_calls/0001_repair.json). Needed to judge what the LLM could and
+# could not know from text alone (e.g. vs. the POV keyframes in evidence/).
+LLM_DUMP_DIR = os.environ.get("MINEEVOLVE_LLM_DUMP_DIR", os.path.splitext(LLM_LOG_PATH)[0])
+_call_counter = 0
+
+
+def _stage_for(system: str) -> str:
+    """Name the pipeline stage from the system prompt it uses."""
+    try:
+        from ...adaptor.prompts import ADAPTOR_SYSTEM_PROMPT
+        from ...inducer.prompts import REMEDY_SYSTEM_PROMPT, SKILL_SYSTEM_PROMPT
+        from ...planner.prompts import PLANNER_SYSTEM_PROMPT
+    except Exception:  # pragma: no cover
+        return "unknown"
+    for name, prompt in (
+        ("plan", PLANNER_SYSTEM_PROMPT),
+        ("induce_skill", SKILL_SYSTEM_PROMPT),
+        ("induce_remedy", REMEDY_SYSTEM_PROMPT),
+        ("repair", ADAPTOR_SYSTEM_PROMPT),
+    ):
+        if system == prompt:
+            return name
+    return "other"
+
+
+def _log_call(record: dict, system: str = "", user: str = "", response: str = "") -> None:
+    global _call_counter
+    _call_counter += 1
+    record["n"] = _call_counter
+    logger.info(
+        "llm call stage=%s model=%s prompt=%s gen=%s finish=%s %.1fs",
+        record["stage"], record["model"], record["prompt_tokens"], record["completion_tokens"],
+        record["finish"], record["s"],
+    )
+    try:
+        os.makedirs(os.path.dirname(LLM_LOG_PATH) or ".", exist_ok=True)
+        with open(LLM_LOG_PATH, "a") as fh:
+            fh.write(json.dumps(record) + "\n")
+        if LLM_DUMP_DIR:
+            os.makedirs(LLM_DUMP_DIR, exist_ok=True)
+            dump = os.path.join(LLM_DUMP_DIR, f"{_call_counter:04d}_{record['stage']}.json")
+            with open(dump, "w") as fh:
+                json.dump({**record, "system": system, "user": user, "response": response}, fh, indent=1)
+            record["dump"] = dump
+    except OSError as exc:  # pragma: no cover
+        logger.warning("could not write %s: %s", LLM_LOG_PATH, exc)
 
 
 class OpenAICompatibleBackend(PlannerBackend):
@@ -74,6 +127,7 @@ class OpenAICompatibleBackend(PlannerBackend):
         max_tokens: int,
         temperature: float,
     ) -> str:
+        t0 = time.monotonic()
         response = self._client.chat.completions.create(
             model=self._model,
             temperature=temperature,
@@ -85,6 +139,18 @@ class OpenAICompatibleBackend(PlannerBackend):
         )
         choice = response.choices[0]
         content = choice.message.content if choice and choice.message else ""
+        usage = getattr(response, "usage", None)
+        _log_call({
+            "t": time.time(),
+            "stage": _stage_for(system),
+            "backend": self.name,
+            "model": self._model,
+            "prompt_tokens": getattr(usage, "prompt_tokens", None),
+            "completion_tokens": getattr(usage, "completion_tokens", None),
+            "finish": getattr(choice, "finish_reason", None),
+            "s": round(time.monotonic() - t0, 2),
+            "content_chars": len(content or ""),
+        }, system=system, user=user, response=content or "")
         return content or ""
 
     def chat(

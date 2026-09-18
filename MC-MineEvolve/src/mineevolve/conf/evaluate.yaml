@@ -3,6 +3,11 @@ defaults:
   - benchmark: wooden
   - llm: qwen_plus
 
+# World seeds: one evaluation run per seed for every task (the paper evaluates on a
+# fixed task-seed split; its seed values are not published, this is ours). Set to
+# [] to fall back to `env.times` runs on random worlds. CLI: seeds='[101]'
+seeds: [101, 102, 103]
+
 # Server endpoint (uvicorn host)
 server:
   url: http://127.0.0.1

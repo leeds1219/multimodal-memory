@@ -364,9 +364,15 @@ def run_episode(
     task_id: int | None = None,
     run_idx: int = 0,
     evidence_keyframe_interval: int = 40,
+    seed: int | None = None,
 ) -> Tuple[bool, int]:
     """Algorithm 1: planner -> executor -> Monitor -> Inducer -> Curator -> Adaptor."""
 
+    if seed is not None:
+        # MineRL sends the seed with the next mission and forgets it after reset,
+        # so it must be set before every episode (paper: fixed task-seed split).
+        env.seed(int(seed))
+        logger.info("world seed %s for task %s run %d", seed, task_id, run_idx + 1)
     obs = env.reset()
     env_info = env.info or {}
     state = _state_snapshot(env_info, task_goal)
@@ -394,6 +400,7 @@ def run_episode(
 
     consecutive_failures = 0
     total_steps = 0
+    n_repairs = 0
     i = 0
     while i < min(len(subgoals), max_subgoals):
         sg = subgoals[i]
@@ -457,6 +464,14 @@ def run_episode(
             i += 1
             continue
 
+        # env.step returned done=True (death or the benchmark's max_minutes horizon):
+        # the env cannot be stepped again without a reset, so every further subgoal
+        # would end on step 1 and the repair loop below would spin forever.
+        if result["died"]:
+            logger.warning("Environment episode ended (done=True) during %s; stopping", result["subgoal_id"])
+            client.advance(success=False)
+            break
+
         # Failure or stagnation: ask Adaptor to repair the suffix
         consecutive_failures += 1
         try:
@@ -472,13 +487,14 @@ def run_episode(
             repair_resp = {"repaired": False}
 
         if repair_resp.get("repaired"):
+            n_repairs += 1
             new_plan = repair_resp.get("plan") or {}
             _save_plan_artifact(
                 artifact_dir=artifact_dir,
                 task_goal=task_goal,
                 task_id=task_id,
                 run_idx=run_idx,
-                stage=f"repair_i{i}",
+                stage=f"repair{n_repairs:02d}_i{i}",  # numbered: repeated repairs at the same i no longer overwrite
                 plan=new_plan,
                 extra={
                     "active_remedies_used": repair_resp.get("active_remedies_used", []),
@@ -489,6 +505,8 @@ def run_episode(
             if new_subgoals:
                 subgoals = new_subgoals
                 continue  # do not advance i; retry from the same logical position
+        else:
+            logger.warning("Adaptor did not repair (%s); advancing past %s", repair_resp.get("reason", "?"), sg.get("subgoal_id"))
 
         # No repair; advance to next subgoal to avoid infinite retry on the same step
         client.advance(success=False)
@@ -570,11 +588,22 @@ def main(cfg: DictConfig) -> None:
     tasks = _get_evaluate_tasks(cfg)
     success_mon = SuccessMonitor()
     step_mon = StepMonitor()
-    times = int(benchmark_cfg.env.get("times") or 1)
+    # `seeds: [..]` -> one run per world seed (reproducible); otherwise `env.times`
+    # runs on random worlds, as upstream did.
+    seeds = [int(x) for x in (OmegaConf.select(cfg, "seeds") or [])]
+    runs = [(i, s) for i, s in enumerate(seeds)] or [(i, None) for i in range(int(benchmark_cfg.env.get("times") or 1))]
+    try:
+        from hydra.core.hydra_config import HydraConfig
+
+        runs_log = Path(HydraConfig.get().runtime.output_dir) / "runs.jsonl"
+    except Exception:  # not launched through hydra
+        runs_log = None
 
     for task_id, task_type, instruction in tasks:
-        for run_idx in range(times):
-            info_panel(f"task {task_id} ({task_type})  run {run_idx + 1}/{times}: {instruction}")
+        for run_idx, seed in runs:
+            seed_note = f"  seed={seed}" if seed is not None else ""
+            info_panel(f"task {task_id} ({task_type})  run {run_idx + 1}/{len(runs)}{seed_note}: {instruction}")
+            t_run = time.time()
             try:
                 success, steps = run_episode(
                     env=env,
@@ -593,12 +622,20 @@ def main(cfg: DictConfig) -> None:
                     evidence_keyframe_interval=int(
                         OmegaConf.select(cfg, "record.evidence.keyframe_interval") or 40
                     ),
+                    seed=seed,
                 )
             except Exception as exc:
                 logger.exception("run_episode failed: %s", exc)
                 success, steps = False, 0
             success_mon.record(instruction, success)
             step_mon.record(instruction, steps)
+            if runs_log is not None:
+                with runs_log.open("a") as fh:
+                    fh.write(json.dumps({
+                        "task_id": task_id, "task": instruction, "run": run_idx + 1, "seed": seed,
+                        "success": bool(success), "steps": int(steps), "wall_s": round(time.time() - t_run, 1),
+                        "llm": f"{cfg.llm.provider}/{cfg.llm.model}",
+                    }) + "\n")
             save_video = getattr(env, "save_video", None)
             if callable(save_video):
                 status = "success" if success else "failed"

@@ -11,8 +11,13 @@ from .parser import parse_plan
 from .prompts import PLANNER_SYSTEM_PROMPT, render_planner_user_prompt
 
 
-def make_chat_callable(backend: PlannerBackend, default_max_tokens: int = 1024):
+def make_chat_callable(backend: PlannerBackend, default_max_tokens: int = 0):
     """Adapter producing a (system, user) -> dict | None callable.
+
+    ``default_max_tokens`` <= 0 means "use the backend's configured max_tokens"
+    (llm.max_tokens / MINEEVOLVE_LLM_MAX_TOKENS). Thinking models such as
+    Gemini 3.x spend part of the budget on hidden reasoning, so a fixed 1024
+    here truncated their JSON.
 
     Used by Inducer / Adaptor which only need JSON output, not raw text.
     """
@@ -34,9 +39,9 @@ def generate_initial_plan(
     completed_prefix: Sequence[str] = (),
     retrieved_skills: Sequence[Mapping] = (),
     active_remedies: Sequence[Mapping] = (),
-    max_tokens: int = 1024,
+    max_tokens: int = 0,
 ) -> Plan | None:
-    """One-shot planner call returning a parsed Plan."""
+    """One-shot planner call returning a parsed Plan (max_tokens <= 0 -> backend default)."""
 
     user = render_planner_user_prompt(
         task_goal=task_goal,
