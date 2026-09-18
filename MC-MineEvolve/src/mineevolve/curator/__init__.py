@@ -7,6 +7,8 @@ exposes a small surface used by the server agent (``ingest`` and
 
 from __future__ import annotations
 
+import os
+
 from typing import Iterable, List, Mapping, Sequence
 
 from ..inducer.schema import KnowledgeEntry
@@ -48,6 +50,11 @@ class Curator:
 
         accepted: List[str] = []
         rejected: List[dict] = []
+        if os.environ.get("MINEEVOLVE_KB_FROZEN") == "1":
+            # Paper Sec. 4.4 / Table 6 "0 eps." protocol: the knowledge base is frozen
+            # during evaluation. Candidates are still generated (their LLM calls
+            # count) but nothing is written to the persistent store.
+            return {"accepted": [], "rejected": [{"id": k.knowledge_id, "reason": "kb_frozen"} for k in candidates], "frozen": True}
         existing = self.store.all()
 
         for k in candidates:

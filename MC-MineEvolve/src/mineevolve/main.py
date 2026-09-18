@@ -518,6 +518,15 @@ def run_episode(
         except Exception as exc:
             logger.warning("client.induce failed: %s", exc)
 
+        # Algorithm 1 line 16: "if task goal g is completed then return success" is
+        # checked after EVERY subgoal, not only when the loop ends. Otherwise an
+        # item picked up during a `move` (or a failed subgoal) leaves the loop
+        # repairing an already-solved task until the horizon.
+        if _episode_succeeded(task_goal=task_goal, inventory=dict((env.info or {}).get("inventory") or {})):
+            logger.info("task goal satisfied after %s; ending episode", result["subgoal_id"])
+            client.advance(success=True)
+            break
+
         if result["success"]:
             consecutive_failures = 0
             client.advance(success=True)

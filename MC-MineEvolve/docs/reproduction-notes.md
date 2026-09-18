@@ -27,7 +27,9 @@ paper and this codebase are ours, which are upstream's, and which are still unkn
 | Knowledge store per model (`memories/<model>`) | Upstream shares `memories/run` across all runs; remedies induced by one model were retrieved into another model's initial plan. | `scripts/server_gemini.sh` (`MINEEVOLVE_MEMORY_PATH`) |
 | `gemini_flash.yaml` → `gemini-3-flash-preview` | Upstream config says `gemini-2.5-flash`, but the paper says Gemini-3-Flash, and 2.5-flash returns 404 "no longer available to new users" for our key. | `conf/llm/gemini_flash.yaml` |
 | Per-call LLM logging (`logs/llm_calls.jsonl` + full prompt/response dumps), numbered evidence dirs | Needed to compare call composition / cost across models and to judge what the planner could know from text. Does not change behaviour. | `planner/backends/openai_compat.py`, `util/evidence.py` |
-| **`move` executor primitive** (`executor_hint: move`, `params: {yaw_deg, pitch_deg, steps, jump}`) + `moved` check | Upstream's only non-STEVE primitives are stationary (`mc_craft`/`mc_smelt`/`place`/`use`); every movement goes through STEVE-1, which deadlocks on some spawns (below). The paper says "action primitives" were controlled but lists none. `move` is a deterministic turn-then-walk the Adaptor can pick, matching the paper's mechanism (failure → remedy → executable repair, Curator `V_exec`) rather than a hidden auto-unstick. It is described to the LLM in the vocabulary the prompts already render. | `main.py` (`_move_script`), `util/vocab.py`, `planner/base.py` |
+| **`move` executor primitive** (`executor_hint: move`, `params: {yaw_deg, pitch_deg, steps, jump}`) + `moved` check | Upstream's only non-STEVE primitives are stationary (`mc_craft`/`mc_smelt`/`place`/`use`); every movement goes through STEVE-1, which deadlocks on some spawns (below). The paper says "action primitives" were controlled but lists none. Precedent: DEPS (`CraftJarvis/MC-Planner/controller.py`) runs scripted `look_to(deg)`, `jump`, `pillar_jump`, `go_surface`, `place_down`, `equip` next to its policy; JARVIS-1 has craft/smelt/equip scripts only. `move` is a deterministic turn-then-walk the Adaptor can pick, matching the paper's mechanism (failure → remedy → executable repair, Curator `V_exec`) rather than a hidden auto-unstick. | `main.py` (`_move_script`), `util/vocab.py`, `planner/base.py` |
+| **Adaptor prompt rule 8** | Without it the Adaptor kept writing 30-word `stevei` conditions ("move backward 2 blocks and jump…") that STEVE-1 cannot follow and used `move` in only 2 of 5 repairs. Rule 8 says: movement → `move` primitive, then a ≤8-word `stevei` step. This is our only change to an upstream prompt. | `adaptor/prompts.py` |
+| **`reasoning_effort=low`, `max_tokens` 16384 for Gemini** | Gemini 3's hidden thinking is unbounded: repair calls of 30–34 s hit `finish=length` even at 8192 and the JSON was cut, ending 2 of 3 episodes after one subgoal. `MINEEVOLVE_LLM_REASONING_EFFORT` is passed through as the OpenAI-compatible `reasoning_effort`. | `planner/backends/openai_compat.py`, `scripts/server_gemini.sh` |
 | Only `inv_ge` checks were evaluated | `path_clear` / `ypos_*` / `gui_closed` are advertised to the LLM but never checked, so a repair subgoal without an item target always timed out. `moved` is now evaluated; the others still are not. | `main.py` |
 
 ## Known mismatches we have NOT resolved
@@ -43,13 +45,17 @@ paper and this codebase are ours, which are upstream's, and which are still unkn
    `oak_forest` spawns; `main.py` seeds the world, resets, then `/tp`s to `pos`), and
    each run is appended to `<hydra output dir>/runs.jsonl`. `scripts/fetch_spawns.py`
    lists more. Whether MineEvolve used exactly these entries is still unknown.
-2. **Knowledge-base state of the main results is unspecified.** Table 4's numbers
-   (e.g. Gemini-3-Flash + MineEvolve: Wooden 98.6 %, Overall 52.0 %) come with a
-   controlled "evaluation-time LLM-call budget" but the paper never says whether the
-   KB is empty, warmed up, or written online during that evaluation. Only the
-   accumulation study (Sec. 4.4, Tables 6–7) is explicit: KB frozen after
-   M ∈ {0, 50, 100, 200, 400} episodes; and App. D.5 shows "Cold Start (Empty KB)"
-   on Diamond stays < 3 %. Our runs are cold start with online writing.
+2. **Main-table numbers are the *accumulated-KB* regime, not cold start.** The paper
+   never states it, but the numbers do: Table 6 (KB frozen after M episodes)
+   gives MineEvolve Iron/Redstone/Diamond/Armor = 39.8/24.2/9.0/16.2 at 0 eps and
+   53.4/31.0/15.8/24.6 at 400 eps, and Table 4's Qwen3.5-Flash row is
+   52.43/30.77/14.58/23.47 — i.e. ≈ the 400-episode checkpoint, 10 pp above cold
+   start. At 0 eps MineEvolve equals Static Store and Text Reflection (no knowledge →
+   plain planner + repair). Our runs are cold start (a few skills/remedies at most).
+   A warm-up of hundreds of episodes would be needed for a like-for-like comparison
+   (~$0.02–0.1 per wooden episode on Gemini 3 Flash); the warm-up protocol is only
+   described for the hard groups. Wooden is where the KB matters least (DEPS, no
+   memory, reaches 84 % with Gemini-3-Flash), so our wooden gap is mostly executor/spawn.
 3. **STEVE-1 gets the full subgoal sentence.** Repairs produce 20–40-word conditions;
    the repo passes them verbatim to STEVE-1's CLIP text encoder (77-token limit,
    keyword-driven). The paper only says the "observation/action interface" and
@@ -128,6 +134,8 @@ Table 4 is not verifiable from the paper. Worth asking the authors.
 | 09-18 | gemini-3.6-flash | 0/1 | 4 | invalid: JSON truncated at max_tokens 1536 |
 | 09-18 | gemini-3-flash-preview | 0/1 | 8 | invalid: plan contaminated by Qwen's remedies from shared store |
 | 09-18 | gemini-3-flash-preview (clean, random seed) | 0/1 | 17 (plan 1, remedy 11, repair 5), 182k prompt tok, $0.16 | spawned facing a hillside; 6 subgoals, all timed out; **0.0 blocks moved in 2,392 steps**, 100 % attack regardless of repair text — the deadlock above |
+| 09-18 | gemini-3-flash-preview, JARVIS-1 spawn 1, `move` available, no prompt rule | 0/1 | 15 | STEVE-1 chopped a log but the drop was out of reach; Adaptor used `move` in 2 of 5 repairs (both succeeded their `moved` check) but paired them with long `stevei` text again |
+| 09-18 | gemini-3-flash-preview, 3 JARVIS-1 spawns, `move` + rule 8, max_tokens 8192 | **1/3** | 15 total, 90k prompt tok, $0.08 | spawn 2 **success** (chop → `move` 20 steps onto the drop → "chop oak_log", 949 steps). Spawns 1 and 3 lost to truncated repair calls (30–34 s of thinking) → `llm_failed` → episode ended after one subgoal |
 
 ## Next steps we agreed on
 

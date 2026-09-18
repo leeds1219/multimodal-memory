@@ -128,6 +128,12 @@ class OpenAICompatibleBackend(PlannerBackend):
         temperature: float,
     ) -> str:
         t0 = time.monotonic()
+        extra = {}
+        # Thinking models (Gemini 3.x, o-series): cap hidden reasoning so the
+        # visible JSON is not truncated by max_tokens. "low" | "medium" | "high".
+        effort = os.environ.get("MINEEVOLVE_LLM_REASONING_EFFORT")
+        if effort:
+            extra["reasoning_effort"] = effort
         response = self._client.chat.completions.create(
             model=self._model,
             temperature=temperature,
@@ -136,6 +142,7 @@ class OpenAICompatibleBackend(PlannerBackend):
                 {"role": "system", "content": system},
                 {"role": "user", "content": user},
             ],
+            **extra,
         )
         choice = response.choices[0]
         content = choice.message.content if choice and choice.message else ""
@@ -148,6 +155,7 @@ class OpenAICompatibleBackend(PlannerBackend):
             "prompt_tokens": getattr(usage, "prompt_tokens", None),
             "completion_tokens": getattr(usage, "completion_tokens", None),
             "finish": getattr(choice, "finish_reason", None),
+            "reasoning_effort": effort,
             "s": round(time.monotonic() - t0, 2),
             "content_chars": len(content or ""),
         }, system=system, user=user, response=content or "")

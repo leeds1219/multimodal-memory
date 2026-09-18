@@ -105,6 +105,17 @@ Allowed `checks[].type` values:
    NOT exceed 14 subgoals.
 6. NEVER produce vague conditions ("try again", "be more careful").
 7. Output STRICT JSON ONLY. No prose. No Markdown fences. No comments.
+8. The `stevei` executor does NOT follow movement instructions ("move back",
+   "turn around", "step forward", "look down"): its text condition only
+   biases what it mines/attacks, and when its view is blocked it keeps
+   attacking in place. When the feedback shows no coordinate change or a
+   NAV_STUCK / TARGET_UNREACHABLE failure, or the fix is a pure movement,
+   INSERT a `move` subgoal first (executor_hint "move", params
+   {{"yaw_deg", "pitch_deg", "steps", "jump"}}, checks [{{"type": "moved", "n": 2}}])
+   and put the mining/attacking step AFTER it as a short `stevei` subgoal
+   (<= 8 words, e.g. "chop oak_log"). Example: agent stuck 2 blocks from a
+   dropped log -> {{"executor_hint": "move", "params": {{"yaw_deg": 0,
+   "pitch_deg": 0, "steps": 6, "jump": false}}}} then "chop oak_log".
 </rules>
 
 <example_subgoal_local>
