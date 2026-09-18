@@ -671,14 +671,16 @@ def _goal_quantity(task_goal: str) -> int:
 def _episode_succeeded(task_goal: str, inventory: Mapping[str, int]) -> bool:
     """Success if the inventory holds the item (and quantity) the task asks for."""
 
-    goal = str(task_goal).lower()
     need = _goal_quantity(task_goal)
-    if any(word in goal for word in ("log", "wood", "tree")) and "sapling" not in goal and any(
-        inventory_satisfies(inventory, target, 1) for target in ("log", "oak_log", "wood")
-    ):
-        return True
     obj = _goal_object(task_goal)
     obj_words = obj.split()
+    # wood-gathering goals ("chop an oak log", "punch a tree to gather wood"): any log counts.
+    # Only when the *object* is wood/log - "wooden sword" also contains "wood" (upstream's
+    # substring rule scored a sword task as solved by holding a log).
+    if obj_words and obj_words[-1] in ("log", "logs", "wood") and any(
+        inventory_satisfies(inventory, target, need) for target in ("log", "oak_log", "wood")
+    ):
+        return True
     if not obj_words:
         return False
     for k, count in inventory.items():
