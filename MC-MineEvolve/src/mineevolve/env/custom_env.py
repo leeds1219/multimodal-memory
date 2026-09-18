@@ -118,4 +118,11 @@ def register_mineevolve_env(
         max_minutes=max_minutes,
         seed=seed,
     )
+    # make_env() may be called again to relaunch a dead Minecraft; gym 0.23 raises
+    # on a duplicate id, so drop the old registration first.
+    import gym
+
+    reg = gym.envs.registration.registry.env_specs
+    if env_name in reg.keys():
+        del reg[env_name]
     spec.register()

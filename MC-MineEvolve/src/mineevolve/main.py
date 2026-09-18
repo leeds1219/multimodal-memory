@@ -743,14 +743,27 @@ def main(cfg: DictConfig) -> None:
     llm_log = Path(os.environ.get("MINEEVOLVE_LLM_LOG", "logs/llm_calls.jsonl"))
     t_eval = time.time()
 
+    episodes_on_instance = 0
+    recycle_every = int(OmegaConf.select(cfg, "env_recycle_every") or 8)
+
+    def _fresh_env(reason: str):
+        nonlocal env, episodes_on_instance
+        logger.warning("relaunching Minecraft (%s)", reason)
+        try:
+            env.close()
+        except Exception as exc:  # the old instance may already be dead
+            logger.warning("env.close() failed: %s", exc)
+        env = make_env(cfg, logger=logger)
+        episodes_on_instance = 0
+
     for task_id, task_type, instruction in tasks:
         for run_idx, seed in runs:
             seed_note = f"  seed={seed}" if seed is not None else ""
             info_panel(f"task {task_id} ({task_type})  run {run_idx + 1}/{len(runs)}{seed_note}: {instruction}")
             t_run = time.time()
-            try:
-                success, steps = run_episode(
-                    env=env,
+            if episodes_on_instance >= recycle_every:
+                _fresh_env(f"{episodes_on_instance} episodes on this instance")
+            episode_kwargs = dict(
                     client=client,
                     task_goal=instruction,
                     max_subgoals=int(cfg.runtime.get("max_subgoals", 12)),
@@ -768,9 +781,18 @@ def main(cfg: DictConfig) -> None:
                     ),
                     seed=seed,
                 )
-            except Exception as exc:
-                logger.exception("run_episode failed: %s", exc)
-                success, steps = False, 0
+            success, steps = False, 0
+            for attempt in range(2):
+                try:
+                    success, steps = run_episode(env=env, **episode_kwargs)
+                    episodes_on_instance += 1
+                    break
+                except Exception as exc:
+                    # a dead / hung Minecraft (socket timeout on reset) is an infrastructure
+                    # failure, not an agent result: relaunch once and retry the episode
+                    logger.exception("run_episode failed (attempt %d): %s", attempt + 1, exc)
+                    if attempt == 0:
+                        _fresh_env("episode failed")
             success_mon.record(instruction, success)
             step_mon.record(instruction, steps)
             if runs_log is not None:
