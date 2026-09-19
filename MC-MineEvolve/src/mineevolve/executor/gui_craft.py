@@ -226,21 +226,33 @@ class GuiCraftController:
         placed = self._place_block_under_feet("crafting_table")
         # if placement failed the agent may already be standing on a table (e.g. after a
         # `place` subgoal): try to open whatever is under the feet before giving up
-        if not self._open_block_under_feet():
-            raise RuntimeError("could not place the crafting table under the agent" if not placed else "crafting table GUI did not open")
-        self._table_placed_here = placed
+        if self._open_block_under_feet():
+            self._table_placed_here = placed
+            self._table_ahead = False
+            return
+        # fallback: place on the ground one block ahead (slopes, tall grass, non-full
+        # block under the feet)
+        if self._place_block_ahead("crafting_table") and self._open_block_ahead():
+            self._table_placed_here = True
+            self._table_ahead = True
+            return
+        raise RuntimeError("could not place the crafting table under the agent or in front of it")
 
     def pickup_table(self):
         """Break the placed table (still looking down; ~75 ticks by hand) so it drops
         under the agent and is picked up, then look back up."""
         before = sum(q for n, q in self.slots().values() if n == "crafting_table")
+        ahead = bool(getattr(self, "_table_ahead", False))
+        self._table_ahead = False
         a = self._noop(); a["attack"] = np.array(1)
         for _ in range(120):
             self._step(a)
             if sum(q for n, q in self.slots().values() if n == "crafting_table") > before:
                 break
+        if ahead:  # the drop lies one block ahead: walk onto it
+            a = self._noop(); a["forward"] = np.array(1); self._step(a, 8)
         self._step(self._noop(), 15)  # let the drop get picked up
-        a = self._noop(); a["camera"] = np.array([-88.0, 0.0], dtype=np.float32); self._step(a, 2)
+        a = self._noop(); a["camera"] = np.array([-88.0 if not ahead else -55.0, 0.0], dtype=np.float32); self._step(a, 2)
         if sum(q for n, q in self.slots().values() if n == "crafting_table") <= before:
             logger.warning("crafting table was not recovered after crafting")
 
@@ -444,6 +456,32 @@ class GuiCraftController:
             a = self._noop(); a["use"] = np.array(1); self._step(a, 1)
             self._step(self._noop(), 8)
             if sum(q for n, q in self.slots().values() if n == item) < before:
+                return True
+        return False
+
+    def _place_block_ahead(self, item: str) -> bool:
+        """Look ~50 deg down at the ground one block ahead and right-click to place ``item`` there."""
+        slot = self._find(item)
+        if slot is None:
+            return False
+        if slot > 8:
+            self.open_inventory(); self._swap_to_hotbar(slot, 0); self.close_gui(); slot = 0
+        self._key(f"hotbar.{slot + 1}", settle=2)
+        before = sum(q for n, q in self.slots().values() if n == item)
+        a = self._noop(); a["camera"] = np.array([-88.0, 0.0], dtype=np.float32); self._step(a, 2)   # back to level
+        a = self._noop(); a["camera"] = np.array([50.0, 0.0], dtype=np.float32); self._step(a, 1)    # ~50 deg down
+        for _ in range(3):
+            self._key("use", settle=6)
+            if sum(q for n, q in self.slots().values() if n == item) < before:
+                return True
+            a = self._noop(); a["camera"] = np.array([5.0, 0.0], dtype=np.float32); self._step(a, 1)  # a bit steeper
+        return False
+
+    def _open_block_ahead(self) -> bool:
+        for _ in range(4):
+            self._key("use", settle=5)
+            if self.gui_open():
+                self.cursor = [WIDTH // 2, HEIGHT // 2]
                 return True
         return False
 
