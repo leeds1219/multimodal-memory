@@ -145,6 +145,43 @@ Table 4 is not verifiable from the paper. Worth asking the authors.
 | 09-18 | gemini-3-flash-preview, task 7 "Craft an oak plank", cold start, real `mc_craft` | scored 0/3, **re-scored 2/3** | runs 1-2 crafted 4 oak_planks (815 / 646 steps) but the old goal matcher missed the plural; run 3 held a log yet looped on re-issued chop subgoals (delta check). Both scoring bugs fixed after this run. |
 | 09-18 | gemini-3-flash-preview, 3 JARVIS-1 spawns, `move` + rule 8, max_tokens 8192 | **1/3** | 15 total, 90k prompt tok, $0.08 | spawn 2 **success** (chop → `move` 20 steps onto the drop → "chop oak_log", 949 steps). Spawns 1 and 3 lost to truncated repair calls (30–34 s of thinking) → `llm_failed` → episode ended after one subgoal |
 
+## Wooden tier, cold start — full result (2026-09-18/19)
+
+Gemini 3 Flash (`reasoning_effort=low`), frozen empty KB, JARVIS-1 `oak_forest`
+spawns (3 per task), paper horizon 2 min, all primitives above. Paper (Table 4,
+accumulated KB): Wooden 98.6 %; STEVE-1-only 25.6 %.
+
+| task | result | notes |
+|---|---|---|
+| 8 Chop an oak log | 3/3 | |
+| 10 Punch a tree to gather wood | 3/3 | |
+| 7 Craft an oak plank | 3/3 | |
+| 6 Craft a crafting table | 3/3 | |
+| 5 Craft a stick | 2/3 | run 2: log obtained at step ~2300, horizon hit mid-craft |
+| 9 Collect a sapling | 0/3 | STEVE-1 hits trunks; sapling is a ~5 % leaf drop |
+| 0 Wooden pickaxe | 0/3 (two batches: 0/6) | see below |
+| 1 Wooden axe | 0/3 (0/6) | |
+| 2 Wooden shovel | 0/3 (0/6) | |
+| 3 Wooden hoe | 0/3 (0/6) | |
+| 4 Wooden sword | 0/3 (0/6) | |
+| **total** | **14/33 = 42 %** | |
+
+Why the five tool tasks fail: a wooden tool from an empty inventory needs 3 logs
+(9 planks: 4 table + 2 sticks + 2-3 head) and 4-5 GUI crafts (~65 steps each, the
+table one ~250). STEVE-1 here collects roughly one log per 500 steps, so gathering
+alone eats 1,500 of the 2,400 steps; add repairs and the horizon runs out — many
+runs ended one craft short with table + planks + sticks in hand. The planner also
+under-counts planks (plans 8, needs 9) on the first attempt; with the new
+`last_executor_error` feedback it repairs correctly but has no time left. The
+first tool batch had reported 15/15 — all false positives from the "wood"
+substring rule (fixed; every success is now re-verified against the final inventory).
+
+Interpretation: under the paper's *stated* conditions (empty inventory, 2 min,
+cold start) this stack solves the single-step wooden tasks but not the 4-craft
+chains. The paper's 98.6 % therefore implies a faster gatherer (their STEVE-1
+interface / spawns) and/or accumulated skills that front-load "chop 3 logs"; the
+6-minute diagnostic below separates horizon from pipeline.
+
 ## Next steps we agreed on
 
 - Run task 8 across the 3 default seeds with the `move` primitive available (not yet done with an API model).
