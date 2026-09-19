@@ -358,9 +358,10 @@ def _run_helper_subgoal(
         "state_start": start_state,
     }
     end_state = _state_snapshot(end_info, task_goal)
-    if helper_error:
-        # what a player would see in the GUI ("not enough planks"); goes into the
-        # state the Inducer/Adaptor prompts render, so repairs can target the cause
+    if helper_error and os.environ.get("MINEEVOLVE_EXECUTOR_ERRORS") == "1":
+        # EXTENSION (off by default, not in the paper): what a player would read off the
+        # GUI ("not enough planks") is added to the state the Inducer/Adaptor prompts
+        # render. The paper's Monitor only emits a failure *type*.
         end_state["last_executor_error"] = helper_error
     evidence_dir = make_subgoal_evidence_dir(
         artifact_dir=artifact_dir,

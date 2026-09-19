@@ -59,8 +59,7 @@ EXECUTOR_HINT_DESCRIPTIONS: dict[str, str] = {
         "for 3x3 recipes, and crafts the `inv_ge` item from ingredients already in the inventory (any "
         "vanilla recipe). Needs the ingredients first (e.g. oak_log -> oak_planks -> stick); a 3x3 recipe "
         "additionally needs a crafting_table ITEM in the inventory - mc_craft places, opens and picks the "
-        "table up by itself, NEVER plan a subgoal to place or equip the crafting_table. Count ingredients: "
-        "a wooden tool from scratch = 3 logs (4 planks for the table + 2 for sticks + up to 3 for the tool)."
+        "table up by itself, NEVER plan a subgoal to place or equip the crafting_table."
     ),
     "mc_smelt": (
         "scripted smelting: places the agent's furnace, loads the raw item (from the `inv_ge` target's "

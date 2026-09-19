@@ -14,7 +14,8 @@
 # MINEEVOLVE_LLM_REASONING_EFFORT=low (a repair call once thought ~7.8k tokens).
 # The knowledge store defaults to memories/<model> so runs with different
 # models do not share (and retrieve) each other's induced skills/remedies.
-# MINEEVOLVE_KB_FROZEN=1 evaluates with a frozen knowledge base (paper's cold-start
+# MINEEVOLVE_EXECUTOR_ERRORS=1 (extension, default off) feeds the GUI helpers' failure
+# reasons into the planner state. MINEEVOLVE_KB_FROZEN=1 evaluates with a frozen knowledge base (paper's cold-start
 # / checkpoint protocol); start from an empty memories/<model> for a true cold start.
 # Override the model with MINEEVOLVE_LLM_MODEL.
 set -euo pipefail

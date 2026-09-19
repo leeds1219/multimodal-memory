@@ -35,6 +35,7 @@ paper and this codebase are ours, which are upstream's, and which are still unkn
 | Only `inv_ge` checks were evaluated | `path_clear` / `ypos_*` / `gui_closed` are advertised to the LLM but never checked, so a repair subgoal without an item target always timed out. `moved` and `ypos_le` / `ypos_ge` are now evaluated; `path_clear` / `gui_closed` still are not. | `main.py` |
 | **Task success scoring** (`_episode_succeeded`) | Upstream matched the item id ("oak planks") as a substring of the goal ("craft an oak plank") → plural/singular mismatches scored finished tasks as failures (task 7 runs 1-2 ended with 4 oak_planks and were counted 0/3). Now the goal's object phrase is extracted ("smelt iron ore into iron ingot" → "iron ingot", "kill a cow to obtain leather" → "leather"), matched head-word + qualifiers, with the named quantity ("mine eight cobblestone"). Unit-tested on all 70 phrasings' shapes. | `main.py` |
 | **`inv_ge` is an absolute post-state check** | Upstream compared against a baseline snapshot at subgoal start (a delta), while the vocabulary tells the planner "inventory has >= n" and the paper's `CheckSuccess(z_i, s_post)` is a post-state check. With the delta, a re-issued "chop an oak log" subgoal could never pass once the log was already in hand (task 7 run 3 looped on this). | `env/mods/task_checker.py` |
+| **Extensions beyond the paper — OFF by default** | `MINEEVOLVE_EXECUTOR_ERRORS=1` adds the GUI helpers' failure reason ("missing oak_planks x1 (have 2, need 3)") to the planner state; the paper's Monitor only emits a failure *type*. A plank-arithmetic hint briefly added to the `mc_craft` description on 2026-09-19 was removed (recipe knowledge does not belong in the prompt). Runs that used either are labelled below. | `main.py`, `util/vocab.py` |
 | Not scripted (3 of 70 tasks) | "Trade with a villager" (villager + trade GUI), "Wash a leather chestplate in a cauldron" (cauldron + water), "Repair an iron helmet at a smithing table" (another GUI) have no primitive; they will fail unless STEVE-1 does them on its own. | — |
 
 ## Known mismatches we have NOT resolved
@@ -175,6 +176,11 @@ under-counts planks (plans 8, needs 9) on the first attempt; with the new
 `last_executor_error` feedback it repairs correctly but has no time left. The
 first tool batch had reported 15/15 — all false positives from the "wood"
 substring rule (fixed; every success is now re-verified against the final inventory).
+
+Provenance of the batches: tool batch 1 (false positives) and batch 2 (0/15) ran under paper
+conditions except that batch 2 had the executor-error extension ON (now default off);
+the 6-minute diagnostics (non-paper horizon) had it ON as well, and the second one also
+carried the plank-arithmetic hint. None of the 14 wooden successes depended on either.
 
 Interpretation: under the paper's *stated* conditions (empty inventory, 2 min,
 cold start) this stack solves the single-step wooden tasks but not the 4-craft
