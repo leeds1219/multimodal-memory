@@ -188,6 +188,29 @@ chains. The paper's 98.6 % therefore implies a faster gatherer (their STEVE-1
 interface / spawns) and/or accumulated skills that front-load "chop 3 logs"; the
 6-minute diagnostic below separates horizon from pipeline.
 
+### 6-minute horizon diagnostic (NOT a paper condition; executor-error extension was ON)
+
+Wooden pickaxe, 3 JARVIS-1 spawns, `env.max_minutes=6`: **1/3** (run 1: 3 logs → 12
+planks → table → sticks → pickaxe in 4,906 steps ≈ 4 min). Run 2 had table + planks +
+sticks at step ~700 but `mc_craft` could not place the table under the agent on that
+ground (bug, fixed: place-ahead fallback) and the planner then spent the rest trying to
+place it by hand; run 3 never got past one log. Earlier 6-minute attempts: 0/3, 0/1
+(STEVE-1 collected no logs at all). Conclusion: the full chain works end to end; at
+this executor's gathering rate (~500 steps per log) the paper's 2-minute horizon is the
+binding constraint for the tool tasks.
+
+## Paper vs. ours, wooden tier (status 2026-09-19)
+
+| | paper (Table 4, Gemini-3-Flash, accumulated KB) | ours (cold start, 2 min, extensions off) |
+|---|---|---|
+| Wooden group | 98.6 % | 42 % (14/33) |
+| single-step tasks (8, 10, 7, 6) | ≈ 99 % | 100 % (12/12) |
+| stick (2 crafts) | ≈ 99 % | 67 % |
+| tools 0-4 (4-5 crafts) | ≈ 99 % | 0 % (0/15) |
+| sapling | ? | 0 % |
+| STEVE-1 only | 25.6 % | 33 % (1/3 twice) |
+| eval-time LLM calls / episode | ≈ 8 | 3-17 |
+
 ## Next steps we agreed on
 
 - Run task 8 across the 3 default seeds with the `move` primitive available (not yet done with an API model).
