@@ -291,6 +291,20 @@ def _run_subgoal(
     }
 
 
+def _item_in_text(text: str) -> str | None:
+    """Longest vanilla item id mentioned in a sentence ('equip the crafting table' -> crafting_table)."""
+    from minerl.herobraine.hero.mc import ALL_ITEMS
+
+    t = " " + re.sub(r"[^a-z0-9_ ]", " ", str(text).lower()).replace("_", " ") + " "
+    t = re.sub(r"\s+", " ", t)
+    best = None
+    for item in ALL_ITEMS:
+        words = " " + item.replace("_", " ") + " "
+        if words in t and (best is None or len(item) > len(best)):
+            best = item
+    return best
+
+
 def _run_helper_subgoal(
     env,
     subgoal: Mapping[str, Any],
@@ -302,12 +316,17 @@ def _run_helper_subgoal(
     """Execute one non-STEVE helper subgoal such as mc_craft or mc_smelt."""
 
     target = None
+    params = subgoal.get("params") or {}
     for c in subgoal.get("checks") or []:
         if isinstance(c, Mapping) and c.get("type") == "inv_ge":
             target = (str(c.get("item") or ""), int(c.get("n") or 1))
             break
+    if target is None and isinstance(params, Mapping) and params.get("item"):
+        target = (str(params["item"]), int(params.get("n") or 1))
     if target is None:
-        target = (str(subgoal.get("condition") or ""), 1)
+        # equip / place / use subgoals usually carry no inv_ge check: read the item off the sentence
+        item = _item_in_text(subgoal.get("condition") or "")
+        target = (item, 1) if item else (str(subgoal.get("condition") or ""), 1)
 
     start_inv = dict((env.info or {}).get("inventory") or {})
     start_coords = list((env.info or {}).get("coords") or [0, 64, 0])

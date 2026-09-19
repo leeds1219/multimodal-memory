@@ -77,10 +77,25 @@ class CraftHelper:
                     pass
             return bool(ok)
 
-        if req.kind == "place":
-            return self._place(req.target, baseline)
-        if req.kind == "use":
-            return self._use(req.target)
+        if req.kind in ("place", "use"):
+            from .gui_craft import GuiCraftController
+
+            ctl = GuiCraftController(self.env)
+            try:
+                ok = ctl.place(req.target) if req.kind == "place" else ctl.use(req.target)
+            except Exception as exc:
+                logger.warning("%s of %s failed: %s", req.kind, req.target, exc)
+                ok = False
+                if "episode ended" in str(exc):
+                    self.episode_ended = True
+            finally:
+                self.last_steps = ctl.steps
+                self.last_error = getattr(ctl, "last_error", "") or ("" if ok else f"{req.kind} {req.target} failed")
+                try:
+                    self.env.step(self.env.action_space.noop())
+                except Exception:
+                    pass
+            return bool(ok)
 
         # mc_craft / mc_smelt: open the relevant GUI then poll inventory
         # for the target item count to reach baseline + quantity.

@@ -58,7 +58,9 @@ EXECUTOR_HINT_DESCRIPTIONS: dict[str, str] = {
         "scripted crafting: opens the inventory 2x2 grid, or places and opens the agent's crafting_table "
         "for 3x3 recipes, and crafts the `inv_ge` item from ingredients already in the inventory (any "
         "vanilla recipe). Needs the ingredients first (e.g. oak_log -> oak_planks -> stick); a 3x3 recipe "
-        "additionally needs a crafting_table in the inventory."
+        "additionally needs a crafting_table ITEM in the inventory - mc_craft places, opens and picks the "
+        "table up by itself, NEVER plan a subgoal to place or equip the crafting_table. Count ingredients: "
+        "a wooden tool from scratch = 3 logs (4 planks for the table + 2 for sticks + up to 3 for the tool)."
     ),
     "mc_smelt": (
         "scripted smelting: places the agent's furnace, loads the raw item (from the `inv_ge` target's "
@@ -66,7 +68,9 @@ EXECUTOR_HINT_DESCRIPTIONS: dict[str, str] = {
         "per item, takes the output and picks the furnace back up (needs a pickaxe). Needs furnace + raw "
         "item + fuel in the inventory first."
     ),
-    "equip": "put the `inv_ge` item (a tool/weapon already in the inventory) into the hotbar and hold it, e.g. before mining stone with a wooden_pickaxe.",
+    "equip": "put an item already in the inventory into the hotbar and hold it (item named in the condition, e.g. 'equip wooden_pickaxe'); use before mining with a tool. Not needed for crafting.",
+    "place": "place one block from the inventory under the agent's feet (item named in the condition). Not needed for crafting or smelting - those helpers place their own table/furnace.",
+    "use": "hold an item and right-click it for ~2 s, e.g. 'use apple' to eat (item named in the condition).",
     "wait": "no executor is invoked; the wrapper just consumes ticks.",
     "move": (
         "deterministic navigation primitive, no policy involved: turns by `params.yaw_deg` "

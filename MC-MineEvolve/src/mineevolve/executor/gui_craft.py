@@ -223,19 +223,12 @@ class GuiCraftController:
             self._swap_to_hotbar(slot, 0)
             self.close_gui()
             slot = 0
-        self._key(f"hotbar.{slot + 1}", settle=2)
-        # look straight down, jump and place under the feet, then use it
-        a = self._noop(); a["camera"] = np.array([88.0, 0.0], dtype=np.float32); self._step(a, 2)
-        a = self._noop(); a["jump"] = np.array(1); self._step(a, 1)
-        a = self._noop(); a["use"] = np.array(1); self._step(a, 1)
-        self._step(self._noop(), 4)
-        for _ in range(4):
-            self._key("use", settle=5)
-            if self.gui_open():
-                break
-        if not self.gui_open():
-            raise RuntimeError("crafting table GUI did not open")
-        self.cursor = [WIDTH // 2, HEIGHT // 2]
+        placed = self._place_block_under_feet("crafting_table")
+        # if placement failed the agent may already be standing on a table (e.g. after a
+        # `place` subgoal): try to open whatever is under the feet before giving up
+        if not self._open_block_under_feet():
+            raise RuntimeError("could not place the crafting table under the agent" if not placed else "crafting table GUI did not open")
+        self._table_placed_here = placed
 
     def pickup_table(self):
         """Break the placed table (still looking down; ~75 ticks by hand) so it drops
@@ -315,7 +308,7 @@ class GuiCraftController:
                         break
                     self.move_to(*INV_SLOT_PX[dst]); self.left_click(); self._step(self._noop(), 3)
                 self.close_gui()
-                if grid == 3:
+                if grid == 3 and getattr(self, "_table_placed_here", True):
                     self.pickup_table()
             except RuntimeError as exc:
                 logger.warning("craft %s failed: %s", target, exc)
@@ -348,7 +341,7 @@ class GuiCraftController:
         if missing:
             parts.append("missing " + ", ".join(missing))
         if grid == 3 and avail.get("crafting_table", 0) < 1:
-            parts.append("needs a crafting_table in the inventory (3x3 recipe)")
+            parts.append("needs a crafting_table ITEM in the inventory (3x3 recipe; mc_craft places and opens it by itself, do not place or equip it manually)")
         return " and ".join(parts) or "unknown"
 
     def _plan(self, r: dict, count: int):
@@ -443,10 +436,16 @@ class GuiCraftController:
             self.open_inventory(); self._swap_to_hotbar(slot, 0); self.close_gui(); slot = 0
         self._key(f"hotbar.{slot + 1}", settle=2)
         a = self._noop(); a["camera"] = np.array([88.0, 0.0], dtype=np.float32); self._step(a, 2)
-        a = self._noop(); a["jump"] = np.array(1); self._step(a, 1)
-        a = self._noop(); a["use"] = np.array(1); self._step(a, 1)
-        self._step(self._noop(), 4)
-        return True
+        before = sum(q for n, q in self.slots().values() if n == item)
+        for _attempt in range(4):
+            # placing under the feet only works while airborne: click ~5 ticks after the jump
+            a = self._noop(); a["jump"] = np.array(1); self._step(a, 1)
+            self._step(self._noop(), 4)
+            a = self._noop(); a["use"] = np.array(1); self._step(a, 1)
+            self._step(self._noop(), 8)
+            if sum(q for n, q in self.slots().values() if n == item) < before:
+                return True
+        return False
 
     def _open_block_under_feet(self) -> bool:
         for _ in range(4):
@@ -531,4 +530,35 @@ class GuiCraftController:
             a = self._noop(); a["camera"] = np.array([-88.0, 0.0], dtype=np.float32); self._step(a, 2)
             logger.warning("smelt: no pickaxe, furnace left behind")
         return sum(q for n, q in self.slots().values() if n == target) - have0 >= count
+
+    # -- place / use ---------------------------------------------------------
+    def place(self, item: str) -> bool:
+        """Place one ``item`` block under the agent's feet (looks down, jumps, uses, looks back)."""
+        item = item.replace("minecraft:", "")
+        self.last_error = ""
+        self._step(self._noop(), 3)
+        before = sum(q for n, q in self.slots().values() if n == item)
+        if before < 1:
+            self.last_error = f"cannot place {item}: not in the inventory"; logger.warning(self.last_error); return False
+        self._place_block_under_feet(item)
+        a = self._noop(); a["camera"] = np.array([-88.0, 0.0], dtype=np.float32); self._step(a, 2)
+        self._step(self._noop(), 3)
+        placed = sum(q for n, q in self.slots().values() if n == item) < before
+        if not placed:
+            self.last_error = f"could not place {item} (no free block under the agent?)"
+        return placed
+
+    def use(self, item: str, ticks: int = 40) -> bool:
+        """Hold ``item`` and right-click for ``ticks`` (eating takes 32 ticks)."""
+        item = item.replace("minecraft:", "")
+        self.last_error = ""
+        if not self.equip(item):
+            return False
+        before = sum(q for n, q in self.slots().values() if n == item)
+        a = self._noop(); a["use"] = np.array(1); self._step(a, ticks)
+        self._step(self._noop(), 5)
+        used = sum(q for n, q in self.slots().values() if n == item) < before
+        if not used:
+            self.last_error = f"used {item} for {ticks} ticks but its count did not change (food is only eaten when hunger < 20)"
+        return used
 
