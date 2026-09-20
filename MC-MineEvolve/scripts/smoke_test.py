@@ -146,7 +146,7 @@ def main() -> int:
     obs = env.reset()
     if args.pos is not None:
         x, y, z = args.pos
-        env.execute_cmd(f"/tp @s {x:.1f} {y:.1f} {z:.1f}")
+        env.execute_cmd(f"/tp @s {x:.1f} {y:.1f} {z:.1f} 0 0")
         env.execute_cmd("/spawnpoint")
         for _ in range(10):
             obs, _r, _d, _i = env.step(env.action_space.noop())

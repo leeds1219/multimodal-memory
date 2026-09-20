@@ -476,7 +476,9 @@ def run_episode(
     if pos is not None:
         # JARVIS-1-style close-ended spawn: fixed seed + fixed player position.
         x, y, z = (float(v) for v in pos)
-        env.execute_cmd(f"/tp @s {x:.1f} {y:.1f} {z:.1f}")
+        # yaw 0 / pitch 0: a fixed spawn must also fix the view; without it the agent
+        # keeps the previous episode's camera (often looking straight up at leaves)
+        env.execute_cmd(f"/tp @s {x:.1f} {y:.1f} {z:.1f} 0 0")
         env.execute_cmd("/spawnpoint")
         for _ in range(10):  # let chunks load and the camera settle before the first frame
             obs, _r, _d, _i = env.step(env.action_space.noop())
