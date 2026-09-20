@@ -866,6 +866,18 @@ def main(cfg: DictConfig) -> None:
     )
 
     OmegaConf.save(config=cfg, f="resolved_config.yaml")
+    if run_dir is not None:
+        (run_dir / "DONE").write_text(time.strftime("%Y-%m-%d %H:%M:%S"))
+
+    # MineRL leaves non-daemon threads / a zombie launchClient behind; the interpreter
+    # then hangs at exit (a 33-episode run sat "running" for 10 h after printing its
+    # results). Close what we can and exit hard.
+    try:
+        env.close()
+    except Exception as exc:
+        logger.warning("env.close() at exit failed: %s", exc)
+    logging.shutdown()
+    os._exit(0)
 
 
 if __name__ == "__main__":
