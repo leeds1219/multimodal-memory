@@ -211,6 +211,72 @@ binding constraint for the tool tasks.
 | STEVE-1 only | 25.6 % | 33 % (1/3 twice) |
 | eval-time LLM calls / episode | ≈ 8 | 3-17 |
 
+## Fixed task–seed split: accumulation to M=66 and frozen checkpoints (2026-09-19/20)
+
+Paper protocol: the same fixed task–seed split (11 wooden tasks × 3 JARVIS-1 `oak_forest`
+spawns = 33 episodes) is used for accumulation (KB writes ON, episodes in order) and for
+evaluation (KB frozen at a checkpoint, same 33 episodes). Extensions off, 2-min horizon,
+empty inventory. Labels from `scripts/analyze_failures.py` (S success, P planner, E executor,
+N no log, O out of time, D no sapling drop).
+
+| run | condition | result | LLM calls/ep | first log (median steps) | $ |
+|---|---|---|---|---|---|
+| 09-19 09:21 | pass 1 online (KB 0→33 ep; 35 skills / 21 remedies) | 14/33 = 42 % | 17.0 | 823 | 5.28 |
+| 09-19 12:32 | M=33 frozen | 14/33 = 42 % | 15.6 | 1028 | 5.31 |
+| 09-19 15:37 | pass 2 online (KB 33→66 ep; 61 / 42) | 12/33 = 36 % | 20.3 | 730 | 6.50 |
+| 09-20 05:33 | **M=66 frozen** | **15/33 = 45 %** | 16.8 | 877 | 5.42 |
+
+Per task (spawn 1·2·3), M=66 frozen: pickaxe SSN, axe ONO, shovel OEO, hoe SOO, sword OEE,
+stick SSN, table SSS, plank SSN, log SSS, sapling NDD, punch SSN. Tool tasks 3/15 (20 %);
+across the four runs 1/15, 3/15, 2/15, 3/15 — no measurable KB effect by 66 episodes.
+Paper Table 4 (accumulated KB, ~400 ep): 98.6 %. Spend stopped here per the user
+(tracked total $39.43 + ≈$2.6 before the tracker ≈ $42).
+
+### Is it the LLM? — no
+
+Over the 132 paper-condition episodes: success 55, out_of_time 31, no_log 30, no_drop 8,
+executor 7, planner 1. Re-checking the 7 "executor" labels in `main.log`: 5 were the horizon
+hitting mid-craft (e.g. sword craft started at step 2,377), 1 was a planner arithmetic slip
+(asked for 8 oak_planks holding 1 oak + 1 birch log), 1 a real executor limitation (crafting
+table could not be placed on that ground, M=66 task 4 run 2). Other planner mistakes seen:
+a sword-task plan that crafted a wooden *pickaxe* (a pickaxe skill was retrieved — negative
+transfer) and two plans that tried to place the table by hand. In total ≤5 planner-caused
+failures out of 132.
+
+The binding constraint is the gathering rate of STEVE-1 against the 2,400-step horizon:
+first log at median 852 steps (p25 637, p75 1,360; 102/132 episodes got one), ~500 steps per
+further log, and a tool needs 3 logs + 4 GUI crafts (measured medians: planks 54, table 76,
+sticks 67, tool ≈230 → ≈430 steps). 852 + 1,000 + 430 = 2,282 leaves ~120 steps for any
+repair. Of the 60 tool-task episodes, 14 got no log, 30 ended with 1–2 logs while still
+chopping, 7 got as far as planks/table/sticks, 9 crafted the tool.
+
+### Knowledge base at M=66 (61 skills / 42 remedies; paper Table 7 at 50 ep: 31 / 44)
+
+Skills are JSON text (context `c`, content `u` with preconditions/steps/observed_effects,
+check `phi`, confidence `rho`, evidence `E`) inserted into the planner prompt (avg 5.7 per
+initial plan) — not code. By step text: 33 move/unstick, 14 gather, 14 craft. Remedies:
+NAV_STUCK 15, DEADLOCK 15, MOB_KILLED 4, MISSING_ITEM 3, GUI_FAIL 2, TARGET_UNREACHABLE 2,
+TIMEOUT 1. Retrieval works (41/61 skills and 21/42 remedies used ≥1; 355/600 repair prompts
+carried 2 retrieved remedies + the temporary one) but quality is low: 15/61 skills are
+movement steps credited with "inventory gained 1 oak_log" (mis-attributed to the next chop);
+the same "jump and move backward to clear any potential block collision" step is stored
+several times under different ids; 52/61 skills sit at rho=0.95 (no ranking); one NAV_STUCK
+remedy has usage_count 175 with support 1. Nothing stored shortens gathering time, which is
+what the tool tasks need.
+
+### Visual input to the planner (extension idea, not run)
+
+Montage `logs/archive/no_log_montage_M33.png` (step 1 vs ~600 of no_log episodes): many
+step-1 frames are sky-only — camera pitch inherited across `/tp` (fixed in 9609632 with
+`/tp @s x y z 0 0`; **not yet reflected in any run above**); at step ~600 trunks are often
+within 1–3 blocks with the cut block visible but the drop not collected; the planner's `move`
+yaw choices in repairs are blind. A keyframe in the repair prompt would inform those choices
+(no_log is 23 % of episodes) but would not change the steps-per-log rate, so the tool-task
+budget problem would remain. Suggested A/B (default off): one end-of-subgoal keyframe in
+repair prompts only, ≈260 tokens per frame.
+
+Summary artifact: https://claude.ai/artifact/S9numm7vujgN5XQqpaRqrJ
+
 ## Next steps we agreed on
 
 - Run task 8 across the 3 default seeds with the `move` primitive available (not yet done with an API model).
