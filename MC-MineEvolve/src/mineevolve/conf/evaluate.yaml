@@ -47,6 +47,27 @@ runtime:
 memory:
   path: memories/${now:%Y-%m-%d}/${now:%H-%M-%S}
 
+# Knowledge accumulation (paper Table 7 protocol: M episodes on the fixed task-seed
+# split, KB checkpoints every 50). episodes > 0 runs that many episodes cycling over
+# tasks x seeds in fixed order (pass 1 = the 33 wooden episodes, pass 2 repeats them,
+# ...) inside ONE run dir; each pass keeps the usual evidence/ plans/ layout under
+# pass<k>/. At every kb_checkpoint_every episodes the server's store (kb_store_dir =
+# its MINEEVOLVE_MEMORY_PATH, written after every curator update) is copied to
+# <run dir>/kb_checkpoints/M<n>/. The server must be started with KB writes ON.
+# CLI: accumulate.episodes=50
+accumulate:
+  episodes: 0
+  kb_checkpoint_every: 50
+  kb_store_dir: memories/gemini-3-flash-preview
+
+# Continue an interrupted run in place (no episode is paid for twice): the episodes
+# already listed in <resume_dir>/runs.jsonl are skipped and everything new is appended
+# there. The server must still hold the same live store (do not restart it with an
+# empty MINEEVOLVE_MEMORY_PATH; to restart from a checkpoint copy
+# <run dir>/kb_checkpoints/M<n>/*.json into the store dir first).
+# CLI: resume_dir=logs/eval/2026-09-21/10-00-00
+resume_dir: null
+
 # Per-step recording
 record:
   video:

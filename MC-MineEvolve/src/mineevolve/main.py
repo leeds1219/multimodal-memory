@@ -766,6 +766,11 @@ def main(cfg: DictConfig) -> None:
         run_dir = Path(HydraConfig.get().runtime.output_dir)
     except Exception:  # not launched through hydra
         run_dir = None
+    resume_dir = OmegaConf.select(cfg, "resume_dir")
+    if resume_dir:
+        run_dir = Path(str(resume_dir))
+        if not run_dir.is_dir():
+            raise SystemExit(f"resume_dir does not exist: {run_dir}")
     runs_log = run_dir / "runs.jsonl" if run_dir else None
     # Every run is self-contained: plans/ and evidence/ go under the hydra run dir
     # (logs/eval/<date>/<time>/) unless artifact_dir is set explicitly, and the
@@ -773,6 +778,42 @@ def main(cfg: DictConfig) -> None:
     artifact_dir = str(OmegaConf.select(cfg, "artifact_dir") or run_dir or ".")
     llm_log = Path(os.environ.get("MINEEVOLVE_LLM_LOG", "logs/llm_calls.jsonl"))
     t_eval = time.time()
+
+    # Episode sequence: tasks x seeds in fixed order (the task-seed split). In
+    # accumulation mode the sequence is repeated until accumulate.episodes episodes
+    # have run; each repetition is a "pass" with its own evidence/ plans/ subdir.
+    sequence = [(task_id, task_type, instruction, run_idx, seed)
+                for task_id, task_type, instruction in tasks for run_idx, seed in runs]
+    n_accumulate = int(OmegaConf.select(cfg, "accumulate.episodes") or 0)
+    n_episodes = n_accumulate if n_accumulate > 0 else len(sequence)
+    checkpoint_every = int(OmegaConf.select(cfg, "accumulate.kb_checkpoint_every") or 50)
+    kb_store_dir = Path(str(OmegaConf.select(cfg, "accumulate.kb_store_dir") or "memories/run"))
+    done_episodes = 0
+    if runs_log is not None and runs_log.exists():
+        done_episodes = sum(1 for line in runs_log.read_text().splitlines() if line.strip())
+    if done_episodes and not resume_dir:
+        raise SystemExit(f"{runs_log} already has {done_episodes} episodes; pass resume_dir=... to continue it")
+    if resume_dir:
+        logger.info("resuming %s at episode %d/%d", run_dir, done_episodes + 1, n_episodes)
+        if n_accumulate > 0 and kb_store_dir.is_dir():
+            n_sk = sum(len(json.loads((kb_store_dir / f).read_text())) for f in ("skills.json", "remedies.json") if (kb_store_dir / f).exists())
+            logger.info("live KB store %s holds %d entries", kb_store_dir, n_sk)
+            if done_episodes >= checkpoint_every and n_sk == 0:
+                logger.warning("live KB store is EMPTY after %d episodes - restore kb_checkpoints/ into %s before resuming", done_episodes, kb_store_dir)
+
+    def _checkpoint_kb(n_done: int) -> None:
+        if run_dir is None:
+            return
+        dst = run_dir / "kb_checkpoints" / f"M{n_done}"
+        if not kb_store_dir.is_dir():
+            logger.warning("KB checkpoint M%d skipped: store dir %s not found", n_done, kb_store_dir)
+            return
+        dst.mkdir(parents=True, exist_ok=True)
+        import shutil
+        for name in ("skills.json", "remedies.json"):
+            if (kb_store_dir / name).exists():
+                shutil.copy2(kb_store_dir / name, dst / name)
+        logger.info("KB checkpoint M%d -> %s", n_done, dst)
 
     episodes_on_instance = 0
     recycle_every = int(OmegaConf.select(cfg, "env_recycle_every") or 8)
@@ -787,60 +828,71 @@ def main(cfg: DictConfig) -> None:
         env = make_env(cfg, logger=logger)
         episodes_on_instance = 0
 
-    for task_id, task_type, instruction in tasks:
-        for run_idx, seed in runs:
-            seed_note = f"  seed={seed}" if seed is not None else ""
-            info_panel(f"task {task_id} ({task_type})  run {run_idx + 1}/{len(runs)}{seed_note}: {instruction}")
-            t_run = time.time()
-            if episodes_on_instance >= recycle_every:
-                _fresh_env(f"{episodes_on_instance} episodes on this instance")
-            episode_kwargs = dict(
-                    client=client,
-                    task_goal=instruction,
-                    max_subgoals=int(cfg.runtime.get("max_subgoals", 12)),
-                    max_steps_per_subgoal=int(cfg.runtime.get("max_steps_per_subgoal", 1200)),
-                    subgoal_timeout_s=int(cfg.runtime.get("subgoal_timeout_s", 60)),
-                    eta_fail=float(cfg.runtime.get("eta_fail", 0.5)),
-                    recent_window=int(cfg.runtime.get("recent_window", 4)),
-                    budget_tokens=int(cfg.runtime.get("budget_tokens", 512)),
-                    top_k=int(cfg.runtime.get("top_k", 16)),
-                    artifact_dir=artifact_dir,
-                    task_id=task_id,
-                    run_idx=run_idx,
-                    evidence_keyframe_interval=int(
-                        OmegaConf.select(cfg, "record.evidence.keyframe_interval") or 40
-                    ),
-                    seed=seed,
-                )
-            success, steps = False, 0
-            for attempt in range(2):
-                try:
-                    success, steps = run_episode(env=env, **episode_kwargs)
-                    episodes_on_instance += 1
-                    break
-                except Exception as exc:
-                    # a dead / hung Minecraft (socket timeout on reset) is an infrastructure
-                    # failure, not an agent result: relaunch once and retry the episode
-                    logger.exception("run_episode failed (attempt %d): %s", attempt + 1, exc)
-                    if attempt == 0:
-                        _fresh_env("episode failed")
-            success_mon.record(instruction, success)
-            step_mon.record(instruction, steps)
-            if runs_log is not None:
-                with runs_log.open("a") as fh:
-                    fh.write(json.dumps({
-                        "task_id": task_id, "task": instruction, "run": run_idx + 1,
-                        "seed": seed if not isinstance(seed, Mapping) else seed["seed"],
-                        "pos": seed["pos"] if isinstance(seed, Mapping) else None,
-                        "success": bool(success), "steps": int(steps), "wall_s": round(time.time() - t_run, 1),
-                        "llm": f"{cfg.llm.provider}/{cfg.llm.model}",
-                    }) + "\n")
-            save_video = getattr(env, "save_video", None)
-            if callable(save_video):
-                status = "success" if success else "failed"
-                thread = save_video(instruction, status)
-                if thread is not None:
-                    thread.join(timeout=30.0)
+    for ep_idx in range(done_episodes, n_episodes):
+        task_id, task_type, instruction, run_idx, seed = sequence[ep_idx % len(sequence)]
+        pass_no = ep_idx // len(sequence) + 1
+        ep_artifact_dir = str(Path(artifact_dir) / f"pass{pass_no}") if n_accumulate > 0 else artifact_dir
+        seed_note = f"  seed={seed}" if seed is not None else ""
+        info_panel(f"episode {ep_idx + 1}/{n_episodes} (pass {pass_no})  task {task_id} ({task_type})  run {run_idx + 1}/{len(runs)}{seed_note}: {instruction}")
+        t_run = time.time()
+        if episodes_on_instance >= recycle_every:
+            _fresh_env(f"{episodes_on_instance} episodes on this instance")
+        episode_kwargs = dict(
+                client=client,
+                task_goal=instruction,
+                max_subgoals=int(cfg.runtime.get("max_subgoals", 12)),
+                max_steps_per_subgoal=int(cfg.runtime.get("max_steps_per_subgoal", 1200)),
+                subgoal_timeout_s=int(cfg.runtime.get("subgoal_timeout_s", 60)),
+                eta_fail=float(cfg.runtime.get("eta_fail", 0.5)),
+                recent_window=int(cfg.runtime.get("recent_window", 4)),
+                budget_tokens=int(cfg.runtime.get("budget_tokens", 512)),
+                top_k=int(cfg.runtime.get("top_k", 16)),
+                artifact_dir=ep_artifact_dir,
+                task_id=task_id,
+                run_idx=run_idx,
+                evidence_keyframe_interval=int(
+                    OmegaConf.select(cfg, "record.evidence.keyframe_interval") or 40
+                ),
+                seed=seed,
+            )
+        success, steps = False, 0
+        for attempt in range(2):
+            try:
+                success, steps = run_episode(env=env, **episode_kwargs)
+                episodes_on_instance += 1
+                break
+            except Exception as exc:
+                # a dead / hung Minecraft (socket timeout on reset) is an infrastructure
+                # failure, not an agent result: relaunch once and retry the episode
+                logger.exception("run_episode failed (attempt %d): %s", attempt + 1, exc)
+                if attempt == 0:
+                    _fresh_env("episode failed")
+        success_mon.record(instruction, success)
+        step_mon.record(instruction, steps)
+        if runs_log is not None:
+            with runs_log.open("a") as fh:
+                row = {
+                    "task_id": task_id, "task": instruction, "run": run_idx + 1,
+                    "seed": seed if not isinstance(seed, Mapping) else seed["seed"],
+                    "pos": seed["pos"] if isinstance(seed, Mapping) else None,
+                    "success": bool(success), "steps": int(steps), "wall_s": round(time.time() - t_run, 1),
+                    "llm": f"{cfg.llm.provider}/{cfg.llm.model}",
+                    "episode": ep_idx + 1, "pass": pass_no,
+                }
+                fh.write(json.dumps(row) + "\n")
+            if n_accumulate > 0:
+                # per-pass copy so scripts/analyze_failures.py works on <run dir>/pass<k>
+                Path(ep_artifact_dir).mkdir(parents=True, exist_ok=True)
+                with (Path(ep_artifact_dir) / "runs.jsonl").open("a") as fh:
+                    fh.write(json.dumps(row) + "\n")
+        if n_accumulate > 0 and ((ep_idx + 1) % checkpoint_every == 0 or ep_idx + 1 == n_episodes):
+            _checkpoint_kb(ep_idx + 1)
+        save_video = getattr(env, "save_video", None)
+        if callable(save_video):
+            status = "success" if success else "failed"
+            thread = save_video(instruction, status)
+            if thread is not None:
+                thread.join(timeout=30.0)
 
     if run_dir is not None and llm_log.exists():
         # copy this run's LLM calls (by timestamp) and their prompt/response dumps
@@ -849,7 +901,8 @@ def main(cfg: DictConfig) -> None:
             for line in llm_log.read_text().splitlines():
                 if line.strip() and json.loads(line).get("t", 0) >= t_eval - 1:
                     kept.append(line)
-            (run_dir / "llm_calls.jsonl").write_text("\n".join(kept) + ("\n" if kept else ""))
+            with (run_dir / "llm_calls.jsonl").open("a" if resume_dir else "w") as fh:
+                fh.write("\n".join(kept) + ("\n" if kept else ""))
             dump_dir = run_dir / "llm_calls"
             for line in kept:
                 src = json.loads(line).get("dump")

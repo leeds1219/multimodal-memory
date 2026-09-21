@@ -264,6 +264,39 @@ with the paper.
 
 Per-task and aggregate results are printed via `rich.Table`. Per-episode logs and (optionally) videos go to `logs/eval/<date>/<time>/` and `videos/<date>/`.
 
+### Knowledge accumulation with checkpoints (paper Table 7 protocol)
+
+The paper accumulates knowledge over M episodes of the fixed task-seed split and
+reports checkpoints at 50 / 100 / 200 / 400. One command does that in a single run
+dir, so an interrupted run never pays for an episode twice:
+
+```bash
+# server with KB writes ON and a fresh store (cold start):
+MINEEVOLVE_MEMORY_PATH=memories/acc-$(date +%Y%m%d) bash scripts/server_gemini.sh &
+# 50 episodes = the 33 wooden episodes (pass 1) + the first 17 again (pass 2)
+xvfb-run -a python -m mineevolve.main benchmark=wooden llm=gemini_flash \
+    accumulate.episodes=50 accumulate.kb_store_dir=memories/acc-$(date +%Y%m%d)
+
+# it died at episode 37?  continue in place (same server, same store):
+xvfb-run -a python -m mineevolve.main benchmark=wooden llm=gemini_flash \
+    accumulate.episodes=50 accumulate.kb_store_dir=memories/acc-... \
+    resume_dir=logs/eval/<date>/<time>
+
+# frozen evaluation of a checkpoint: copy it into a store, start the server frozen
+mkdir -p memories/M50 && cp logs/eval/<date>/<time>/kb_checkpoints/M50/*.json memories/M50/
+MINEEVOLVE_KB_FROZEN=1 MINEEVOLVE_MEMORY_PATH=memories/M50 bash scripts/server_gemini.sh &
+xvfb-run -a python -m mineevolve.main benchmark=wooden llm=gemini_flash
+```
+
+Layout of an accumulation run: `runs.jsonl` (with `episode` and `pass` fields),
+`pass<k>/` (the usual `evidence/`, `plans/`, `runs.jsonl` of that pass —
+`scripts/analyze_failures.py logs/eval/<date>/<time>/pass1` works unchanged),
+`kb_checkpoints/M<n>/{skills,remedies}.json` every `accumulate.kb_checkpoint_every`
+(50) episodes and at the end, `llm_calls.jsonl` + `llm_calls/` (appended on resume).
+Everything needed for offline analysis (`scripts/analyze_failures.py`,
+`scripts/llm_usage.py`, `scripts/spend.py`) is inside the run dir; no API call is
+needed to look at a result again.
+
 ### Evaluate a custom task subset
 
 `conf/benchmark/<group>.yaml::evaluate` selects task ids; leave it `[]` for all 70 tasks. To run iron tasks #2 and #5 only:

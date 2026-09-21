@@ -29,6 +29,9 @@ LLM_LOG_PATH = os.environ.get("MINEEVOLVE_LLM_LOG", "logs/llm_calls.jsonl")
 # could not know from text alone (e.g. vs. the POV keyframes in evidence/).
 LLM_DUMP_DIR = os.environ.get("MINEEVOLVE_LLM_DUMP_DIR", os.path.splitext(LLM_LOG_PATH)[0])
 _call_counter = 0
+# The counter restarts with every server process; prefix dump names with the
+# process start time so two server sessions never overwrite each other's files.
+_SESSION = time.strftime("%Y%m%d-%H%M%S")
 
 
 def _stage_for(system: str) -> str:
@@ -61,14 +64,16 @@ def _log_call(record: dict, system: str = "", user: str = "", response: str = ""
     )
     try:
         os.makedirs(os.path.dirname(LLM_LOG_PATH) or ".", exist_ok=True)
-        with open(LLM_LOG_PATH, "a") as fh:
-            fh.write(json.dumps(record) + "\n")
         if LLM_DUMP_DIR:
+            # dump first so the jsonl line can point at it (main.py copies the
+            # dumps of a run into its run dir by this path)
             os.makedirs(LLM_DUMP_DIR, exist_ok=True)
-            dump = os.path.join(LLM_DUMP_DIR, f"{_call_counter:04d}_{record['stage']}.json")
+            dump = os.path.join(LLM_DUMP_DIR, f"{_SESSION}_{_call_counter:04d}_{record['stage']}.json")
             with open(dump, "w") as fh:
                 json.dump({**record, "system": system, "user": user, "response": response}, fh, indent=1)
             record["dump"] = dump
+        with open(LLM_LOG_PATH, "a") as fh:
+            fh.write(json.dumps(record) + "\n")
     except OSError as exc:  # pragma: no cover
         logger.warning("could not write %s: %s", LLM_LOG_PATH, exc)
 
