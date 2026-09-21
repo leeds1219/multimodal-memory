@@ -42,15 +42,25 @@ stop_server() {
 latest_run_dir() { ls -td logs/eval/*/* | head -1; }
 
 # ---- stage 1: accumulate --------------------------------------------------
-if [[ -e "$STORE" ]] && [[ -n "$(ls -A "$STORE" 2>/dev/null)" ]]; then
-  log "store $STORE already exists and is not empty - refusing to accumulate into it (set BLOCK_TAG)"; exit 1
+# RESUME_DIR=logs/eval/<date>/<time> continues an interrupted stage 1 in place
+# (the live store must hold the KB as of the last finished episode).
+if [[ -n "${RESUME_DIR:-}" ]]; then
+  start_server "$STORE" 0
+  log "stage 1: resuming $RESUME_DIR to $N episodes (store $STORE)"
+  xvfb-run -a python -m mineevolve.main benchmark="$BENCHMARK" llm="$LLM" server.port="$PORT" \
+    accumulate.episodes="$N" accumulate.kb_store_dir="$STORE" resume_dir="$RESUME_DIR" || log "stage 1 exited non-zero"
+  RUN1="$RESUME_DIR"
+else
+  if [[ -e "$STORE" ]] && [[ -n "$(ls -A "$STORE" 2>/dev/null)" ]]; then
+    log "store $STORE already exists and is not empty - refusing to accumulate into it (set BLOCK_TAG)"; exit 1
+  fi
+  mkdir -p "$STORE"
+  start_server "$STORE" 0
+  log "stage 1: accumulate $N episodes into $STORE"
+  xvfb-run -a python -m mineevolve.main benchmark="$BENCHMARK" llm="$LLM" server.port="$PORT" \
+    accumulate.episodes="$N" accumulate.kb_store_dir="$STORE" || log "stage 1 exited non-zero"
+  RUN1="$(latest_run_dir)"
 fi
-mkdir -p "$STORE"
-start_server "$STORE" 0
-log "stage 1: accumulate $N episodes into $STORE"
-xvfb-run -a python -m mineevolve.main benchmark="$BENCHMARK" llm="$LLM" server.port="$PORT" \
-  accumulate.episodes="$N" accumulate.kb_store_dir="$STORE" || log "stage 1 exited non-zero"
-RUN1="$(latest_run_dir)"
 stop_server
 if [[ ! -f "$RUN1/DONE" ]]; then
   log "stage 1 did not finish (no DONE in $RUN1) - resume with resume_dir=$RUN1"; exit 1

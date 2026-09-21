@@ -25,6 +25,7 @@ server:
 # Algorithm 1 hyperparameters (paper Section 3 + Algorithm 1 + Figure 3)
 runtime:
   max_subgoals: 12              # cap on plan length
+  max_episode_wall_s: 1800      # backstop: abort + relaunch if one episode runs > 30 min wall clock (dead env guard)
   max_steps_per_subgoal: 1200   # one in-game minute at 20 ticks per second
   subgoal_timeout_s: 60
   eta_fail: 0.5                 # paper Eq. (5) failure-rate threshold

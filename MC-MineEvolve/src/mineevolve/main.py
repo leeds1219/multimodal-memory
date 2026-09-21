@@ -26,6 +26,16 @@ import numpy as np
 from omegaconf import DictConfig, OmegaConf
 
 from .client import MineEvolveClient
+
+
+class EnvCrashed(RuntimeError):
+    """Minecraft died under us (socket timeout, MineRL terminated the instance).
+
+    Raised out of the subgoal runners so run_episode aborts and main() relaunches
+    the env; treating it as an ordinary subgoal failure sent the repair loop into
+    an unbounded LLM-calling spin (episode 49 of the 2026-09-21 block: 7,100 calls,
+    ~$41, in 6.5 h while the env was dead).
+    """
 from .executor import CraftHelper, CraftRequest
 from .monitors import StepMonitor, SuccessMonitor
 from .util.evidence import SubgoalEvidenceRecorder, make_subgoal_evidence_dir
@@ -226,7 +236,7 @@ def _run_subgoal(
             )
         except Exception as exc:
             logger.exception("env.step crashed: %s", exc)
-            break
+            raise EnvCrashed(str(exc)) from exc
 
         steps += 1
         coords = list(info.get("coords") or [0, 64, 0])
@@ -450,6 +460,7 @@ def run_episode(
     client: MineEvolveClient,
     task_goal: str,
     max_subgoals: int = 12,
+    max_episode_wall_s: float = 1800.0,
     max_steps_per_subgoal: int = 1200,
     subgoal_timeout_s: int = 60,
     eta_fail: float = 0.5,
@@ -509,19 +520,36 @@ def run_episode(
     consecutive_failures = 0
     total_steps = 0
     n_repairs = 0
+    zero_step_subgoals = 0   # subgoals that consumed no env step at all
+    t_episode = time.time()
     i = 0
     while i < min(len(subgoals), max_subgoals):
+        # Backstops against a dead env slipping through as "subgoal failures" (each
+        # of which costs 2-3 LLM calls): no healthy episode has 5 zero-step subgoals in
+        # a row, and none lasts longer than max_episode_wall_s (paper horizon 2 min,
+        # observed max ~10 min incl. LLM latency).
+        if zero_step_subgoals >= 5:
+            raise EnvCrashed(f"{zero_step_subgoals} consecutive subgoals consumed 0 env steps")
+        if time.time() - t_episode > max_episode_wall_s:
+            raise EnvCrashed(f"episode wall clock exceeded {max_episode_wall_s}s")
         sg = subgoals[i]
         executor_hint = str(sg.get("executor_hint") or "stevei").strip().lower()
         if executor_hint in {"mc_craft", "mc_smelt", "place", "use", "equip"}:
-            result = _run_helper_subgoal(
-                env=env,
-                subgoal=sg,
-                task_goal=task_goal,
-                artifact_dir=artifact_dir,
-                task_id=task_id,
-                run_idx=run_idx,
-            )
+            try:
+                result = _run_helper_subgoal(
+                    env=env,
+                    subgoal=sg,
+                    task_goal=task_goal,
+                    artifact_dir=artifact_dir,
+                    task_id=task_id,
+                    run_idx=run_idx,
+                )
+            except EnvCrashed:
+                raise
+            except Exception as exc:
+                if "done=True" in str(exc) or "timed out" in str(exc):
+                    raise EnvCrashed(str(exc)) from exc
+                raise
         else:
             result = _run_subgoal(
                 env=env,
@@ -536,6 +564,7 @@ def run_episode(
                 evidence_keyframe_interval=evidence_keyframe_interval,
             )
         total_steps += int(result["steps"])
+        zero_step_subgoals = zero_step_subgoals + 1 if int(result["steps"]) == 0 and not result["success"] else 0
 
         # Push typed feedback to server (Monitor stage 1)
         try:
@@ -841,6 +870,7 @@ def main(cfg: DictConfig) -> None:
                 client=client,
                 task_goal=instruction,
                 max_subgoals=int(cfg.runtime.get("max_subgoals", 12)),
+                max_episode_wall_s=float(cfg.runtime.get("max_episode_wall_s", 1800)),
                 max_steps_per_subgoal=int(cfg.runtime.get("max_steps_per_subgoal", 1200)),
                 subgoal_timeout_s=int(cfg.runtime.get("subgoal_timeout_s", 60)),
                 eta_fail=float(cfg.runtime.get("eta_fail", 0.5)),
@@ -862,11 +892,13 @@ def main(cfg: DictConfig) -> None:
                 episodes_on_instance += 1
                 break
             except Exception as exc:
-                # a dead / hung Minecraft (socket timeout on reset) is an infrastructure
+                # a dead / hung Minecraft (socket timeout, EnvCrashed) is an infrastructure
                 # failure, not an agent result: relaunch once and retry the episode
                 logger.exception("run_episode failed (attempt %d): %s", attempt + 1, exc)
                 if attempt == 0:
                     _fresh_env("episode failed")
+                else:
+                    logger.error("episode %d failed twice; recorded as failure", ep_idx + 1)
         success_mon.record(instruction, success)
         step_mon.record(instruction, steps)
         if runs_log is not None:

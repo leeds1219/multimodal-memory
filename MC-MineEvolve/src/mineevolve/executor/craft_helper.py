@@ -18,6 +18,12 @@ from typing import Any, Mapping
 logger = logging.getLogger("mineevolve.executor.craft_helper")
 
 
+def _env_dead(exc: BaseException) -> bool:
+    """MineRL raises these once the Minecraft instance is gone; the episode must abort."""
+    msg = str(exc)
+    return "done=True" in msg or "timed out" in msg or isinstance(exc, (TimeoutError, ConnectionError, BrokenPipeError))
+
+
 @dataclass
 class CraftRequest:
     """A single craft / smelt / place request issued by the planner."""
@@ -68,6 +74,8 @@ class CraftHelper:
                 ok = False
                 if "episode ended" in str(exc):
                     self.episode_ended = True
+                elif _env_dead(exc):
+                    raise
             finally:
                 self.last_steps = ctl.steps
                 self.last_error = getattr(ctl, "last_error", "") or ("" if ok else f"{req.kind} {req.target} failed")
@@ -88,6 +96,8 @@ class CraftHelper:
                 ok = False
                 if "episode ended" in str(exc):
                     self.episode_ended = True
+                elif _env_dead(exc):
+                    raise
             finally:
                 self.last_steps = ctl.steps
                 self.last_error = getattr(ctl, "last_error", "") or ("" if ok else f"{req.kind} {req.target} failed")
