@@ -9,7 +9,7 @@ import argparse
 import json
 from pathlib import Path
 
-PRICE_IN, PRICE_OUT = 0.75, 3.75  # $/1M tokens, gemini-3-flash-preview (intro pricing)
+PRICE_IN, PRICE_OUT = 0.50, 3.00  # $/1M tokens, gemini-3-flash-preview list price (ai.google.dev/gemini-api/docs/pricing, 2026-09-16); output includes thinking tokens; no caching credit applied -> upper bound
 
 
 def main() -> int:

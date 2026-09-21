@@ -30,7 +30,7 @@ from pathlib import Path
 PRICES = {
     "qwen-flash": (0.15, 0.47),
     "qwen-plus": (0.40, 1.60),
-    "gemini-3.6-flash": (0.75, 3.75),  # intro price to 2026-12-31; 2.5-flash ($0.30/$2.50) returned "not available to new users" for our key
+    "gemini-3-flash-preview": (0.50, 3.00),  # list price 2026-09-16 (thinking tokens billed as output); 2.5-flash returned "not available to new users" for our key
     "gpt-4o": (2.50, 10.00),
 }
 LINE_RE = re.compile(r"prompt=(\d+) gen=(\d+) tok in ([0-9.]+)s")

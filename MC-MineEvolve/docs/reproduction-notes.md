@@ -221,16 +221,18 @@ N no log, O out of time, D no sapling drop).
 
 | run | condition | result | LLM calls/ep | first log (median steps) | $ |
 |---|---|---|---|---|---|
-| 09-19 09:21 | pass 1 online (KB 0→33 ep; 35 skills / 21 remedies) | 14/33 = 42 % | 17.0 | 823 | 5.28 |
-| 09-19 12:32 | M=33 frozen | 14/33 = 42 % | 15.6 | 1028 | 5.31 |
-| 09-19 15:37 | pass 2 online (KB 33→66 ep; 61 / 42) | 12/33 = 36 % | 20.3 | 730 | 6.50 |
-| 09-20 05:33 | **M=66 frozen** | **15/33 = 45 %** | 16.8 | 877 | 5.42 |
+| 09-19 09:21 | pass 1 online (KB 0→33 ep; 35 skills / 21 remedies) | 14/33 = 42 % | 17.0 | 823 | 3.63 |
+| 09-19 12:32 | M=33 frozen | 14/33 = 42 % | 15.6 | 1028 | 3.65 |
+| 09-19 15:37 | pass 2 online (KB 33→66 ep; 61 / 42) | 12/33 = 36 % | 20.3 | 730 | 4.47 |
+| 09-20 05:33 | **M=66 frozen** | **15/33 = 45 %** | 16.8 | 877 | 3.73 |
 
 Per task (spawn 1·2·3), M=66 frozen: pickaxe SSN, axe ONO, shovel OEO, hoe SOO, sword OEE,
 stick SSN, table SSS, plank SSN, log SSS, sapling NDD, punch SSN. Tool tasks 3/15 (20 %);
 across the four runs 1/15, 3/15, 2/15, 3/15 — no measurable KB effect by 66 episodes.
 Paper Table 4 (accumulated KB, ~400 ep): 98.6 %. Spend stopped here per the user
-(tracked total $39.43 + ≈$2.6 before the tracker ≈ $42).
+(tracked total $27.13 at the verified list price $0.50/$3.00 per 1M — ai.google.dev pricing page,
+2026-09-16, thinking tokens billed as output, no caching credit applied, so an upper bound;
+earlier notes used $0.75/$3.75 and overstate spend by ~45 %).
 
 ### Is it the LLM? — no
 
