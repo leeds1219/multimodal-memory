@@ -1,5 +1,12 @@
 # Reproduction notes — MineEvolve (arXiv 2603.13131 v3) vs. this repo
 
+> **Terminology.** "Baseline condition" (기준 조건) = the public repo plus every setting the
+> paper states (2-min horizon, empty inventory, prompts, KB accumulate/freeze protocol,
+> Gemini-3-Flash). It is *not* "the paper's condition": the paper does not publish its
+> seeds, executor primitives or observation set, and we had to fill those in (JARVIS-1
+> oak_forest spawns, the primitives listed below). Older text below that says
+> "paper condition" means this baseline condition.
+
 Status as of 2026-09-18. Written so we do not forget which differences between the
 paper and this codebase are ours, which are upstream's, and which are still unknown.
 
