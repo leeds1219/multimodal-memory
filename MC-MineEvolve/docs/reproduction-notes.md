@@ -286,6 +286,45 @@ repair prompts only, ≈260 tokens per frame.
 
 Summary artifact: https://claude.ai/artifact/S9numm7vujgN5XQqpaRqrJ
 
+## Block 1 on a fresh KB with the camera fix (2026-09-21/22) — track ① baseline
+
+`scripts/accumulate_block.sh 50`: accumulate 50 episodes (pass 1 = 33, pass 2 = first 17)
+into a new store, then freeze the M=50 checkpoint and evaluate the same 33 episodes.
+
+| run | result | tools 0-4 | first log (median) | $ |
+|---|---|---|---|---|
+| pass 1 online (09-21 02:16, `logs/eval/2026-09-21/02-16-56/pass1`) | 15/33 = 45 % | 3/15 | 677 | |
+| pass 2 online, 17 ep (tasks 0-5) | 6/17 | 5/15 | 944 | 5.2 (ep 1-48) |
+| **M=50 frozen** (09-22 03:53, `logs/eval/2026-09-22/03-53-15`) | **15/33 = 45 %** | 2/15 | 806 | 3.9 |
+
+KB at M=48/M=50: 41 skills (19 craft / 8 gather / 14 move) + 27 remedies; 6 movement skills
+still credited with a log gain (was 15 of 61 in the camera-bug KB). Same 45 % as the old
+M=66: no measurable effect of accumulation at this size. Episode 49 of the accumulation was a
+runaway (Minecraft died, repair loop spun 6.5 h, 7,129 LLM calls ≈ $41) — quarantined under
+`runaway_ep49/`, the store rolled back to the pre-crash state, fixed by `EnvCrashed` +
+the LLM spending guard (`src/mineevolve/util/llm_guard.py`, `scripts/llm_guard.py`).
+
+## Track ② reconstruction: nearby_blocks observation + `approach` primitive (2026-09-22)
+
+Upstream's Adaptor prompt example repairs a subgoal "approach oak tree at (118, 64, 208)",
+but the released code has no observation that could supply a tree's coordinates and never
+reads the subgoal `mode: move|stay` field — the same "prompt survived, code did not"
+pattern as the `mc_craft` stub. Reconstructed (default off, `MINEEVOLVE_NEARBY_BLOCKS=1`
+exposes it to the planner): jar patch emits the 3 nearest positions of `*_log`, `*_ore`,
+`crafting_table`, `furnace`, `water`, `lava` within 33x33x17; `approach` walks to the nearest
+named block (closed loop, breaks leaves when stuck). Also found and fixed on track ①: the
+first 5-15 ticks after `/tp` show an unloaded world (empty POV and no landmarks) — reset
+now waits for the chunks.
+
+`scripts/test_approach.py`, STEVE-1 only, 3 spawns x 4 initial yaws, steps to first log:
+
+| | got a log | median steps |
+|---|---|---|
+| approach then STEVE-1 "chop a tree" | 12/12 | 103 (82-677) |
+| control: STEVE-1 blind, same protocol | 8/12 | 371 (4 runs: none in 2,400) |
+
+The gathering bottleneck is finding the tree, not chopping it.
+
 ## Next steps we agreed on
 
 - Run task 8 across the 3 default seeds with the `move` primitive available (not yet done with an API model).
