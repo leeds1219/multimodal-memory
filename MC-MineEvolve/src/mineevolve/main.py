@@ -73,7 +73,7 @@ def _benchmark_cfg(cfg: DictConfig) -> DictConfig:
 
 
 def _state_snapshot(env_info: Mapping[str, Any], task_goal: str) -> Dict[str, Any]:
-    return {
+    state = {
         "task_goal": task_goal,
         "inventory": dict(env_info.get("inventory") or {}),
         "coords": list(env_info.get("coords") or [0, 64, 0]),
@@ -82,6 +82,13 @@ def _state_snapshot(env_info: Mapping[str, Any], task_goal: str) -> Dict[str, An
         "hunger": float(env_info.get("hunger") or 20.0),
         "isGuiOpen": bool(env_info.get("isGuiOpen") or False),
     }
+    if os.environ.get("MINEEVOLVE_NEARBY_BLOCKS") == "1":
+        # RECONSTRUCTION (off by default): the coordinates behind the upstream prompt
+        # example "approach oak tree at (118, 64, 208)". Paper-condition runs keep it off.
+        from .env.nearby_blocks import summarize_nearby
+
+        state["nearby_blocks"] = summarize_nearby(env_info.get("nearby_blocks") or {}, state["coords"])
+    return state
 
 
 # ----------------------------------------------------------------------
@@ -115,6 +122,56 @@ def _move_script(env, params: Mapping[str, Any]):
         a["forward"] = np.array(1); a["sprint"] = np.array(1)
         a["jump"] = np.array(int(jump and i % 2 == 0))
         yield a
+
+
+class _ApproachScript:
+    """Closed-loop `approach` executor primitive: walk to the nearest landmark block.
+
+    Reads the nearest matching block from ``info["nearby_blocks"]`` every step,
+    turns toward it (<= 30 deg per step), walks forward with sprint and jumps every
+    other step; done when within ``stop_dist`` blocks horizontally. Deterministic;
+    no policy. Reconstructs the executor behind the upstream prompt example
+    "approach oak tree at (118, 64, 208)" (see env/nearby_blocks.py).
+    """
+
+    def __init__(self, env, params: Mapping[str, Any]):
+        self.env = env
+        self.block = str(params.get("block") or params.get("target") or "log")
+        self.stop_dist = float(params.get("stop_dist", 2.0) or 2.0)
+        self.max_steps = int(np.clip(int(params.get("steps", 300) or 300), 1, 600))
+        self.i = 0
+        self.reached = False
+        self.target = None
+
+    def next(self, info: Mapping[str, Any]):
+        from .env.nearby_blocks import nearest_matching
+
+        if self.i >= self.max_steps or self.reached:
+            return None
+        self.i += 1
+        noop = self.env.action_space.noop()
+        tgt = nearest_matching(info.get("nearby_blocks") or {}, self.block)
+        if tgt is None:
+            if self.target is None:
+                return None  # nothing of that kind within the landmark box
+            tgt = self.target  # keep the last known position while the block is out of the box
+        self.target = tgt
+        x, y, z = (info.get("coords") or [0, 64, 0])[:3]
+        dx, dz = tgt[0] + 0.5 - x, tgt[2] + 0.5 - z
+        dist = float(np.hypot(dx, dz))
+        if dist <= self.stop_dist:
+            self.reached = True
+            return None
+        want_yaw = float(np.degrees(np.arctan2(-dx, dz)))          # minecraft: yaw 0 = +z, 90 = -x
+        d_yaw = (want_yaw - float(info.get("yaw", 0.0)) + 180.0) % 360.0 - 180.0
+        want_pitch = float(np.degrees(np.arctan2(-(tgt[1] - y), dist)))  # look at the block (+ = down)
+        d_pitch = float(np.clip(want_pitch, -60, 30) - float(info.get("pitch", 0.0)))
+        a = dict(noop)
+        a["camera"] = np.array([float(np.clip(d_pitch, -30, 30)), float(np.clip(d_yaw, -30, 30))], dtype=np.float32)
+        if abs(d_yaw) < 45:  # walk once roughly facing the target
+            a["forward"] = np.array(1); a["sprint"] = np.array(1)
+            a["jump"] = np.array(int(self.i % 2 == 0))
+        return a
 
 
 def _ypos_check_ok(subgoal: Mapping[str, Any], info: Mapping[str, Any]) -> bool:
@@ -201,15 +258,20 @@ def _run_subgoal(
     steps = 0
     executor_hint = str(subgoal.get("executor_hint") or "stevei").strip().lower()
     script = _move_script(env, subgoal.get("params") or {}) if executor_hint == "move" else None
-    if script is not None:
-        logger.info("move primitive: params=%s", dict(subgoal.get("params") or {}))
+    approach = _ApproachScript(env, subgoal.get("params") or {}) if executor_hint == "approach" else None
+    if script is not None or approach is not None:
+        logger.info("%s primitive: params=%s", executor_hint, dict(subgoal.get("params") or {}))
 
     while steps < max_steps:
         if time.monotonic() > deadline:
             timed_out = True
             break
 
-        if script is not None:
+        if approach is not None:
+            action = approach.next(env.info or {})
+            if action is None:
+                break  # reached / no target / step cap; success = reached (set below)
+        elif script is not None:
             action = next(script, None)
             if action is None:
                 break  # script finished; success decided by the `moved` check below
@@ -263,6 +325,9 @@ def _run_subgoal(
     end_inv = dict(end_info.get("inventory") or {})
     end_coords = list(end_info.get("coords") or [0, 64, 0])
 
+    if approach is not None and not success and not died:
+        success = bool(approach.reached)
+        logger.info("approach %s: %s (target %s, %d steps)", approach.block, "reached" if success else "not reached", approach.target, approach.i)
     moved_n = _moved_threshold(subgoal)
     if moved_n is not None and not success and not died:
         dist_xz = float(np.hypot(end_coords[0] - start_coords[0], end_coords[2] - start_coords[2]))
@@ -491,8 +556,14 @@ def run_episode(
         # keeps the previous episode's camera (often looking straight up at leaves)
         env.execute_cmd(f"/tp @s {x:.1f} {y:.1f} {z:.1f} 0 0")
         env.execute_cmd("/spawnpoint")
-        for _ in range(10):  # let chunks load and the camera settle before the first frame
+        # Let the chunks around the new position load before the first frame: the client
+        # needs ~5-15 ticks after a teleport, during which the POV shows an unloaded world
+        # and the landmark observation is empty (measured with scripts/test_approach.py).
+        for k in range(60):
             obs, _r, _d, _i = env.step(env.action_space.noop())
+            if k >= 10 and (_i.get("nearby_blocks") or {}):
+                break
+        logger.info("chunks loaded after %d ticks (%d landmark kinds)", k + 1, len(_i.get("nearby_blocks") or {}))
     env_info = env.info or {}
     state = _state_snapshot(env_info, task_goal)
 

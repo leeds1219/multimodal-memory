@@ -44,6 +44,7 @@ from typing import Any, Dict, Mapping, Sequence, Tuple
 import gym
 import numpy as np
 
+from .nearby_blocks import decode_nearby
 from .mods.recorder import RecorderMod
 from .mods.status import StatusMod
 from .mods.task_checker import TaskCheckerMod
@@ -285,6 +286,13 @@ class MineEvolveEnvWrapper(
         info = dict(info)
         info.update(self.status_mod.get_status())
         info["isGuiOpen"] = bool(obs.get("isGuiOpen", False))
+        # landmark blocks (jar patch) + facing, for the `approach` primitive
+        info["nearby_blocks"] = decode_nearby(obs.get("nearby_blocks"))
+        loc = obs.get("location_stats") or {}
+        try:
+            info["yaw"] = float(loc.get("yaw", 0.0)); info["pitch"] = float(loc.get("pitch", 0.0))
+        except (TypeError, ValueError):
+            info["yaw"], info["pitch"] = 0.0, 0.0
 
         ypos = self.status_mod.get_height()
         self._update_y_dwell(ypos)

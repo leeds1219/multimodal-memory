@@ -14,6 +14,8 @@ system prompt.
 
 from __future__ import annotations
 
+import os
+
 from typing import Iterable
 
 from ..monitor.failure import FAILURE_TYPES
@@ -71,6 +73,13 @@ EXECUTOR_HINT_DESCRIPTIONS: dict[str, str] = {
     "place": "place one block from the inventory under the agent's feet (item named in the condition). Not needed for crafting or smelting - those helpers place their own table/furnace.",
     "use": "hold an item and right-click it for ~2 s, e.g. 'use apple' to eat (item named in the condition).",
     "wait": "no executor is invoked; the wrapper just consumes ticks.",
+    "approach": (
+        "deterministic navigation primitive, no policy involved: walks to the nearest block named in "
+        "`params.block` (e.g. 'log', 'oak_log', 'iron_ore', 'crafting_table') as listed in the state's "
+        "`nearby_blocks`, turning toward it and jumping over 1-block ledges, and stops within 2 blocks "
+        "(`params.stop_dist`) or after `params.steps` ticks (default 300). Use it to get next to a tree or ore "
+        "before a `stevei` mining step. Succeeds only if the block was reached."
+    ),
     "move": (
         "deterministic navigation primitive, no policy involved: turns by `params.yaw_deg` "
         "(-180..180, + = right) and `params.pitch_deg` (-45..45, + = down), then walks forward "
@@ -124,7 +133,10 @@ def render_task_kinds() -> str:
 
 
 def render_executor_hints() -> str:
-    return render_bullet_table(EXECUTOR_HINT_DESCRIPTIONS.items())
+    items = EXECUTOR_HINT_DESCRIPTIONS.items()
+    if os.environ.get("MINEEVOLVE_NEARBY_BLOCKS") != "1":
+        items = [(k, v) for k, v in items if k != "approach"]  # reconstruction, off by default
+    return render_bullet_table(items)
 
 
 def render_check_types() -> str:
