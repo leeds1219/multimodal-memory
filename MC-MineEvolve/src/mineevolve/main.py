@@ -25,7 +25,7 @@ import hydra
 import numpy as np
 from omegaconf import DictConfig, OmegaConf
 
-from .client import MineEvolveClient
+from .client import LLMGuardAbort, MineEvolveClient
 
 
 class EnvCrashed(RuntimeError):
@@ -891,6 +891,14 @@ def main(cfg: DictConfig) -> None:
                 success, steps = run_episode(env=env, **episode_kwargs)
                 episodes_on_instance += 1
                 break
+            except LLMGuardAbort as exc:
+                logger.error("LLM guard aborted by operator (%s); stopping after %d episodes", exc, ep_idx)
+                if run_dir is not None:
+                    (run_dir / "ABORTED").write_text(time.strftime("%Y-%m-%d %H:%M:%S"))
+                try:
+                    env.close()
+                finally:
+                    os._exit(3)
             except Exception as exc:
                 # a dead / hung Minecraft (socket timeout, EnvCrashed) is an infrastructure
                 # failure, not an agent result: relaunch once and retry the episode

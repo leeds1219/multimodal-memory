@@ -297,6 +297,26 @@ Everything needed for offline analysis (`scripts/analyze_failures.py`,
 `scripts/llm_usage.py`, `scripts/spend.py`) is inside the run dir; no API call is
 needed to look at a result again.
 
+### Spending guard (pause for review, never a silent runaway)
+
+Every paid LLM call goes through `src/mineevolve/util/llm_guard.py`. The server
+**pauses** (writes `logs/llm_guard/PAUSED`, answers 503, the env process waits without
+spending) when the session exceeds its estimate (`MINEEVOLVE_GUARD_MAX_USD_TOTAL`,
+set by `accumulate_block.sh` to episodes × $0.12 × 1.3), when one episode exceeds
+`MINEEVOLVE_GUARD_MAX_USD_PER_EPISODE` (0.60) or `_MAX_CALLS_PER_EPISODE` (80; healthy
+episodes stay under 48), or when an hour exceeds `_MAX_USD_PER_HOUR` (3.00). Then:
+
+```bash
+python scripts/llm_guard.py status     # counters + reason
+python scripts/llm_guard.py resume     # after looking at the run: continue (fresh allowance)
+python scripts/llm_guard.py abort      # stop the evaluation at its next LLM call
+```
+
+Why: on 2026-09-21 a Minecraft socket timeout left the env dead and the repair loop
+made 7,129 LLM calls (~$41) in 6.5 h before anyone looked. The env crash itself is
+now caught (`EnvCrashed` relaunches Minecraft), and the guard is the backstop for
+whatever the next failure mode is.
+
 ### Evaluate a custom task subset
 
 `conf/benchmark/<group>.yaml::evaluate` selects task ids; leave it `[]` for all 70 tasks. To run iron tasks #2 and #5 only:

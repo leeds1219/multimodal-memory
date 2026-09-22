@@ -12,6 +12,7 @@ from typing import Any, Mapping
 
 from fastapi import FastAPI, HTTPException
 
+from ..util.llm_guard import GUARD, GuardAborted, GuardPaused
 from .agent import MineEvolveAgent
 from .routes import (
     ActionPayload,
@@ -41,11 +42,17 @@ def create_app(cfg: Mapping[str, Any] | None = None) -> FastAPI:
 
     @app.post("/reset")
     def reset(req: ResetRequest) -> dict:
+        GUARD.episode_start(req.task_goal)
         return app.state.agent.reset(task_goal=req.task_goal)
 
     @app.get("/status")
     def status() -> dict:
         return app.state.agent.status()
+
+    @app.get("/guard")
+    def guard_status() -> dict:
+        # spending guard: counters + whether a PAUSED/ABORT marker is present
+        return GUARD.status()
 
     @app.post("/chat")
     def chat(req: ChatRequest) -> dict:
@@ -103,6 +110,11 @@ def create_app(cfg: Mapping[str, Any] | None = None) -> FastAPI:
                 return agent.status()
         except HTTPException:
             raise
+        except GuardPaused as exc:
+            # not an error: the client polls /guard and retries once a human resumes
+            raise HTTPException(status_code=503, detail={"guard": "paused", "reason": str(exc)}) from exc
+        except GuardAborted as exc:
+            raise HTTPException(status_code=503, detail={"guard": "aborted", "reason": str(exc)}) from exc
         except Exception as exc:
             logger.exception("chat error (type=%s)", t)
             raise HTTPException(status_code=500, detail=str(exc)) from exc

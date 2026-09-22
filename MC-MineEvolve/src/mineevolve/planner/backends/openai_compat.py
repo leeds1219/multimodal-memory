@@ -12,6 +12,8 @@ import json
 import logging
 import os
 import time
+
+from ...util.llm_guard import GUARD
 from typing import Optional
 
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
@@ -152,6 +154,7 @@ class OpenAICompatibleBackend(PlannerBackend):
         choice = response.choices[0]
         content = choice.message.content if choice and choice.message else ""
         usage = getattr(response, "usage", None)
+        GUARD.after_call(getattr(usage, "prompt_tokens", None), getattr(usage, "completion_tokens", None))
         _log_call({
             "t": time.time(),
             "stage": _stage_for(system),
@@ -177,6 +180,9 @@ class OpenAICompatibleBackend(PlannerBackend):
             max_tokens = self._default_max_tokens
         if temperature < 0:
             temperature = self._default_temperature
+        # Spending guard (outside the retry and outside the swallow below): a paused
+        # or aborted guard must reach the API layer as an exception, never as "".
+        GUARD.before_call(_stage_for(system))
         try:
             return self._do_chat(system, user, max_tokens, temperature)
         except Exception as exc:

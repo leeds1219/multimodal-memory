@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import time
 from typing import Any, Dict, Mapping, Sequence
 
 import requests
@@ -10,6 +11,10 @@ from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_ex
 
 
 logger = logging.getLogger("mineevolve.client")
+
+
+class LLMGuardAbort(RuntimeError):
+    """The server's spending guard was aborted by an operator; stop the evaluation."""
 
 
 class MineEvolveClient:
@@ -32,11 +37,43 @@ class MineEvolveClient:
     )
     def _post(self, path: str, json: Mapping[str, Any]) -> Dict[str, Any]:
         url = f"{self.base_url}{path}"
-        response = self._session.post(url, json=json, timeout=self.timeout)
-        response.raise_for_status()
-        if not response.content:
-            return {}
-        return response.json()
+        while True:
+            response = self._session.post(url, json=json, timeout=self.timeout)
+            if response.status_code == 503:
+                detail = {}
+                try:
+                    detail = response.json().get("detail") or {}
+                except ValueError:
+                    pass
+                if isinstance(detail, Mapping) and detail.get("guard") == "aborted":
+                    raise LLMGuardAbort(str(detail.get("reason", "")))
+                if isinstance(detail, Mapping) and detail.get("guard") == "paused":
+                    self._wait_for_guard(str(detail.get("reason", "")))
+                    continue  # retry the same request after the operator resumed
+            response.raise_for_status()
+            if not response.content:
+                return {}
+            return response.json()
+
+    def _wait_for_guard(self, reason: str) -> None:
+        """Block (without spending) until logs/llm_guard/PAUSED is cleared with
+        `python scripts/llm_guard.py resume`, or raise on `abort`."""
+        logger.error("LLM guard PAUSED on the server: %s -- waiting for `scripts/llm_guard.py resume`", reason)
+        t0 = time.time()
+        while True:
+            time.sleep(10)
+            try:
+                st = self._session.get(f"{self.base_url}/guard", timeout=30).json()
+            except Exception as exc:  # server restarting etc.: keep waiting
+                logger.warning("guard status unavailable (%s); still waiting", exc)
+                continue
+            if st.get("abort_requested"):
+                raise LLMGuardAbort("ABORT marker present")
+            if not st.get("paused"):
+                logger.warning("LLM guard resumed after %.0f s", time.time() - t0)
+                return
+            if int(time.time() - t0) % 300 < 10:
+                logger.error("still paused (%.0f min): %s", (time.time() - t0) / 60, st.get("paused_reason"))
 
     def _chat(self, type_: str, payload: Mapping[str, Any]) -> Dict[str, Any]:
         return self._post("/chat", {"type": type_, "payload": dict(payload)})
