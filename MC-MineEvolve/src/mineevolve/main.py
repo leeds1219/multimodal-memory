@@ -731,6 +731,10 @@ def _episode_succeeded(task_goal: str, inventory: Mapping[str, int]) -> bool:
 
     need = _goal_quantity(task_goal)
     obj = _goal_object(task_goal)
+    # Task 8 of the stone tier, "Mine stone slab material from a stone outcrop", asks for
+    # the *material* (what mining stone yields), not a crafted slab. Literal reading.
+    if obj == "stone slab":
+        return inventory_satisfies(inventory, "cobblestone", need) or inventory_satisfies(inventory, "stone", need)
     obj_words = obj.split()
     # wood-gathering goals ("chop an oak log", "punch a tree to gather wood"): any log counts.
     # Only when the *object* is wood/log - "wooden sword" also contains "wood" (upstream's
