@@ -173,6 +173,8 @@ class EpisodeMonitor:
             self.end_reason = "horizon" if self.steps >= self.horizon else "death_or_done"
             rec["done"] = self.end_reason
         self._traj.write(json.dumps(rec) + "\n")
+        if self.steps % 100 == 0 or done:
+            (self.dir / "heartbeat").write_text(f"{self.steps} {_time.time():.0f}\n")
 
     def close(self) -> None:
         try:
