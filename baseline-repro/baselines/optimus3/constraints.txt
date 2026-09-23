@@ -14,3 +14,4 @@ accelerate<=1.7.0
 peft<=0.15.2
 trl<=0.9.6
 numpy<2
+cuda-python<13

@@ -1,3 +1,1910 @@
+diff --git a/MineStudio/minestudio.egg-info/SOURCES.txt b/MineStudio/minestudio.egg-info/SOURCES.txt
+index 247fabd..a552a11 100644
+--- a/MineStudio/minestudio.egg-info/SOURCES.txt
++++ b/MineStudio/minestudio.egg-info/SOURCES.txt
+@@ -4,4 +4,1863 @@ minestudio.egg-info/PKG-INFO
+ minestudio.egg-info/SOURCES.txt
+ minestudio.egg-info/dependency_links.txt
+ minestudio.egg-info/requires.txt
+-minestudio.egg-info/top_level.txt
+\ No newline at end of file
++minestudio.egg-info/top_level.txt
++minestudio/__pycache__/__init__.cpython-311.pyc
++minestudio/assets/mc_constants.1.16.json
++minestudio/assets/mc_equipments.1.16.json
++minestudio/assets/mc_recipes.zip
++minestudio/assets/mc_tag_items.json
++minestudio/assets/tag_items.json
++minestudio/assets/vgl_entrypoint.sh
++minestudio/assets/recipes/acacia_boat.json
++minestudio/assets/recipes/acacia_button.json
++minestudio/assets/recipes/acacia_door.json
++minestudio/assets/recipes/acacia_fence.json
++minestudio/assets/recipes/acacia_fence_gate.json
++minestudio/assets/recipes/acacia_planks.json
++minestudio/assets/recipes/acacia_pressure_plate.json
++minestudio/assets/recipes/acacia_sign.json
++minestudio/assets/recipes/acacia_slab.json
++minestudio/assets/recipes/acacia_stairs.json
++minestudio/assets/recipes/acacia_trapdoor.json
++minestudio/assets/recipes/acacia_wood.json
++minestudio/assets/recipes/activator_rail.json
++minestudio/assets/recipes/andesite.json
++minestudio/assets/recipes/andesite_slab.json
++minestudio/assets/recipes/andesite_slab_from_andesite_stonecutting.json
++minestudio/assets/recipes/andesite_stairs.json
++minestudio/assets/recipes/andesite_stairs_from_andesite_stonecutting.json
++minestudio/assets/recipes/andesite_wall.json
++minestudio/assets/recipes/andesite_wall_from_andesite_stonecutting.json
++minestudio/assets/recipes/anvil.json
++minestudio/assets/recipes/armor_dye.json
++minestudio/assets/recipes/armor_stand.json
++minestudio/assets/recipes/arrow.json
++minestudio/assets/recipes/baked_potato.json
++minestudio/assets/recipes/baked_potato_from_campfire_cooking.json
++minestudio/assets/recipes/baked_potato_from_smoking.json
++minestudio/assets/recipes/banner_duplicate.json
++minestudio/assets/recipes/barrel.json
++minestudio/assets/recipes/beacon.json
++minestudio/assets/recipes/beehive.json
++minestudio/assets/recipes/beetroot_soup.json
++minestudio/assets/recipes/birch_boat.json
++minestudio/assets/recipes/birch_button.json
++minestudio/assets/recipes/birch_door.json
++minestudio/assets/recipes/birch_fence.json
++minestudio/assets/recipes/birch_fence_gate.json
++minestudio/assets/recipes/birch_planks.json
++minestudio/assets/recipes/birch_pressure_plate.json
++minestudio/assets/recipes/birch_sign.json
++minestudio/assets/recipes/birch_slab.json
++minestudio/assets/recipes/birch_stairs.json
++minestudio/assets/recipes/birch_trapdoor.json
++minestudio/assets/recipes/birch_wood.json
++minestudio/assets/recipes/black_banner.json
++minestudio/assets/recipes/black_bed.json
++minestudio/assets/recipes/black_bed_from_white_bed.json
++minestudio/assets/recipes/black_carpet.json
++minestudio/assets/recipes/black_carpet_from_white_carpet.json
++minestudio/assets/recipes/black_concrete_powder.json
++minestudio/assets/recipes/black_dye.json
++minestudio/assets/recipes/black_dye_from_wither_rose.json
++minestudio/assets/recipes/black_glazed_terracotta.json
++minestudio/assets/recipes/black_stained_glass.json
++minestudio/assets/recipes/black_stained_glass_pane.json
++minestudio/assets/recipes/black_stained_glass_pane_from_glass_pane.json
++minestudio/assets/recipes/black_terracotta.json
++minestudio/assets/recipes/black_wool.json
++minestudio/assets/recipes/blackstone_slab.json
++minestudio/assets/recipes/blackstone_slab_from_blackstone_stonecutting.json
++minestudio/assets/recipes/blackstone_stairs.json
++minestudio/assets/recipes/blackstone_stairs_from_blackstone_stonecutting.json
++minestudio/assets/recipes/blackstone_wall.json
++minestudio/assets/recipes/blackstone_wall_from_blackstone_stonecutting.json
++minestudio/assets/recipes/blast_furnace.json
++minestudio/assets/recipes/blaze_powder.json
++minestudio/assets/recipes/blue_banner.json
++minestudio/assets/recipes/blue_bed.json
++minestudio/assets/recipes/blue_bed_from_white_bed.json
++minestudio/assets/recipes/blue_carpet.json
++minestudio/assets/recipes/blue_carpet_from_white_carpet.json
++minestudio/assets/recipes/blue_concrete_powder.json
++minestudio/assets/recipes/blue_dye.json
++minestudio/assets/recipes/blue_dye_from_cornflower.json
++minestudio/assets/recipes/blue_glazed_terracotta.json
++minestudio/assets/recipes/blue_ice.json
++minestudio/assets/recipes/blue_stained_glass.json
++minestudio/assets/recipes/blue_stained_glass_pane.json
++minestudio/assets/recipes/blue_stained_glass_pane_from_glass_pane.json
++minestudio/assets/recipes/blue_terracotta.json
++minestudio/assets/recipes/blue_wool.json
++minestudio/assets/recipes/bone_block.json
++minestudio/assets/recipes/bone_meal.json
++minestudio/assets/recipes/bone_meal_from_bone_block.json
++minestudio/assets/recipes/book.json
++minestudio/assets/recipes/book_cloning.json
++minestudio/assets/recipes/bookshelf.json
++minestudio/assets/recipes/bow.json
++minestudio/assets/recipes/bowl.json
++minestudio/assets/recipes/bread.json
++minestudio/assets/recipes/brewing_stand.json
++minestudio/assets/recipes/brick.json
++minestudio/assets/recipes/brick_slab.json
++minestudio/assets/recipes/brick_slab_from_bricks_stonecutting.json
++minestudio/assets/recipes/brick_stairs.json
++minestudio/assets/recipes/brick_stairs_from_bricks_stonecutting.json
++minestudio/assets/recipes/brick_wall.json
++minestudio/assets/recipes/brick_wall_from_bricks_stonecutting.json
++minestudio/assets/recipes/bricks.json
++minestudio/assets/recipes/brown_banner.json
++minestudio/assets/recipes/brown_bed.json
++minestudio/assets/recipes/brown_bed_from_white_bed.json
++minestudio/assets/recipes/brown_carpet.json
++minestudio/assets/recipes/brown_carpet_from_white_carpet.json
++minestudio/assets/recipes/brown_concrete_powder.json
++minestudio/assets/recipes/brown_dye.json
++minestudio/assets/recipes/brown_glazed_terracotta.json
++minestudio/assets/recipes/brown_stained_glass.json
++minestudio/assets/recipes/brown_stained_glass_pane.json
++minestudio/assets/recipes/brown_stained_glass_pane_from_glass_pane.json
++minestudio/assets/recipes/brown_terracotta.json
++minestudio/assets/recipes/brown_wool.json
++minestudio/assets/recipes/bucket.json
++minestudio/assets/recipes/cake.json
++minestudio/assets/recipes/campfire.json
++minestudio/assets/recipes/carrot_on_a_stick.json
++minestudio/assets/recipes/cartography_table.json
++minestudio/assets/recipes/cauldron.json
++minestudio/assets/recipes/chain.json
++minestudio/assets/recipes/charcoal.json
++minestudio/assets/recipes/chest.json
++minestudio/assets/recipes/chest_minecart.json
++minestudio/assets/recipes/chiseled_nether_bricks.json
++minestudio/assets/recipes/chiseled_nether_bricks_from_nether_bricks_stonecutting.json
++minestudio/assets/recipes/chiseled_polished_blackstone.json
++minestudio/assets/recipes/chiseled_polished_blackstone_from_blackstone_stonecutting.json
++minestudio/assets/recipes/chiseled_polished_blackstone_from_polished_blackstone_stonecutting.json
++minestudio/assets/recipes/chiseled_quartz_block.json
++minestudio/assets/recipes/chiseled_quartz_block_from_quartz_block_stonecutting.json
++minestudio/assets/recipes/chiseled_red_sandstone.json
++minestudio/assets/recipes/chiseled_red_sandstone_from_red_sandstone_stonecutting.json
++minestudio/assets/recipes/chiseled_sandstone.json
++minestudio/assets/recipes/chiseled_sandstone_from_sandstone_stonecutting.json
++minestudio/assets/recipes/chiseled_stone_bricks.json
++minestudio/assets/recipes/chiseled_stone_bricks_from_stone_bricks_stonecutting.json
++minestudio/assets/recipes/chiseled_stone_bricks_stone_from_stonecutting.json
++minestudio/assets/recipes/clay.json
++minestudio/assets/recipes/clock.json
++minestudio/assets/recipes/coal.json
++minestudio/assets/recipes/coal_block.json
++minestudio/assets/recipes/coal_from_blasting.json
++minestudio/assets/recipes/coal_from_smelting.json
++minestudio/assets/recipes/coarse_dirt.json
++minestudio/assets/recipes/cobblestone_slab.json
++minestudio/assets/recipes/cobblestone_slab_from_cobblestone_stonecutting.json
++minestudio/assets/recipes/cobblestone_stairs.json
++minestudio/assets/recipes/cobblestone_stairs_from_cobblestone_stonecutting.json
++minestudio/assets/recipes/cobblestone_wall.json
++minestudio/assets/recipes/cobblestone_wall_from_cobblestone_stonecutting.json
++minestudio/assets/recipes/comparator.json
++minestudio/assets/recipes/compass.json
++minestudio/assets/recipes/composter.json
++minestudio/assets/recipes/conduit.json
++minestudio/assets/recipes/cooked_beef.json
++minestudio/assets/recipes/cooked_beef_from_campfire_cooking.json
++minestudio/assets/recipes/cooked_beef_from_smoking.json
++minestudio/assets/recipes/cooked_chicken.json
++minestudio/assets/recipes/cooked_chicken_from_campfire_cooking.json
++minestudio/assets/recipes/cooked_chicken_from_smoking.json
++minestudio/assets/recipes/cooked_cod.json
++minestudio/assets/recipes/cooked_cod_from_campfire_cooking.json
++minestudio/assets/recipes/cooked_cod_from_smoking.json
++minestudio/assets/recipes/cooked_mutton.json
++minestudio/assets/recipes/cooked_mutton_from_campfire_cooking.json
++minestudio/assets/recipes/cooked_mutton_from_smoking.json
++minestudio/assets/recipes/cooked_porkchop.json
++minestudio/assets/recipes/cooked_porkchop_from_campfire_cooking.json
++minestudio/assets/recipes/cooked_porkchop_from_smoking.json
++minestudio/assets/recipes/cooked_rabbit.json
++minestudio/assets/recipes/cooked_rabbit_from_campfire_cooking.json
++minestudio/assets/recipes/cooked_rabbit_from_smoking.json
++minestudio/assets/recipes/cooked_salmon.json
++minestudio/assets/recipes/cooked_salmon_from_campfire_cooking.json
++minestudio/assets/recipes/cooked_salmon_from_smoking.json
++minestudio/assets/recipes/cookie.json
++minestudio/assets/recipes/cracked_nether_bricks.json
++minestudio/assets/recipes/cracked_polished_blackstone_bricks.json
++minestudio/assets/recipes/cracked_stone_bricks.json
++minestudio/assets/recipes/crafting_table.json
++minestudio/assets/recipes/creeper_banner_pattern.json
++minestudio/assets/recipes/crimson_button.json
++minestudio/assets/recipes/crimson_door.json
++minestudio/assets/recipes/crimson_fence.json
++minestudio/assets/recipes/crimson_fence_gate.json
++minestudio/assets/recipes/crimson_hyphae.json
++minestudio/assets/recipes/crimson_planks.json
++minestudio/assets/recipes/crimson_pressure_plate.json
++minestudio/assets/recipes/crimson_sign.json
++minestudio/assets/recipes/crimson_slab.json
++minestudio/assets/recipes/crimson_stairs.json
++minestudio/assets/recipes/crimson_trapdoor.json
++minestudio/assets/recipes/crossbow.json
++minestudio/assets/recipes/cut_red_sandstone.json
++minestudio/assets/recipes/cut_red_sandstone_from_red_sandstone_stonecutting.json
++minestudio/assets/recipes/cut_red_sandstone_slab.json
++minestudio/assets/recipes/cut_red_sandstone_slab_from_cut_red_sandstone_stonecutting.json
++minestudio/assets/recipes/cut_red_sandstone_slab_from_red_sandstone_stonecutting.json
++minestudio/assets/recipes/cut_sandstone.json
++minestudio/assets/recipes/cut_sandstone_from_sandstone_stonecutting.json
++minestudio/assets/recipes/cut_sandstone_slab.json
++minestudio/assets/recipes/cut_sandstone_slab_from_cut_sandstone_stonecutting.json
++minestudio/assets/recipes/cut_sandstone_slab_from_sandstone_stonecutting.json
++minestudio/assets/recipes/cyan_banner.json
++minestudio/assets/recipes/cyan_bed.json
++minestudio/assets/recipes/cyan_bed_from_white_bed.json
++minestudio/assets/recipes/cyan_carpet.json
++minestudio/assets/recipes/cyan_carpet_from_white_carpet.json
++minestudio/assets/recipes/cyan_concrete_powder.json
++minestudio/assets/recipes/cyan_dye.json
++minestudio/assets/recipes/cyan_glazed_terracotta.json
++minestudio/assets/recipes/cyan_stained_glass.json
++minestudio/assets/recipes/cyan_stained_glass_pane.json
++minestudio/assets/recipes/cyan_stained_glass_pane_from_glass_pane.json
++minestudio/assets/recipes/cyan_terracotta.json
++minestudio/assets/recipes/cyan_wool.json
++minestudio/assets/recipes/dark_oak_boat.json
++minestudio/assets/recipes/dark_oak_button.json
++minestudio/assets/recipes/dark_oak_door.json
++minestudio/assets/recipes/dark_oak_fence.json
++minestudio/assets/recipes/dark_oak_fence_gate.json
++minestudio/assets/recipes/dark_oak_planks.json
++minestudio/assets/recipes/dark_oak_pressure_plate.json
++minestudio/assets/recipes/dark_oak_sign.json
++minestudio/assets/recipes/dark_oak_slab.json
++minestudio/assets/recipes/dark_oak_stairs.json
++minestudio/assets/recipes/dark_oak_trapdoor.json
++minestudio/assets/recipes/dark_oak_wood.json
++minestudio/assets/recipes/dark_prismarine.json
++minestudio/assets/recipes/dark_prismarine_slab.json
++minestudio/assets/recipes/dark_prismarine_slab_from_dark_prismarine_stonecutting.json
++minestudio/assets/recipes/dark_prismarine_stairs.json
++minestudio/assets/recipes/dark_prismarine_stairs_from_dark_prismarine_stonecutting.json
++minestudio/assets/recipes/daylight_detector.json
++minestudio/assets/recipes/detector_rail.json
++minestudio/assets/recipes/diamond.json
++minestudio/assets/recipes/diamond_axe.json
++minestudio/assets/recipes/diamond_block.json
++minestudio/assets/recipes/diamond_boots.json
++minestudio/assets/recipes/diamond_chestplate.json
++minestudio/assets/recipes/diamond_from_blasting.json
++minestudio/assets/recipes/diamond_from_smelting.json
++minestudio/assets/recipes/diamond_helmet.json
++minestudio/assets/recipes/diamond_hoe.json
++minestudio/assets/recipes/diamond_leggings.json
++minestudio/assets/recipes/diamond_pickaxe.json
++minestudio/assets/recipes/diamond_shovel.json
++minestudio/assets/recipes/diamond_sword.json
++minestudio/assets/recipes/diorite.json
++minestudio/assets/recipes/diorite_slab.json
++minestudio/assets/recipes/diorite_slab_from_diorite_stonecutting.json
++minestudio/assets/recipes/diorite_stairs.json
++minestudio/assets/recipes/diorite_stairs_from_diorite_stonecutting.json
++minestudio/assets/recipes/diorite_wall.json
++minestudio/assets/recipes/diorite_wall_from_diorite_stonecutting.json
++minestudio/assets/recipes/dispenser.json
++minestudio/assets/recipes/dried_kelp.json
++minestudio/assets/recipes/dried_kelp_block.json
++minestudio/assets/recipes/dried_kelp_from_campfire_cooking.json
++minestudio/assets/recipes/dried_kelp_from_smelting.json
++minestudio/assets/recipes/dried_kelp_from_smoking.json
++minestudio/assets/recipes/dropper.json
++minestudio/assets/recipes/emerald.json
++minestudio/assets/recipes/emerald_block.json
++minestudio/assets/recipes/emerald_from_blasting.json
++minestudio/assets/recipes/emerald_from_smelting.json
++minestudio/assets/recipes/enchanting_table.json
++minestudio/assets/recipes/end_crystal.json
++minestudio/assets/recipes/end_rod.json
++minestudio/assets/recipes/end_stone_brick_slab.json
++minestudio/assets/recipes/end_stone_brick_slab_from_end_stone_brick_stonecutting.json
++minestudio/assets/recipes/end_stone_brick_slab_from_end_stone_stonecutting.json
++minestudio/assets/recipes/end_stone_brick_stairs.json
++minestudio/assets/recipes/end_stone_brick_stairs_from_end_stone_brick_stonecutting.json
++minestudio/assets/recipes/end_stone_brick_stairs_from_end_stone_stonecutting.json
++minestudio/assets/recipes/end_stone_brick_wall.json
++minestudio/assets/recipes/end_stone_brick_wall_from_end_stone_brick_stonecutting.json
++minestudio/assets/recipes/end_stone_brick_wall_from_end_stone_stonecutting.json
++minestudio/assets/recipes/end_stone_bricks.json
++minestudio/assets/recipes/end_stone_bricks_from_end_stone_stonecutting.json
++minestudio/assets/recipes/ender_chest.json
++minestudio/assets/recipes/ender_eye.json
++minestudio/assets/recipes/fermented_spider_eye.json
++minestudio/assets/recipes/fire_charge.json
++minestudio/assets/recipes/firework_rocket.json
++minestudio/assets/recipes/firework_star.json
++minestudio/assets/recipes/fishing_rod.json
++minestudio/assets/recipes/fletching_table.json
++minestudio/assets/recipes/flint_and_steel.json
++minestudio/assets/recipes/flower_banner_pattern.json
++minestudio/assets/recipes/flower_pot.json
++minestudio/assets/recipes/furnace.json
++minestudio/assets/recipes/furnace_minecart.json
++minestudio/assets/recipes/glass.json
++minestudio/assets/recipes/glass_bottle.json
++minestudio/assets/recipes/glass_pane.json
++minestudio/assets/recipes/glistering_melon_slice.json
++minestudio/assets/recipes/glowstone.json
++minestudio/assets/recipes/gold_block.json
++minestudio/assets/recipes/gold_ingot.json
++minestudio/assets/recipes/gold_ingot_from_blasting.json
++minestudio/assets/recipes/gold_ingot_from_gold_block.json
++minestudio/assets/recipes/gold_ingot_from_nuggets.json
++minestudio/assets/recipes/gold_nugget.json
++minestudio/assets/recipes/gold_nugget_from_blasting.json
++minestudio/assets/recipes/gold_nugget_from_smelting.json
++minestudio/assets/recipes/golden_apple.json
++minestudio/assets/recipes/golden_axe.json
++minestudio/assets/recipes/golden_boots.json
++minestudio/assets/recipes/golden_carrot.json
++minestudio/assets/recipes/golden_chestplate.json
++minestudio/assets/recipes/golden_helmet.json
++minestudio/assets/recipes/golden_hoe.json
++minestudio/assets/recipes/golden_leggings.json
++minestudio/assets/recipes/golden_pickaxe.json
++minestudio/assets/recipes/golden_shovel.json
++minestudio/assets/recipes/golden_sword.json
++minestudio/assets/recipes/granite.json
++minestudio/assets/recipes/granite_slab.json
++minestudio/assets/recipes/granite_slab_from_granite_stonecutting.json
++minestudio/assets/recipes/granite_stairs.json
++minestudio/assets/recipes/granite_stairs_from_granite_stonecutting.json
++minestudio/assets/recipes/granite_wall.json
++minestudio/assets/recipes/granite_wall_from_granite_stonecutting.json
++minestudio/assets/recipes/gray_banner.json
++minestudio/assets/recipes/gray_bed.json
++minestudio/assets/recipes/gray_bed_from_white_bed.json
++minestudio/assets/recipes/gray_carpet.json
++minestudio/assets/recipes/gray_carpet_from_white_carpet.json
++minestudio/assets/recipes/gray_concrete_powder.json
++minestudio/assets/recipes/gray_dye.json
++minestudio/assets/recipes/gray_glazed_terracotta.json
++minestudio/assets/recipes/gray_stained_glass.json
++minestudio/assets/recipes/gray_stained_glass_pane.json
++minestudio/assets/recipes/gray_stained_glass_pane_from_glass_pane.json
++minestudio/assets/recipes/gray_terracotta.json
++minestudio/assets/recipes/gray_wool.json
++minestudio/assets/recipes/green_banner.json
++minestudio/assets/recipes/green_bed.json
++minestudio/assets/recipes/green_bed_from_white_bed.json
++minestudio/assets/recipes/green_carpet.json
++minestudio/assets/recipes/green_carpet_from_white_carpet.json
++minestudio/assets/recipes/green_concrete_powder.json
++minestudio/assets/recipes/green_dye.json
++minestudio/assets/recipes/green_glazed_terracotta.json
++minestudio/assets/recipes/green_stained_glass.json
++minestudio/assets/recipes/green_stained_glass_pane.json
++minestudio/assets/recipes/green_stained_glass_pane_from_glass_pane.json
++minestudio/assets/recipes/green_terracotta.json
++minestudio/assets/recipes/green_wool.json
++minestudio/assets/recipes/grindstone.json
++minestudio/assets/recipes/hay_block.json
++minestudio/assets/recipes/heavy_weighted_pressure_plate.json
++minestudio/assets/recipes/honey_block.json
++minestudio/assets/recipes/honey_bottle.json
++minestudio/assets/recipes/honeycomb_block.json
++minestudio/assets/recipes/hopper.json
++minestudio/assets/recipes/hopper_minecart.json
++minestudio/assets/recipes/iron_axe.json
++minestudio/assets/recipes/iron_bars.json
++minestudio/assets/recipes/iron_block.json
++minestudio/assets/recipes/iron_boots.json
++minestudio/assets/recipes/iron_chestplate.json
++minestudio/assets/recipes/iron_door.json
++minestudio/assets/recipes/iron_helmet.json
++minestudio/assets/recipes/iron_hoe.json
++minestudio/assets/recipes/iron_ingot.json
++minestudio/assets/recipes/iron_ingot_from_blasting.json
++minestudio/assets/recipes/iron_ingot_from_iron_block.json
++minestudio/assets/recipes/iron_ingot_from_nuggets.json
++minestudio/assets/recipes/iron_leggings.json
++minestudio/assets/recipes/iron_nugget.json
++minestudio/assets/recipes/iron_nugget_from_blasting.json
++minestudio/assets/recipes/iron_nugget_from_smelting.json
++minestudio/assets/recipes/iron_pickaxe.json
++minestudio/assets/recipes/iron_shovel.json
++minestudio/assets/recipes/iron_sword.json
++minestudio/assets/recipes/iron_trapdoor.json
++minestudio/assets/recipes/item_frame.json
++minestudio/assets/recipes/jack_o_lantern.json
++minestudio/assets/recipes/jukebox.json
++minestudio/assets/recipes/jungle_boat.json
++minestudio/assets/recipes/jungle_button.json
++minestudio/assets/recipes/jungle_door.json
++minestudio/assets/recipes/jungle_fence.json
++minestudio/assets/recipes/jungle_fence_gate.json
++minestudio/assets/recipes/jungle_planks.json
++minestudio/assets/recipes/jungle_pressure_plate.json
++minestudio/assets/recipes/jungle_sign.json
++minestudio/assets/recipes/jungle_slab.json
++minestudio/assets/recipes/jungle_stairs.json
++minestudio/assets/recipes/jungle_trapdoor.json
++minestudio/assets/recipes/jungle_wood.json
++minestudio/assets/recipes/ladder.json
++minestudio/assets/recipes/lantern.json
++minestudio/assets/recipes/lapis_block.json
++minestudio/assets/recipes/lapis_from_blasting.json
++minestudio/assets/recipes/lapis_from_smelting.json
++minestudio/assets/recipes/lapis_lazuli.json
++minestudio/assets/recipes/lead.json
++minestudio/assets/recipes/leather.json
++minestudio/assets/recipes/leather_boots.json
++minestudio/assets/recipes/leather_chestplate.json
++minestudio/assets/recipes/leather_helmet.json
++minestudio/assets/recipes/leather_horse_armor.json
++minestudio/assets/recipes/leather_leggings.json
++minestudio/assets/recipes/lectern.json
++minestudio/assets/recipes/lever.json
++minestudio/assets/recipes/light_blue_banner.json
++minestudio/assets/recipes/light_blue_bed.json
++minestudio/assets/recipes/light_blue_bed_from_white_bed.json
++minestudio/assets/recipes/light_blue_carpet.json
++minestudio/assets/recipes/light_blue_carpet_from_white_carpet.json
++minestudio/assets/recipes/light_blue_concrete_powder.json
++minestudio/assets/recipes/light_blue_dye_from_blue_orchid.json
++minestudio/assets/recipes/light_blue_dye_from_blue_white_dye.json
++minestudio/assets/recipes/light_blue_glazed_terracotta.json
++minestudio/assets/recipes/light_blue_stained_glass.json
++minestudio/assets/recipes/light_blue_stained_glass_pane.json
++minestudio/assets/recipes/light_blue_stained_glass_pane_from_glass_pane.json
++minestudio/assets/recipes/light_blue_terracotta.json
++minestudio/assets/recipes/light_blue_wool.json
++minestudio/assets/recipes/light_gray_banner.json
++minestudio/assets/recipes/light_gray_bed.json
++minestudio/assets/recipes/light_gray_bed_from_white_bed.json
++minestudio/assets/recipes/light_gray_carpet.json
++minestudio/assets/recipes/light_gray_carpet_from_white_carpet.json
++minestudio/assets/recipes/light_gray_concrete_powder.json
++minestudio/assets/recipes/light_gray_dye_from_azure_bluet.json
++minestudio/assets/recipes/light_gray_dye_from_black_white_dye.json
++minestudio/assets/recipes/light_gray_dye_from_gray_white_dye.json
++minestudio/assets/recipes/light_gray_dye_from_oxeye_daisy.json
++minestudio/assets/recipes/light_gray_dye_from_white_tulip.json
++minestudio/assets/recipes/light_gray_glazed_terracotta.json
++minestudio/assets/recipes/light_gray_stained_glass.json
++minestudio/assets/recipes/light_gray_stained_glass_pane.json
++minestudio/assets/recipes/light_gray_stained_glass_pane_from_glass_pane.json
++minestudio/assets/recipes/light_gray_terracotta.json
++minestudio/assets/recipes/light_gray_wool.json
++minestudio/assets/recipes/light_weighted_pressure_plate.json
++minestudio/assets/recipes/lime_banner.json
++minestudio/assets/recipes/lime_bed.json
++minestudio/assets/recipes/lime_bed_from_white_bed.json
++minestudio/assets/recipes/lime_carpet.json
++minestudio/assets/recipes/lime_carpet_from_white_carpet.json
++minestudio/assets/recipes/lime_concrete_powder.json
++minestudio/assets/recipes/lime_dye.json
++minestudio/assets/recipes/lime_dye_from_smelting.json
++minestudio/assets/recipes/lime_glazed_terracotta.json
++minestudio/assets/recipes/lime_stained_glass.json
++minestudio/assets/recipes/lime_stained_glass_pane.json
++minestudio/assets/recipes/lime_stained_glass_pane_from_glass_pane.json
++minestudio/assets/recipes/lime_terracotta.json
++minestudio/assets/recipes/lime_wool.json
++minestudio/assets/recipes/lodestone.json
++minestudio/assets/recipes/loom.json
++minestudio/assets/recipes/magenta_banner.json
++minestudio/assets/recipes/magenta_bed.json
++minestudio/assets/recipes/magenta_bed_from_white_bed.json
++minestudio/assets/recipes/magenta_carpet.json
++minestudio/assets/recipes/magenta_carpet_from_white_carpet.json
++minestudio/assets/recipes/magenta_concrete_powder.json
++minestudio/assets/recipes/magenta_dye_from_allium.json
++minestudio/assets/recipes/magenta_dye_from_blue_red_pink.json
++minestudio/assets/recipes/magenta_dye_from_blue_red_white_dye.json
++minestudio/assets/recipes/magenta_dye_from_lilac.json
++minestudio/assets/recipes/magenta_dye_from_purple_and_pink.json
++minestudio/assets/recipes/magenta_glazed_terracotta.json
++minestudio/assets/recipes/magenta_stained_glass.json
++minestudio/assets/recipes/magenta_stained_glass_pane.json
++minestudio/assets/recipes/magenta_stained_glass_pane_from_glass_pane.json
++minestudio/assets/recipes/magenta_terracotta.json
++minestudio/assets/recipes/magenta_wool.json
++minestudio/assets/recipes/magma_block.json
++minestudio/assets/recipes/magma_cream.json
++minestudio/assets/recipes/map.json
++minestudio/assets/recipes/map_cloning.json
++minestudio/assets/recipes/map_extending.json
++minestudio/assets/recipes/melon.json
++minestudio/assets/recipes/melon_seeds.json
++minestudio/assets/recipes/minecart.json
++minestudio/assets/recipes/mojang_banner_pattern.json
++minestudio/assets/recipes/mossy_cobblestone.json
++minestudio/assets/recipes/mossy_cobblestone_slab.json
++minestudio/assets/recipes/mossy_cobblestone_slab_from_mossy_cobblestone_stonecutting.json
++minestudio/assets/recipes/mossy_cobblestone_stairs.json
++minestudio/assets/recipes/mossy_cobblestone_stairs_from_mossy_cobblestone_stonecutting.json
++minestudio/assets/recipes/mossy_cobblestone_wall.json
++minestudio/assets/recipes/mossy_cobblestone_wall_from_mossy_cobblestone_stonecutting.json
++minestudio/assets/recipes/mossy_stone_brick_slab.json
++minestudio/assets/recipes/mossy_stone_brick_slab_from_mossy_stone_brick_stonecutting.json
++minestudio/assets/recipes/mossy_stone_brick_stairs.json
++minestudio/assets/recipes/mossy_stone_brick_stairs_from_mossy_stone_brick_stonecutting.json
++minestudio/assets/recipes/mossy_stone_brick_wall.json
++minestudio/assets/recipes/mossy_stone_brick_wall_from_mossy_stone_brick_stonecutting.json
++minestudio/assets/recipes/mossy_stone_bricks.json
++minestudio/assets/recipes/mushroom_stew.json
++minestudio/assets/recipes/nether_brick.json
++minestudio/assets/recipes/nether_brick_fence.json
++minestudio/assets/recipes/nether_brick_slab.json
++minestudio/assets/recipes/nether_brick_slab_from_nether_bricks_stonecutting.json
++minestudio/assets/recipes/nether_brick_stairs.json
++minestudio/assets/recipes/nether_brick_stairs_from_nether_bricks_stonecutting.json
++minestudio/assets/recipes/nether_brick_wall.json
++minestudio/assets/recipes/nether_brick_wall_from_nether_bricks_stonecutting.json
++minestudio/assets/recipes/nether_bricks.json
++minestudio/assets/recipes/nether_wart_block.json
++minestudio/assets/recipes/netherite_axe_smithing.json
++minestudio/assets/recipes/netherite_block.json
++minestudio/assets/recipes/netherite_boots_smithing.json
++minestudio/assets/recipes/netherite_chestplate_smithing.json
++minestudio/assets/recipes/netherite_helmet_smithing.json
++minestudio/assets/recipes/netherite_hoe_smithing.json
++minestudio/assets/recipes/netherite_ingot.json
++minestudio/assets/recipes/netherite_ingot_from_netherite_block.json
++minestudio/assets/recipes/netherite_leggings_smithing.json
++minestudio/assets/recipes/netherite_pickaxe_smithing.json
++minestudio/assets/recipes/netherite_scrap.json
++minestudio/assets/recipes/netherite_scrap_from_blasting.json
++minestudio/assets/recipes/netherite_shovel_smithing.json
++minestudio/assets/recipes/netherite_sword_smithing.json
++minestudio/assets/recipes/note_block.json
++minestudio/assets/recipes/oak_boat.json
++minestudio/assets/recipes/oak_button.json
++minestudio/assets/recipes/oak_door.json
++minestudio/assets/recipes/oak_fence.json
++minestudio/assets/recipes/oak_fence_gate.json
++minestudio/assets/recipes/oak_planks.json
++minestudio/assets/recipes/oak_pressure_plate.json
++minestudio/assets/recipes/oak_sign.json
++minestudio/assets/recipes/oak_slab.json
++minestudio/assets/recipes/oak_stairs.json
++minestudio/assets/recipes/oak_trapdoor.json
++minestudio/assets/recipes/oak_wood.json
++minestudio/assets/recipes/observer.json
++minestudio/assets/recipes/orange_banner.json
++minestudio/assets/recipes/orange_bed.json
++minestudio/assets/recipes/orange_bed_from_white_bed.json
++minestudio/assets/recipes/orange_carpet.json
++minestudio/assets/recipes/orange_carpet_from_white_carpet.json
++minestudio/assets/recipes/orange_concrete_powder.json
++minestudio/assets/recipes/orange_dye_from_orange_tulip.json
++minestudio/assets/recipes/orange_dye_from_red_yellow.json
++minestudio/assets/recipes/orange_glazed_terracotta.json
++minestudio/assets/recipes/orange_stained_glass.json
++minestudio/assets/recipes/orange_stained_glass_pane.json
++minestudio/assets/recipes/orange_stained_glass_pane_from_glass_pane.json
++minestudio/assets/recipes/orange_terracotta.json
++minestudio/assets/recipes/orange_wool.json
++minestudio/assets/recipes/packed_ice.json
++minestudio/assets/recipes/painting.json
++minestudio/assets/recipes/paper.json
++minestudio/assets/recipes/pink_banner.json
++minestudio/assets/recipes/pink_bed.json
++minestudio/assets/recipes/pink_bed_from_white_bed.json
++minestudio/assets/recipes/pink_carpet.json
++minestudio/assets/recipes/pink_carpet_from_white_carpet.json
++minestudio/assets/recipes/pink_concrete_powder.json
++minestudio/assets/recipes/pink_dye_from_peony.json
++minestudio/assets/recipes/pink_dye_from_pink_tulip.json
++minestudio/assets/recipes/pink_dye_from_red_white_dye.json
++minestudio/assets/recipes/pink_glazed_terracotta.json
++minestudio/assets/recipes/pink_stained_glass.json
++minestudio/assets/recipes/pink_stained_glass_pane.json
++minestudio/assets/recipes/pink_stained_glass_pane_from_glass_pane.json
++minestudio/assets/recipes/pink_terracotta.json
++minestudio/assets/recipes/pink_wool.json
++minestudio/assets/recipes/piston.json
++minestudio/assets/recipes/polished_andesite.json
++minestudio/assets/recipes/polished_andesite_from_andesite_stonecutting.json
++minestudio/assets/recipes/polished_andesite_slab.json
++minestudio/assets/recipes/polished_andesite_slab_from_andesite_stonecutting.json
++minestudio/assets/recipes/polished_andesite_slab_from_polished_andesite_stonecutting.json
++minestudio/assets/recipes/polished_andesite_stairs.json
++minestudio/assets/recipes/polished_andesite_stairs_from_andesite_stonecutting.json
++minestudio/assets/recipes/polished_andesite_stairs_from_polished_andesite_stonecutting.json
++minestudio/assets/recipes/polished_basalt.json
++minestudio/assets/recipes/polished_basalt_from_basalt_stonecutting.json
++minestudio/assets/recipes/polished_blackstone.json
++minestudio/assets/recipes/polished_blackstone_brick_slab.json
++minestudio/assets/recipes/polished_blackstone_brick_slab_from_blackstone_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_brick_slab_from_polished_blackstone_bricks_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_brick_slab_from_polished_blackstone_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_brick_stairs.json
++minestudio/assets/recipes/polished_blackstone_brick_stairs_from_blackstone_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_brick_stairs_from_polished_blackstone_bricks_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_brick_stairs_from_polished_blackstone_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_brick_wall.json
++minestudio/assets/recipes/polished_blackstone_brick_wall_from_blackstone_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_brick_wall_from_polished_blackstone_bricks_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_brick_wall_from_polished_blackstone_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_bricks.json
++minestudio/assets/recipes/polished_blackstone_bricks_from_blackstone_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_bricks_from_polished_blackstone_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_button.json
++minestudio/assets/recipes/polished_blackstone_from_blackstone_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_pressure_plate.json
++minestudio/assets/recipes/polished_blackstone_slab.json
++minestudio/assets/recipes/polished_blackstone_slab_from_blackstone_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_slab_from_polished_blackstone_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_stairs.json
++minestudio/assets/recipes/polished_blackstone_stairs_from_blackstone_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_stairs_from_polished_blackstone_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_wall.json
++minestudio/assets/recipes/polished_blackstone_wall_from_blackstone_stonecutting.json
++minestudio/assets/recipes/polished_blackstone_wall_from_polished_blackstone_stonecutting.json
++minestudio/assets/recipes/polished_diorite.json
++minestudio/assets/recipes/polished_diorite_from_diorite_stonecutting.json
++minestudio/assets/recipes/polished_diorite_slab.json
++minestudio/assets/recipes/polished_diorite_slab_from_diorite_stonecutting.json
++minestudio/assets/recipes/polished_diorite_slab_from_polished_diorite_stonecutting.json
++minestudio/assets/recipes/polished_diorite_stairs.json
++minestudio/assets/recipes/polished_diorite_stairs_from_diorite_stonecutting.json
++minestudio/assets/recipes/polished_diorite_stairs_from_polished_diorite_stonecutting.json
++minestudio/assets/recipes/polished_granite.json
++minestudio/assets/recipes/polished_granite_from_granite_stonecutting.json
++minestudio/assets/recipes/polished_granite_slab.json
++minestudio/assets/recipes/polished_granite_slab_from_granite_stonecutting.json
++minestudio/assets/recipes/polished_granite_slab_from_polished_granite_stonecutting.json
++minestudio/assets/recipes/polished_granite_stairs.json
++minestudio/assets/recipes/polished_granite_stairs_from_granite_stonecutting.json
++minestudio/assets/recipes/polished_granite_stairs_from_polished_granite_stonecutting.json
++minestudio/assets/recipes/popped_chorus_fruit.json
++minestudio/assets/recipes/powered_rail.json
++minestudio/assets/recipes/prismarine.json
++minestudio/assets/recipes/prismarine_brick_slab.json
++minestudio/assets/recipes/prismarine_brick_slab_from_prismarine_stonecutting.json
++minestudio/assets/recipes/prismarine_brick_stairs.json
++minestudio/assets/recipes/prismarine_brick_stairs_from_prismarine_stonecutting.json
++minestudio/assets/recipes/prismarine_bricks.json
++minestudio/assets/recipes/prismarine_slab.json
++minestudio/assets/recipes/prismarine_slab_from_prismarine_stonecutting.json
++minestudio/assets/recipes/prismarine_stairs.json
++minestudio/assets/recipes/prismarine_stairs_from_prismarine_stonecutting.json
++minestudio/assets/recipes/prismarine_wall.json
++minestudio/assets/recipes/prismarine_wall_from_prismarine_stonecutting.json
++minestudio/assets/recipes/pumpkin_pie.json
++minestudio/assets/recipes/pumpkin_seeds.json
++minestudio/assets/recipes/purple_banner.json
++minestudio/assets/recipes/purple_bed.json
++minestudio/assets/recipes/purple_bed_from_white_bed.json
++minestudio/assets/recipes/purple_carpet.json
++minestudio/assets/recipes/purple_carpet_from_white_carpet.json
++minestudio/assets/recipes/purple_concrete_powder.json
++minestudio/assets/recipes/purple_dye.json
++minestudio/assets/recipes/purple_glazed_terracotta.json
++minestudio/assets/recipes/purple_stained_glass.json
++minestudio/assets/recipes/purple_stained_glass_pane.json
++minestudio/assets/recipes/purple_stained_glass_pane_from_glass_pane.json
++minestudio/assets/recipes/purple_terracotta.json
++minestudio/assets/recipes/purple_wool.json
++minestudio/assets/recipes/purpur_block.json
++minestudio/assets/recipes/purpur_pillar.json
++minestudio/assets/recipes/purpur_pillar_from_purpur_block_stonecutting.json
++minestudio/assets/recipes/purpur_slab.json
++minestudio/assets/recipes/purpur_slab_from_purpur_block_stonecutting.json
++minestudio/assets/recipes/purpur_stairs.json
++minestudio/assets/recipes/purpur_stairs_from_purpur_block_stonecutting.json
++minestudio/assets/recipes/quartz.json
++minestudio/assets/recipes/quartz_block.json
++minestudio/assets/recipes/quartz_bricks.json
++minestudio/assets/recipes/quartz_bricks_from_quartz_block_stonecutting.json
++minestudio/assets/recipes/quartz_from_blasting.json
++minestudio/assets/recipes/quartz_pillar.json
++minestudio/assets/recipes/quartz_pillar_from_quartz_block_stonecutting.json
++minestudio/assets/recipes/quartz_slab.json
++minestudio/assets/recipes/quartz_slab_from_stonecutting.json
++minestudio/assets/recipes/quartz_stairs.json
++minestudio/assets/recipes/quartz_stairs_from_quartz_block_stonecutting.json
++minestudio/assets/recipes/rabbit_stew_from_brown_mushroom.json
++minestudio/assets/recipes/rabbit_stew_from_red_mushroom.json
++minestudio/assets/recipes/rail.json
++minestudio/assets/recipes/red_banner.json
++minestudio/assets/recipes/red_bed.json
++minestudio/assets/recipes/red_bed_from_white_bed.json
++minestudio/assets/recipes/red_carpet.json
++minestudio/assets/recipes/red_carpet_from_white_carpet.json
++minestudio/assets/recipes/red_concrete_powder.json
++minestudio/assets/recipes/red_dye_from_beetroot.json
++minestudio/assets/recipes/red_dye_from_poppy.json
++minestudio/assets/recipes/red_dye_from_rose_bush.json
++minestudio/assets/recipes/red_dye_from_tulip.json
++minestudio/assets/recipes/red_glazed_terracotta.json
++minestudio/assets/recipes/red_nether_brick_slab.json
++minestudio/assets/recipes/red_nether_brick_slab_from_red_nether_bricks_stonecutting.json
++minestudio/assets/recipes/red_nether_brick_stairs.json
++minestudio/assets/recipes/red_nether_brick_stairs_from_red_nether_bricks_stonecutting.json
++minestudio/assets/recipes/red_nether_brick_wall.json
++minestudio/assets/recipes/red_nether_brick_wall_from_red_nether_bricks_stonecutting.json
++minestudio/assets/recipes/red_nether_bricks.json
++minestudio/assets/recipes/red_sandstone.json
++minestudio/assets/recipes/red_sandstone_slab.json
++minestudio/assets/recipes/red_sandstone_slab_from_red_sandstone_stonecutting.json
++minestudio/assets/recipes/red_sandstone_stairs.json
++minestudio/assets/recipes/red_sandstone_stairs_from_red_sandstone_stonecutting.json
++minestudio/assets/recipes/red_sandstone_wall.json
++minestudio/assets/recipes/red_sandstone_wall_from_red_sandstone_stonecutting.json
++minestudio/assets/recipes/red_stained_glass.json
++minestudio/assets/recipes/red_stained_glass_pane.json
++minestudio/assets/recipes/red_stained_glass_pane_from_glass_pane.json
++minestudio/assets/recipes/red_terracotta.json
++minestudio/assets/recipes/red_wool.json
++minestudio/assets/recipes/redstone.json
++minestudio/assets/recipes/redstone_block.json
++minestudio/assets/recipes/redstone_from_blasting.json
++minestudio/assets/recipes/redstone_from_smelting.json
++minestudio/assets/recipes/redstone_lamp.json
++minestudio/assets/recipes/redstone_torch.json
++minestudio/assets/recipes/repair_item.json
++minestudio/assets/recipes/repeater.json
++minestudio/assets/recipes/respawn_anchor.json
++minestudio/assets/recipes/sandstone.json
++minestudio/assets/recipes/sandstone_slab.json
++minestudio/assets/recipes/sandstone_slab_from_sandstone_stonecutting.json
++minestudio/assets/recipes/sandstone_stairs.json
++minestudio/assets/recipes/sandstone_stairs_from_sandstone_stonecutting.json
++minestudio/assets/recipes/sandstone_wall.json
++minestudio/assets/recipes/sandstone_wall_from_sandstone_stonecutting.json
++minestudio/assets/recipes/scaffolding.json
++minestudio/assets/recipes/sea_lantern.json
++minestudio/assets/recipes/shears.json
++minestudio/assets/recipes/shield.json
++minestudio/assets/recipes/shield_decoration.json
++minestudio/assets/recipes/shulker_box.json
++minestudio/assets/recipes/shulker_box_coloring.json
++minestudio/assets/recipes/skull_banner_pattern.json
++minestudio/assets/recipes/slime_ball.json
++minestudio/assets/recipes/slime_block.json
++minestudio/assets/recipes/smithing_table.json
++minestudio/assets/recipes/smoker.json
++minestudio/assets/recipes/smooth_quartz.json
++minestudio/assets/recipes/smooth_quartz_slab.json
++minestudio/assets/recipes/smooth_quartz_slab_from_smooth_quartz_stonecutting.json
++minestudio/assets/recipes/smooth_quartz_stairs.json
++minestudio/assets/recipes/smooth_quartz_stairs_from_smooth_quartz_stonecutting.json
++minestudio/assets/recipes/smooth_red_sandstone.json
++minestudio/assets/recipes/smooth_red_sandstone_slab.json
++minestudio/assets/recipes/smooth_red_sandstone_slab_from_smooth_red_sandstone_stonecutting.json
++minestudio/assets/recipes/smooth_red_sandstone_stairs.json
++minestudio/assets/recipes/smooth_red_sandstone_stairs_from_smooth_red_sandstone_stonecutting.json
++minestudio/assets/recipes/smooth_sandstone.json
++minestudio/assets/recipes/smooth_sandstone_slab.json
++minestudio/assets/recipes/smooth_sandstone_slab_from_smooth_sandstone_stonecutting.json
++minestudio/assets/recipes/smooth_sandstone_stairs.json
++minestudio/assets/recipes/smooth_sandstone_stairs_from_smooth_sandstone_stonecutting.json
++minestudio/assets/recipes/smooth_stone.json
++minestudio/assets/recipes/smooth_stone_slab.json
++minestudio/assets/recipes/smooth_stone_slab_from_smooth_stone_stonecutting.json
++minestudio/assets/recipes/snow.json
++minestudio/assets/recipes/snow_block.json
++minestudio/assets/recipes/soul_campfire.json
++minestudio/assets/recipes/soul_lantern.json
++minestudio/assets/recipes/soul_torch.json
++minestudio/assets/recipes/spectral_arrow.json
++minestudio/assets/recipes/sponge.json
++minestudio/assets/recipes/spruce_boat.json
++minestudio/assets/recipes/spruce_button.json
++minestudio/assets/recipes/spruce_door.json
++minestudio/assets/recipes/spruce_fence.json
++minestudio/assets/recipes/spruce_fence_gate.json
++minestudio/assets/recipes/spruce_planks.json
++minestudio/assets/recipes/spruce_pressure_plate.json
++minestudio/assets/recipes/spruce_sign.json
++minestudio/assets/recipes/spruce_slab.json
++minestudio/assets/recipes/spruce_stairs.json
++minestudio/assets/recipes/spruce_trapdoor.json
++minestudio/assets/recipes/spruce_wood.json
++minestudio/assets/recipes/stick.json
++minestudio/assets/recipes/stick_from_bamboo_item.json
++minestudio/assets/recipes/sticky_piston.json
++minestudio/assets/recipes/stone.json
++minestudio/assets/recipes/stone_axe.json
++minestudio/assets/recipes/stone_brick_slab.json
++minestudio/assets/recipes/stone_brick_slab_from_stone_bricks_stonecutting.json
++minestudio/assets/recipes/stone_brick_slab_from_stone_stonecutting.json
++minestudio/assets/recipes/stone_brick_stairs.json
++minestudio/assets/recipes/stone_brick_stairs_from_stone_bricks_stonecutting.json
++minestudio/assets/recipes/stone_brick_stairs_from_stone_stonecutting.json
++minestudio/assets/recipes/stone_brick_wall.json
++minestudio/assets/recipes/stone_brick_wall_from_stone_bricks_stonecutting.json
++minestudio/assets/recipes/stone_brick_walls_from_stone_stonecutting.json
++minestudio/assets/recipes/stone_bricks.json
++minestudio/assets/recipes/stone_bricks_from_stone_stonecutting.json
++minestudio/assets/recipes/stone_button.json
++minestudio/assets/recipes/stone_hoe.json
++minestudio/assets/recipes/stone_pickaxe.json
++minestudio/assets/recipes/stone_pressure_plate.json
++minestudio/assets/recipes/stone_shovel.json
++minestudio/assets/recipes/stone_slab.json
++minestudio/assets/recipes/stone_slab_from_stone_stonecutting.json
++minestudio/assets/recipes/stone_stairs.json
++minestudio/assets/recipes/stone_stairs_from_stone_stonecutting.json
++minestudio/assets/recipes/stone_sword.json
++minestudio/assets/recipes/stonecutter.json
++minestudio/assets/recipes/stripped_acacia_wood.json
++minestudio/assets/recipes/stripped_birch_wood.json
++minestudio/assets/recipes/stripped_crimson_hyphae.json
++minestudio/assets/recipes/stripped_dark_oak_wood.json
++minestudio/assets/recipes/stripped_jungle_wood.json
++minestudio/assets/recipes/stripped_oak_wood.json
++minestudio/assets/recipes/stripped_spruce_wood.json
++minestudio/assets/recipes/stripped_warped_hyphae.json
++minestudio/assets/recipes/sugar_from_honey_bottle.json
++minestudio/assets/recipes/sugar_from_sugar_cane.json
++minestudio/assets/recipes/suspicious_stew.json
++minestudio/assets/recipes/target.json
++minestudio/assets/recipes/terracotta.json
++minestudio/assets/recipes/tipped_arrow.json
++minestudio/assets/recipes/tnt.json
++minestudio/assets/recipes/tnt_minecart.json
++minestudio/assets/recipes/torch.json
++minestudio/assets/recipes/trapped_chest.json
++minestudio/assets/recipes/tripwire_hook.json
++minestudio/assets/recipes/turtle_helmet.json
++minestudio/assets/recipes/warped_button.json
++minestudio/assets/recipes/warped_door.json
++minestudio/assets/recipes/warped_fence.json
++minestudio/assets/recipes/warped_fence_gate.json
++minestudio/assets/recipes/warped_fungus_on_a_stick.json
++minestudio/assets/recipes/warped_hyphae.json
++minestudio/assets/recipes/warped_planks.json
++minestudio/assets/recipes/warped_pressure_plate.json
++minestudio/assets/recipes/warped_sign.json
++minestudio/assets/recipes/warped_slab.json
++minestudio/assets/recipes/warped_stairs.json
++minestudio/assets/recipes/warped_trapdoor.json
++minestudio/assets/recipes/wheat.json
++minestudio/assets/recipes/white_banner.json
++minestudio/assets/recipes/white_bed.json
++minestudio/assets/recipes/white_carpet.json
++minestudio/assets/recipes/white_concrete_powder.json
++minestudio/assets/recipes/white_dye.json
++minestudio/assets/recipes/white_dye_from_lily_of_the_valley.json
++minestudio/assets/recipes/white_glazed_terracotta.json
++minestudio/assets/recipes/white_stained_glass.json
++minestudio/assets/recipes/white_stained_glass_pane.json
++minestudio/assets/recipes/white_stained_glass_pane_from_glass_pane.json
++minestudio/assets/recipes/white_terracotta.json
++minestudio/assets/recipes/white_wool_from_string.json
++minestudio/assets/recipes/wooden_axe.json
++minestudio/assets/recipes/wooden_hoe.json
++minestudio/assets/recipes/wooden_pickaxe.json
++minestudio/assets/recipes/wooden_shovel.json
++minestudio/assets/recipes/wooden_sword.json
++minestudio/assets/recipes/writable_book.json
++minestudio/assets/recipes/yellow_banner.json
++minestudio/assets/recipes/yellow_bed.json
++minestudio/assets/recipes/yellow_bed_from_white_bed.json
++minestudio/assets/recipes/yellow_carpet.json
++minestudio/assets/recipes/yellow_carpet_from_white_carpet.json
++minestudio/assets/recipes/yellow_concrete_powder.json
++minestudio/assets/recipes/yellow_dye_from_dandelion.json
++minestudio/assets/recipes/yellow_dye_from_sunflower.json
++minestudio/assets/recipes/yellow_glazed_terracotta.json
++minestudio/assets/recipes/yellow_stained_glass.json
++minestudio/assets/recipes/yellow_stained_glass_pane.json
++minestudio/assets/recipes/yellow_stained_glass_pane_from_glass_pane.json
++minestudio/assets/recipes/yellow_terracotta.json
++minestudio/assets/recipes/yellow_wool.json
++minestudio/benchmark/__init__.py
++minestudio/benchmark/test.py
++minestudio/benchmark/test_pipeline.py
++minestudio/benchmark/auto_eval/README.md
++minestudio/benchmark/auto_eval/batch_video_rating.py
++minestudio/benchmark/auto_eval/individual_video_rating.py
++minestudio/benchmark/auto_eval/video_comparison.py
++minestudio/benchmark/auto_eval/criteria_files/build_a_waterfall.txt
++minestudio/benchmark/auto_eval/criteria_files/build_dig3fill1.txt
++minestudio/benchmark/auto_eval/criteria_files/build_gate.txt
++minestudio/benchmark/auto_eval/criteria_files/build_golems.txt
++minestudio/benchmark/auto_eval/criteria_files/build_nether_portal.txt
++minestudio/benchmark/auto_eval/criteria_files/build_obsidian.txt
++minestudio/benchmark/auto_eval/criteria_files/build_pillar.txt
++minestudio/benchmark/auto_eval/criteria_files/build_snow_golem.txt
++minestudio/benchmark/auto_eval/criteria_files/build_snow_golems.txt
++minestudio/benchmark/auto_eval/criteria_files/build_waterfall.txt
++minestudio/benchmark/auto_eval/criteria_files/carve_pumpkin.txt
++minestudio/benchmark/auto_eval/criteria_files/carve_pumpkins.txt
++minestudio/benchmark/auto_eval/criteria_files/clean_up.txt
++minestudio/benchmark/auto_eval/criteria_files/climb_the_mountain.txt
++minestudio/benchmark/auto_eval/criteria_files/collect_dirt.txt
++minestudio/benchmark/auto_eval/criteria_files/collect_grass.txt
++minestudio/benchmark/auto_eval/criteria_files/collect_seagrass.txt
++minestudio/benchmark/auto_eval/criteria_files/collect_wood.txt
++minestudio/benchmark/auto_eval/criteria_files/collect_wool.txt
++minestudio/benchmark/auto_eval/criteria_files/combat_enderman.txt
++minestudio/benchmark/auto_eval/criteria_files/combat_enemies.txt
++minestudio/benchmark/auto_eval/criteria_files/combat_skeletons.txt
++minestudio/benchmark/auto_eval/criteria_files/combat_spider.txt
++minestudio/benchmark/auto_eval/criteria_files/combat_spiders.txt
++minestudio/benchmark/auto_eval/criteria_files/combat_zombies.txt
++minestudio/benchmark/auto_eval/criteria_files/craft_enchantment.txt
++minestudio/benchmark/auto_eval/criteria_files/craft_ladder.txt
++minestudio/benchmark/auto_eval/criteria_files/craft_ladders.txt
++minestudio/benchmark/auto_eval/criteria_files/craft_smelting.txt
++minestudio/benchmark/auto_eval/criteria_files/craft_stonecut.txt
++minestudio/benchmark/auto_eval/criteria_files/craft_table.txt
++minestudio/benchmark/auto_eval/criteria_files/craft_the_crafting_table.txt
++minestudio/benchmark/auto_eval/criteria_files/craft_to_cake.txt
++minestudio/benchmark/auto_eval/criteria_files/craft_to_clock.txt
++minestudio/benchmark/auto_eval/criteria_files/craft_to_craft_table.txt
++minestudio/benchmark/auto_eval/criteria_files/craft_to_ladder.txt
++minestudio/benchmark/auto_eval/criteria_files/cut_stone.txt
++minestudio/benchmark/auto_eval/criteria_files/dig_three_down_and_fill_one_up.txt
++minestudio/benchmark/auto_eval/criteria_files/drink_harming_potion.txt
++minestudio/benchmark/auto_eval/criteria_files/enchant_diamond_sword.txt
++minestudio/benchmark/auto_eval/criteria_files/enchant_sword.txt
++minestudio/benchmark/auto_eval/criteria_files/explore_boat.txt
++minestudio/benchmark/auto_eval/criteria_files/explore_chest.txt
++minestudio/benchmark/auto_eval/criteria_files/explore_climb.txt
++minestudio/benchmark/auto_eval/criteria_files/explore_mine.txt
++minestudio/benchmark/auto_eval/criteria_files/explore_run.txt
++minestudio/benchmark/auto_eval/criteria_files/explore_the_treasure.txt
++minestudio/benchmark/auto_eval/criteria_files/find_diamond.txt
++minestudio/benchmark/auto_eval/criteria_files/find_forest.txt
++minestudio/benchmark/auto_eval/criteria_files/find_village.txt
++minestudio/benchmark/auto_eval/criteria_files/hunt_a_sheep.txt
++minestudio/benchmark/auto_eval/criteria_files/hunt_animals.txt
++minestudio/benchmark/auto_eval/criteria_files/lead_animals.txt
++minestudio/benchmark/auto_eval/criteria_files/make_fire_with_flint_and_steel.txt
++minestudio/benchmark/auto_eval/criteria_files/make_obsidian_by_wate.txt
++minestudio/benchmark/auto_eval/criteria_files/mine_diamond_ore.txt
++minestudio/benchmark/auto_eval/criteria_files/mine_dirt.txt
++minestudio/benchmark/auto_eval/criteria_files/mine_grass.txt
++minestudio/benchmark/auto_eval/criteria_files/mine_horizontally.txt
++minestudio/benchmark/auto_eval/criteria_files/mine_iron_ore.txt
++minestudio/benchmark/auto_eval/criteria_files/mine_obsidian.txt
++minestudio/benchmark/auto_eval/criteria_files/plant_wheats.txt
++minestudio/benchmark/auto_eval/criteria_files/prepare_a_birthday_present_for_your_neighbor.txt
++minestudio/benchmark/auto_eval/criteria_files/run_and_explore.txt
++minestudio/benchmark/auto_eval/criteria_files/set_fires.txt
++minestudio/benchmark/auto_eval/criteria_files/shoot_phantom.txt
++minestudio/benchmark/auto_eval/criteria_files/sleep_in_bed.txt
++minestudio/benchmark/auto_eval/criteria_files/sleep_on_the_bed.txt
++minestudio/benchmark/auto_eval/criteria_files/smelt_food.txt
++minestudio/benchmark/auto_eval/criteria_files/survive_combat.txt
++minestudio/benchmark/auto_eval/criteria_files/survive_hunt.txt
++minestudio/benchmark/auto_eval/criteria_files/survive_plant.txt
++minestudio/benchmark/auto_eval/criteria_files/survive_shield.txt
++minestudio/benchmark/auto_eval/criteria_files/survive_sleep.txt
++minestudio/benchmark/auto_eval/criteria_files/tool_bow.txt
++minestudio/benchmark/auto_eval/criteria_files/tool_flint.txt
++minestudio/benchmark/auto_eval/criteria_files/tool_lead.txt
++minestudio/benchmark/auto_eval/criteria_files/tool_pumpkin.txt
++minestudio/benchmark/auto_eval/criteria_files/tool_trident.txt
++minestudio/benchmark/auto_eval/criteria_files/travel_by_boat.txt
++minestudio/benchmark/auto_eval/criteria_files/use_bow.txt
++minestudio/benchmark/auto_eval/criteria_files/use_shield.txt
++minestudio/benchmark/auto_eval/criteria_files/use_trident.txt
++minestudio/benchmark/auto_eval/eval_video/build_gate/build_gate_5.mp4
++minestudio/benchmark/auto_eval/eval_video/build_gate/build_gate_7.mp4
++minestudio/benchmark/auto_eval/eval_video/build_pillar/build_pillar_0.mp4
++minestudio/benchmark/auto_eval/eval_video/build_pillar/build_pillar_6.mp4
++minestudio/benchmark/auto_eval/eval_video/combat_spider/combat_spider_7.mp4
++minestudio/benchmark/auto_eval/eval_video/combat_spider/combat_spider_8.mp4
++minestudio/benchmark/auto_eval/prompts/compare_rating_prompts.txt
++minestudio/benchmark/auto_eval/prompts/rule_system_prompt.txt
++minestudio/benchmark/auto_eval/prompts/single_rating_prompt.txt
++minestudio/benchmark/auto_eval/vlm_rating_res/build_gate.json
++minestudio/benchmark/auto_eval/vlm_rating_res/combat_spider.json
++minestudio/benchmark/task_configs/upload.py
++minestudio/benchmark/task_configs/hard/build_a_waterfall.yaml
++minestudio/benchmark/task_configs/hard/build_dig3fill1.yaml
++minestudio/benchmark/task_configs/hard/build_gate.yaml
++minestudio/benchmark/task_configs/hard/build_golems.yaml
++minestudio/benchmark/task_configs/hard/build_nether_portal.yaml
++minestudio/benchmark/task_configs/hard/build_obsidian.yaml
++minestudio/benchmark/task_configs/hard/build_pillar.yaml
++minestudio/benchmark/task_configs/hard/build_snow_golem.yaml
++minestudio/benchmark/task_configs/hard/carve_pumpkins.yaml
++minestudio/benchmark/task_configs/hard/clean_up.yaml
++minestudio/benchmark/task_configs/hard/climb_the_mountain.yaml
++minestudio/benchmark/task_configs/hard/collect_dirt.yaml
++minestudio/benchmark/task_configs/hard/collect_grass.yaml
++minestudio/benchmark/task_configs/hard/collect_seagrass.yaml
++minestudio/benchmark/task_configs/hard/collect_wood.yaml
++minestudio/benchmark/task_configs/hard/collect_wool.yaml
++minestudio/benchmark/task_configs/hard/combat_enderman.yaml
++minestudio/benchmark/task_configs/hard/combat_enemies.yaml
++minestudio/benchmark/task_configs/hard/combat_skeletons.yaml
++minestudio/benchmark/task_configs/hard/combat_spider.yaml
++minestudio/benchmark/task_configs/hard/combat_spiders.yaml
++minestudio/benchmark/task_configs/hard/combat_zombies.yaml
++minestudio/benchmark/task_configs/hard/craft_enchantment.yaml
++minestudio/benchmark/task_configs/hard/craft_ladder.yaml
++minestudio/benchmark/task_configs/hard/craft_smelting.yaml
++minestudio/benchmark/task_configs/hard/craft_stonecut.yaml
++minestudio/benchmark/task_configs/hard/craft_table.yaml
++minestudio/benchmark/task_configs/hard/craft_the_crafting_table.yaml
++minestudio/benchmark/task_configs/hard/craft_to_cake.yaml
++minestudio/benchmark/task_configs/hard/craft_to_clock.yaml
++minestudio/benchmark/task_configs/hard/craft_to_ladder.yaml
++minestudio/benchmark/task_configs/hard/cut_stone.yaml
++minestudio/benchmark/task_configs/hard/dig_three_down_and_fill_one_up.yaml
++minestudio/benchmark/task_configs/hard/drink_harming_potion.yaml
++minestudio/benchmark/task_configs/hard/enchant_diamond_sword.yaml
++minestudio/benchmark/task_configs/hard/enchant_sword.yaml
++minestudio/benchmark/task_configs/hard/explore_boat.yaml
++minestudio/benchmark/task_configs/hard/explore_chest.yaml
++minestudio/benchmark/task_configs/hard/explore_climb.yaml
++minestudio/benchmark/task_configs/hard/explore_mine.yaml
++minestudio/benchmark/task_configs/hard/explore_run.yaml
++minestudio/benchmark/task_configs/hard/explore_the_treasure.yaml
++minestudio/benchmark/task_configs/hard/find_diamond.yaml
++minestudio/benchmark/task_configs/hard/find_forest.yaml
++minestudio/benchmark/task_configs/hard/find_village.yaml
++minestudio/benchmark/task_configs/hard/hunt_a_sheep.yaml
++minestudio/benchmark/task_configs/hard/hunt_animals.yaml
++minestudio/benchmark/task_configs/hard/lead_animals.yaml
++minestudio/benchmark/task_configs/hard/make_fire_with_flint_and_steel.yaml
++minestudio/benchmark/task_configs/hard/make_obsidian_by_wate.yaml
++minestudio/benchmark/task_configs/hard/mine_diamond_ore.yaml
++minestudio/benchmark/task_configs/hard/mine_dirt.yaml
++minestudio/benchmark/task_configs/hard/mine_grass.yaml
++minestudio/benchmark/task_configs/hard/mine_horizontally.yaml
++minestudio/benchmark/task_configs/hard/mine_iron_ore.yaml
++minestudio/benchmark/task_configs/hard/mine_obsidian.yaml
++minestudio/benchmark/task_configs/hard/plant_wheats.yaml
++minestudio/benchmark/task_configs/hard/prepare_a_birthday_present_for_your_neighbor.yaml
++minestudio/benchmark/task_configs/hard/run_and_explore.yaml
++minestudio/benchmark/task_configs/hard/set_fires.yaml
++minestudio/benchmark/task_configs/hard/shoot_phantom.yaml
++minestudio/benchmark/task_configs/hard/sleep_in_bed.yaml
++minestudio/benchmark/task_configs/hard/smelt_food.yaml
++minestudio/benchmark/task_configs/hard/survive_combat.yaml
++minestudio/benchmark/task_configs/hard/survive_hunt.yaml
++minestudio/benchmark/task_configs/hard/survive_plant.yaml
++minestudio/benchmark/task_configs/hard/survive_shield.yaml
++minestudio/benchmark/task_configs/hard/survive_sleep.yaml
++minestudio/benchmark/task_configs/hard/tool_bow.yaml
++minestudio/benchmark/task_configs/hard/tool_flint.yaml
++minestudio/benchmark/task_configs/hard/tool_lead.yaml
++minestudio/benchmark/task_configs/hard/tool_pumpkin.yaml
++minestudio/benchmark/task_configs/hard/tool_trident.yaml
++minestudio/benchmark/task_configs/hard/travel_by_boat.yaml
++minestudio/benchmark/task_configs/hard/use_bow.yaml
++minestudio/benchmark/task_configs/hard/use_shield.yaml
++minestudio/benchmark/task_configs/hard/use_trident.yaml
++minestudio/benchmark/task_configs/simple/build_a_waterfall.yaml
++minestudio/benchmark/task_configs/simple/build_dig3fill1.yaml
++minestudio/benchmark/task_configs/simple/build_gate.yaml
++minestudio/benchmark/task_configs/simple/build_golems.yaml
++minestudio/benchmark/task_configs/simple/build_nether_portal.yaml
++minestudio/benchmark/task_configs/simple/build_obsidian.yaml
++minestudio/benchmark/task_configs/simple/build_pillar.yaml
++minestudio/benchmark/task_configs/simple/build_snow_golem.yaml
++minestudio/benchmark/task_configs/simple/carve_pumpkins.yaml
++minestudio/benchmark/task_configs/simple/clean_up.yaml
++minestudio/benchmark/task_configs/simple/climb_the_mountain.yaml
++minestudio/benchmark/task_configs/simple/collect_dirt.yaml
++minestudio/benchmark/task_configs/simple/collect_grass.yaml
++minestudio/benchmark/task_configs/simple/collect_seagrass.yaml
++minestudio/benchmark/task_configs/simple/collect_wood.yaml
++minestudio/benchmark/task_configs/simple/collect_wool.yaml
++minestudio/benchmark/task_configs/simple/combat_enderman.yaml
++minestudio/benchmark/task_configs/simple/combat_enemies.yaml
++minestudio/benchmark/task_configs/simple/combat_skeletons.yaml
++minestudio/benchmark/task_configs/simple/combat_spider.yaml
++minestudio/benchmark/task_configs/simple/combat_spiders.yaml
++minestudio/benchmark/task_configs/simple/combat_zombies.yaml
++minestudio/benchmark/task_configs/simple/craft_enchantment.yaml
++minestudio/benchmark/task_configs/simple/craft_ladder.yaml
++minestudio/benchmark/task_configs/simple/craft_smelting.yaml
++minestudio/benchmark/task_configs/simple/craft_stonecut.yaml
++minestudio/benchmark/task_configs/simple/craft_table.yaml
++minestudio/benchmark/task_configs/simple/craft_the_crafting_table.yaml
++minestudio/benchmark/task_configs/simple/craft_to_cake.yaml
++minestudio/benchmark/task_configs/simple/craft_to_clock.yaml
++minestudio/benchmark/task_configs/simple/craft_to_ladder.yaml
++minestudio/benchmark/task_configs/simple/cut_stone.yaml
++minestudio/benchmark/task_configs/simple/dig_three_down_and_fill_one_up.yaml
++minestudio/benchmark/task_configs/simple/drink_harming_potion.yaml
++minestudio/benchmark/task_configs/simple/enchant_diamond_sword.yaml
++minestudio/benchmark/task_configs/simple/enchant_sword.yaml
++minestudio/benchmark/task_configs/simple/explore_boat.yaml
++minestudio/benchmark/task_configs/simple/explore_chest.yaml
++minestudio/benchmark/task_configs/simple/explore_climb.yaml
++minestudio/benchmark/task_configs/simple/explore_mine.yaml
++minestudio/benchmark/task_configs/simple/explore_run.yaml
++minestudio/benchmark/task_configs/simple/explore_the_treasure.yaml
++minestudio/benchmark/task_configs/simple/find_diamond.yaml
++minestudio/benchmark/task_configs/simple/find_forest.yaml
++minestudio/benchmark/task_configs/simple/find_village.yaml
++minestudio/benchmark/task_configs/simple/hunt_a_sheep.yaml
++minestudio/benchmark/task_configs/simple/hunt_animals.yaml
++minestudio/benchmark/task_configs/simple/lead_animals.yaml
++minestudio/benchmark/task_configs/simple/make_fire_with_flint_and_steel.yaml
++minestudio/benchmark/task_configs/simple/make_obsidian_by_wate.yaml
++minestudio/benchmark/task_configs/simple/mine_diamond_ore.yaml
++minestudio/benchmark/task_configs/simple/mine_dirt.yaml
++minestudio/benchmark/task_configs/simple/mine_grass.yaml
++minestudio/benchmark/task_configs/simple/mine_horizontally.yaml
++minestudio/benchmark/task_configs/simple/mine_iron_ore.yaml
++minestudio/benchmark/task_configs/simple/mine_obsidian.yaml
++minestudio/benchmark/task_configs/simple/plant_wheats.yaml
++minestudio/benchmark/task_configs/simple/prepare_a_birthday_present_for_your_neighbor.yaml
++minestudio/benchmark/task_configs/simple/run_and_explore.yaml
++minestudio/benchmark/task_configs/simple/set_fires.yaml
++minestudio/benchmark/task_configs/simple/shoot_phantom.yaml
++minestudio/benchmark/task_configs/simple/sleep_in_bed.yaml
++minestudio/benchmark/task_configs/simple/smelt_food.yaml
++minestudio/benchmark/task_configs/simple/survive_combat.yaml
++minestudio/benchmark/task_configs/simple/survive_hunt.yaml
++minestudio/benchmark/task_configs/simple/survive_plant.yaml
++minestudio/benchmark/task_configs/simple/survive_sleep.yaml
++minestudio/benchmark/task_configs/simple/tool_bow.yaml
++minestudio/benchmark/task_configs/simple/tool_flint.yaml
++minestudio/benchmark/task_configs/simple/tool_lead.yaml
++minestudio/benchmark/task_configs/simple/tool_pumpkin.yaml
++minestudio/benchmark/task_configs/simple/tool_trident.yaml
++minestudio/benchmark/task_configs/simple/travel_by_boat.yaml
++minestudio/benchmark/task_configs/simple/use_bow.yaml
++minestudio/benchmark/task_configs/simple/use_shield.yaml
++minestudio/benchmark/task_configs/simple/use_trident.yaml
++minestudio/benchmark/utility/read_conf.py
++minestudio/benchmark/utility/record_call.py
++minestudio/benchmark/utility/task_call.py
++minestudio/data/__init__.py
++minestudio/data/datamodule.py
++minestudio/data/optimus2_datamodule.py
++minestudio/data/optimus3_datamodule.py
++minestudio/data/__pycache__/__init__.cpython-311.pyc
++minestudio/data/__pycache__/datamodule.cpython-311.pyc
++minestudio/data/__pycache__/optimus2_datamodule.cpython-311.pyc
++minestudio/data/__pycache__/optimus3_datamodule.cpython-311.pyc
++minestudio/data/minecraft/__init__.py
++minestudio/data/minecraft/core.py
++minestudio/data/minecraft/dataset.py
++minestudio/data/minecraft/demo.py
++minestudio/data/minecraft/optimus2_dataset.py
++minestudio/data/minecraft/optimus3_dataset.py
++minestudio/data/minecraft/part_event.py
++minestudio/data/minecraft/part_raw.py
++minestudio/data/minecraft/utils.py
++minestudio/data/minecraft/__pycache__/__init__.cpython-311.pyc
++minestudio/data/minecraft/__pycache__/core.cpython-311.pyc
++minestudio/data/minecraft/__pycache__/dataset.cpython-311.pyc
++minestudio/data/minecraft/__pycache__/optimus2_dataset.cpython-311.pyc
++minestudio/data/minecraft/__pycache__/optimus3_dataset.cpython-311.pyc
++minestudio/data/minecraft/__pycache__/part_event.cpython-311.pyc
++minestudio/data/minecraft/__pycache__/part_raw.cpython-311.pyc
++minestudio/data/minecraft/__pycache__/utils.cpython-311.pyc
++minestudio/data/minecraft/demo_configs/base.yaml
++minestudio/data/minecraft/demo_configs/type-event.yaml
++minestudio/data/minecraft/demo_configs/type-raw.yaml
++minestudio/data/minecraft/tools/convert_Imdb.sh
++minestudio/data/minecraft/tools/convert_lmdb.py
++minestudio/data/minecraft/tools/convert_lmdb_event.py
++minestudio/data/minecraft/tools/label_action_idm.py
++minestudio/data/minecraft/tools/process_action_openai.py
++minestudio/data/minecraft/tools/process_all_openai.py
++minestudio/data/minecraft/tools/process_privilege_openai.py
++minestudio/data/minecraft/tools/__pycache__/convert_lmdb.cpython-311.pyc
++minestudio/data/minecraft/tools/cursors/mouse_cursor_white_16x16.png
++minestudio/data/minecraft/tools/idm_lib/LICENSE
++minestudio/data/minecraft/tools/idm_lib/README.md
++minestudio/data/minecraft/tools/idm_lib/agent.py
++minestudio/data/minecraft/tools/idm_lib/behavioural_cloning.py
++minestudio/data/minecraft/tools/idm_lib/data_loader.py
++minestudio/data/minecraft/tools/idm_lib/inverse_dynamics_model.py
++minestudio/data/minecraft/tools/idm_lib/requirements.txt
++minestudio/data/minecraft/tools/idm_lib/run_agent.py
++minestudio/data/minecraft/tools/idm_lib/run_inverse_dynamics_model.py
++minestudio/inference/__init__.py
++minestudio/inference/example.py
++minestudio/inference/pipeline.py
++minestudio/inference/filter/__init__.py
++minestudio/inference/filter/base_filter.py
++minestudio/inference/filter/info_base_filter.py
++minestudio/inference/generator/__init__.py
++minestudio/inference/generator/base_generator.py
++minestudio/inference/generator/mine_generator.py
++minestudio/inference/recorder/__init__.py
++minestudio/inference/recorder/base_recorder.py
++minestudio/models/__init__.py
++minestudio/models/base_policy.py
++minestudio/models/__pycache__/__init__.cpython-311.pyc
++minestudio/models/__pycache__/base_policy.cpython-311.pyc
++minestudio/models/groot_one/__init__.py
++minestudio/models/groot_one/body.py
++minestudio/models/groot_one/__pycache__/__init__.cpython-311.pyc
++minestudio/models/groot_one/__pycache__/body.cpython-311.pyc
++minestudio/models/rocket_one/__init__.py
++minestudio/models/rocket_one/body.py
++minestudio/models/rocket_one/__pycache__/__init__.cpython-311.pyc
++minestudio/models/rocket_one/__pycache__/body.cpython-311.pyc
++minestudio/models/shell/__init__.py
++minestudio/models/shell/craft_agent.py
++minestudio/models/shell/equipe_agent.py
++minestudio/models/shell/gui_agent.py
++minestudio/models/shell/smelt_agent.py
++minestudio/models/shell/__pycache__/__init__.cpython-311.pyc
++minestudio/models/shell/__pycache__/craft_agent.cpython-311.pyc
++minestudio/models/shell/__pycache__/equipe_agent.cpython-311.pyc
++minestudio/models/shell/__pycache__/gui_agent.cpython-311.pyc
++minestudio/models/shell/__pycache__/smelt_agent.cpython-311.pyc
++minestudio/models/steve_one/__init__.py
++minestudio/models/steve_one/body.py
++minestudio/models/steve_one/steve1.py
++minestudio/models/steve_one/__pycache__/__init__.cpython-311.pyc
++minestudio/models/steve_one/__pycache__/body.cpython-311.pyc
++minestudio/models/utils/download.py
++minestudio/models/vpt/__init__.py
++minestudio/models/vpt/body.py
++minestudio/models/vpt/__pycache__/__init__.cpython-311.pyc
++minestudio/models/vpt/__pycache__/body.cpython-311.pyc
++minestudio/offline/__init__.py
++minestudio/offline/trainer.py
++minestudio/offline/utils.py
++minestudio/offline/__pycache__/__init__.cpython-311.pyc
++minestudio/offline/__pycache__/trainer.cpython-311.pyc
++minestudio/offline/__pycache__/utils.cpython-311.pyc
++minestudio/offline/lightning_callbacks/__init__.py
++minestudio/offline/lightning_callbacks/ema.py
++minestudio/offline/lightning_callbacks/smart_checkpoint.py
++minestudio/offline/lightning_callbacks/speed_monitor.py
++minestudio/offline/lightning_callbacks/__pycache__/__init__.cpython-311.pyc
++minestudio/offline/lightning_callbacks/__pycache__/ema.cpython-311.pyc
++minestudio/offline/lightning_callbacks/__pycache__/smart_checkpoint.cpython-311.pyc
++minestudio/offline/lightning_callbacks/__pycache__/speed_monitor.cpython-311.pyc
++minestudio/offline/mine_callbacks/__init__.py
++minestudio/offline/mine_callbacks/behavior_clone.py
++minestudio/offline/mine_callbacks/callback.py
++minestudio/offline/mine_callbacks/kl_divergence.py
++minestudio/offline/mine_callbacks/__pycache__/__init__.cpython-311.pyc
++minestudio/offline/mine_callbacks/__pycache__/behavior_clone.cpython-311.pyc
++minestudio/offline/mine_callbacks/__pycache__/callback.cpython-311.pyc
++minestudio/offline/mine_callbacks/__pycache__/kl_divergence.cpython-311.pyc
++minestudio/online/rollout/env_worker.py
++minestudio/online/rollout/episode_statistics.py
++minestudio/online/rollout/rollout_manager.py
++minestudio/online/rollout/rollout_worker.py
++minestudio/online/rollout/start_manager.py
++minestudio/online/rollout/replay_buffer/__init__.py
++minestudio/online/rollout/replay_buffer/actor.py
++minestudio/online/rollout/replay_buffer/fragment_store.py
++minestudio/online/rollout/replay_buffer/interface.py
++minestudio/online/run/run.py
++minestudio/online/run/run.sh
++minestudio/online/run/start_headnode.sh
++minestudio/online/run/config/__init__.py
++minestudio/online/run/config/config_shoot.py
++minestudio/online/run/config/gate.py
++minestudio/online/run/config/gate_kl.py
++minestudio/online/trainer/__init__.py
++minestudio/online/trainer/basetrainer.py
++minestudio/online/trainer/ppotrainer.py
++minestudio/online/trainer/start_trainer.py
++minestudio/online/utils/__init__.py
++minestudio/online/utils/__pycache__/__init__.cpython-311.pyc
++minestudio/online/utils/rollout/__init__.py
++minestudio/online/utils/rollout/datatypes.py
++minestudio/online/utils/rollout/monitor.py
++minestudio/online/utils/train/__init__.py
++minestudio/online/utils/train/data.py
++minestudio/online/utils/train/gae.py
++minestudio/online/utils/train/training_session.py
++minestudio/online/utils/train/wandb_logger.py
++minestudio/simulator/__init__.py
++minestudio/simulator/entry.py
++minestudio/simulator/__pycache__/__init__.cpython-311.pyc
++minestudio/simulator/__pycache__/entry.cpython-311.pyc
++minestudio/simulator/callbacks/__init__.py
++minestudio/simulator/callbacks/callback.py
++minestudio/simulator/callbacks/commands.py
++minestudio/simulator/callbacks/demonstration.py
++minestudio/simulator/callbacks/fast_reset.py
++minestudio/simulator/callbacks/init_inventory.py
++minestudio/simulator/callbacks/judgereset.py
++minestudio/simulator/callbacks/mask_actions.py
++minestudio/simulator/callbacks/play.py
++minestudio/simulator/callbacks/point.py
++minestudio/simulator/callbacks/record.py
++minestudio/simulator/callbacks/reward_gate.py
++minestudio/simulator/callbacks/rewards.py
++minestudio/simulator/callbacks/speed_test.py
++minestudio/simulator/callbacks/summon_mobs.py
++minestudio/simulator/callbacks/task.py
++minestudio/simulator/callbacks/voxels.py
++minestudio/simulator/callbacks/__pycache__/__init__.cpython-311.pyc
++minestudio/simulator/callbacks/__pycache__/callback.cpython-311.pyc
++minestudio/simulator/callbacks/__pycache__/commands.cpython-311.pyc
++minestudio/simulator/callbacks/__pycache__/demonstration.cpython-311.pyc
++minestudio/simulator/callbacks/__pycache__/fast_reset.cpython-311.pyc
++minestudio/simulator/callbacks/__pycache__/init_inventory.cpython-311.pyc
++minestudio/simulator/callbacks/__pycache__/judgereset.cpython-311.pyc
++minestudio/simulator/callbacks/__pycache__/mask_actions.cpython-311.pyc
++minestudio/simulator/callbacks/__pycache__/play.cpython-311.pyc
++minestudio/simulator/callbacks/__pycache__/point.cpython-311.pyc
++minestudio/simulator/callbacks/__pycache__/record.cpython-311.pyc
++minestudio/simulator/callbacks/__pycache__/reward_gate.cpython-311.pyc
++minestudio/simulator/callbacks/__pycache__/rewards.cpython-311.pyc
++minestudio/simulator/callbacks/__pycache__/speed_test.cpython-311.pyc
++minestudio/simulator/callbacks/__pycache__/summon_mobs.cpython-311.pyc
++minestudio/simulator/callbacks/__pycache__/task.cpython-311.pyc
++minestudio/simulator/callbacks/__pycache__/voxels.cpython-311.pyc
++minestudio/simulator/minerl/__init__.py
++minestudio/simulator/minerl/Malmo/.gitattributes
++minestudio/simulator/minerl/Malmo/.gitignore
++minestudio/simulator/minerl/Malmo/.gitrepo
++minestudio/simulator/minerl/Malmo/LICENSE.txt
++minestudio/simulator/minerl/Malmo/README.md
++minestudio/simulator/minerl/Malmo/VERSION
++minestudio/simulator/minerl/Malmo/changelog.txt
++minestudio/simulator/minerl/Malmo/malmo.properties
++minestudio/simulator/minerl/Malmo/Minecraft/CMakeLists.txt
++minestudio/simulator/minerl/Malmo/Minecraft/CREDITS-fml.txt
++minestudio/simulator/minerl/Malmo/Minecraft/LICENSE-new.txt
++minestudio/simulator/minerl/Malmo/Minecraft/MinecraftForge-Credits.txt
++minestudio/simulator/minerl/Malmo/Minecraft/Paulscode IBXM Library License.txt
++minestudio/simulator/minerl/Malmo/Minecraft/Paulscode SoundSystem CodecIBXM License.txt
++minestudio/simulator/minerl/Malmo/Minecraft/README.txt
++minestudio/simulator/minerl/Malmo/Minecraft/build.gradle
++minestudio/simulator/minerl/Malmo/Minecraft/gradlew
++minestudio/simulator/minerl/Malmo/Minecraft/gradlew.bat
++minestudio/simulator/minerl/Malmo/Minecraft/launchClient.bat
++minestudio/simulator/minerl/Malmo/Minecraft/launchClient.sh
++minestudio/simulator/minerl/Malmo/Minecraft/launch_minecraft_in_background.py
++minestudio/simulator/minerl/Malmo/Minecraft/gradle/wrapper/gradle-wrapper.properties
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/EpisodeEventWrapper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/IState.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MalmoMod.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MalmoModGuiOptions.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MixinTextureHandler.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/OverclockingClassTransformer.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/OverclockingPlugin.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/StateEpisode.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/StateMachine.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/TestLogHandler.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Client/ClientState.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Client/ClientStateMachine.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Client/FakeKeyboard.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Client/FakeMouse.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Client/FakeMouseCursor.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Client/InternalKey.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Client/KeyManager.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Client/MalmoEnvServer.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Client/MalmoModClient.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Client/PostRenderEvent.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Client/VideoHook.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Client/VideoProducedObserver.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Launcher/GradleForgeHacks.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Launcher/GradleStart.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Launcher/GradleStartCommon.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Launcher/GradleStartServer.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Launcher/tweakers/AccessTransformerTweaker.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Launcher/tweakers/CoremodTweaker.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlerInterfaces/IAudioProducer.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlerInterfaces/ICommandHandler.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlerInterfaces/IObservationProducer.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlerInterfaces/IPerformanceProducer.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlerInterfaces/IRewardProducer.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlerInterfaces/IVideoProducer.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlerInterfaces/IWantToQuit.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlerInterfaces/IWorldDecorator.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlerInterfaces/IWorldGenerator.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/AbsoluteMovementCommandsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/AgentQuitFromCatchingMobImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/AgentQuitFromCollectingItemImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/AgentQuitFromCollectingItemQuantityImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/AgentQuitFromCraftingItemImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/AgentQuitFromPossessingItemImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/AgentQuitFromReachingCommandQuotaImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/AgentQuitFromReachingPositionImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/AgentQuitFromSmeltingItemImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/AgentQuitFromTimeUpImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/AgentQuitFromTouchingBlockTypeImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/AnimationDecoratorImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/BiomeGeneratorImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/BuildBattleDecoratorImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/CameraCommandsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ChatCommandsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ClassroomDecoratorImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ColourMapProducerImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/CommandBase.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/CommandForAttackAndUseImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/CommandForHotBarKeysImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/CommandForKey.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/CommandForWheeledRobotNavigationImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/CommandGroup.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ContinuousMovementCommandsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/DefaultWorldGeneratorImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/DepthProducerImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/DiscreteMovementCommandsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/DrawingDecoratorImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/EquipCommandsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/FileBasedPerformanceProducerImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/FileWorldGeneratorImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/FlatWorldGeneratorImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/HandlerBase.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/HumanLevelCommandsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/InventoryCommandsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/LuminanceProducerImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/MarkingDecoratorImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/MazeDecoratorImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/MissionBehaviour.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/MissionQuitCommandsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/MovingTargetDecoratorImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/MultidimensionalReward.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/NavigationDecoratorImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/NearbyCraftCommandsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/NearbySmeltCommandsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromAchievementsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromChatImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromCompassImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromComposite.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromDiscreteCellImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromDistanceImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromEquippedItemImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromFullInventoryImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromFullStatsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromGridImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromHotBarImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromHumanImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromNearbyEntitiesImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromRayImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromRecentCommandsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromServer.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromSubgoalPositionListImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromSystemImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ObservationFromTurnSchedulerImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/PauseCommandImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/PlaceCommandsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/QuitFromComposite.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/QuitFromTimeUpBase.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RandomizedStartDecoratorImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardBase.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForCatchingMobImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForCollectingItemImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForCollectingItemQuantityImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForCraftingItemImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForDamagingEntityImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForDiscardingItemImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForDistanceTraveledToCompassTargetImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForItemBase.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForMissionEndImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForPossessingItemImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForReachingPositionImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForSendingCommandImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForSendingMatchingChatMessageImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForSmeltingItemImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForStructureCopyingImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForTimeTakenImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardForTouchingBlockTypeImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardFromTeamImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/RewardGroup.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ServerQuitFromTimeUpImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/ServerQuitWhenAnyAgentFinishesImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/SimpleCraftCommandsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/SnakeDecoratorImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/TurnBasedCommandsImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/VideoProducerImplementation.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/MissionHandlers/WorldFromComposite.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Mixins/MixinDisplay.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Mixins/MixinEntityRandom.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Mixins/MixinKeyboard.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Mixins/MixinLargeInventory.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Mixins/MixinMinecraftGameloop.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Mixins/MixinMinecraftServerRun.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Mixins/MixinMouse.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Mixins/MixinNoGuiInteract.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Mixins/MixinRandomSkinTexture.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Mixins/MixinSyncClientStats.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Mixins/MixinWorldProviderSpawn.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Schemas/.gitignore
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Schemas/README.txt
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Server/MalmoModServer.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Server/ServerState.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Server/ServerStateMachine.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/AddressHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/AnimationDrawingHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/AuthenticationHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/BlockDrawingHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/CraftingHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/Discrete.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/EnvironmentHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/EvaluationHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/JSONWorldDataHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/LogHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/MapFileHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/MinecraftTypeHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/PauseTimer.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/PerformanceHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/PositionHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/SchemaHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/ScoreHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/ScreenHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/SeedHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/TCPInputPoller.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/TCPSocketChannel.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/TCPUtils.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/TextureHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/TimeHelper.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/java/com/microsoft/Malmo/Utils/WrappedTimer.java
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/resources/.fuse_hidden0002b4de00000048
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/resources/.gitignore
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/resources/README.txt
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/resources/annotate.fsh
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/resources/annotate.vsh
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/resources/lum.fsh
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/resources/lum.vsh
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/resources/malmomod_at.cfg
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/resources/mcmod.info
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/resources/mixins.overclocking.malmomod.json
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/resources/schemas.index
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/resources/version.properties
++minestudio/simulator/minerl/Malmo/Minecraft/src/main/resources/assets/MalmoMod/lang/en_US.lang
++minestudio/simulator/minerl/Malmo/Schemas/CMakeLists.txt
++minestudio/simulator/minerl/Malmo/Schemas/MinecraftBlocks.txt
++minestudio/simulator/minerl/Malmo/Schemas/MinecraftItems.txt
++minestudio/simulator/minerl/Malmo/Schemas/Mission.xsd
++minestudio/simulator/minerl/Malmo/Schemas/MissionEnded.xsd
++minestudio/simulator/minerl/Malmo/Schemas/MissionHandlers.xsd
++minestudio/simulator/minerl/Malmo/Schemas/MissionInit.xsd
++minestudio/simulator/minerl/Malmo/Schemas/Types.xsd
++minestudio/simulator/minerl/Malmo/Schemas/Types.xsd.in
++minestudio/simulator/minerl/Malmo/Schemas/items.json
++minestudio/simulator/minerl/Malmo/Schemas/links.xml
++minestudio/simulator/minerl/Malmo/doc/CMakeLists.txt
++minestudio/simulator/minerl/Malmo/doc/Doxyfile.in
++minestudio/simulator/minerl/Malmo/doc/build_linux.md
++minestudio/simulator/minerl/Malmo/doc/build_macosx.md
++minestudio/simulator/minerl/Malmo/doc/build_windows.md
++minestudio/simulator/minerl/Malmo/doc/cmake_readme.md
++minestudio/simulator/minerl/Malmo/doc/install_linux.md
++minestudio/simulator/minerl/Malmo/doc/install_macosx.md
++minestudio/simulator/minerl/Malmo/doc/install_readme.md
++minestudio/simulator/minerl/Malmo/doc/install_windows.md
++minestudio/simulator/minerl/Malmo/doc/install_windows_manual.md
++minestudio/simulator/minerl/Malmo/doc/jar_readme.md
++minestudio/simulator/minerl/Malmo/doc/readme.html
++minestudio/simulator/minerl/__pycache__/__init__.cpython-311.pyc
++minestudio/simulator/minerl/env/__init__.py
++minestudio/simulator/minerl/env/_fake.py
++minestudio/simulator/minerl/env/_multiagent.py
++minestudio/simulator/minerl/env/_singleagent.py
++minestudio/simulator/minerl/env/comms.py
++minestudio/simulator/minerl/env/daemon.py
++minestudio/simulator/minerl/env/database_manager.py
++minestudio/simulator/minerl/env/exceptions.py
++minestudio/simulator/minerl/env/gpu_utils.py
++minestudio/simulator/minerl/env/info.npz
++minestudio/simulator/minerl/env/launchClient.sh
++minestudio/simulator/minerl/env/malmo.py
++minestudio/simulator/minerl/env/recording.py
++minestudio/simulator/minerl/env/replay_wrapper.py
++minestudio/simulator/minerl/env/test_fake_env.py
++minestudio/simulator/minerl/env/__pycache__/__init__.cpython-311.pyc
++minestudio/simulator/minerl/env/__pycache__/_multiagent.cpython-311.pyc
++minestudio/simulator/minerl/env/__pycache__/_singleagent.cpython-311.pyc
++minestudio/simulator/minerl/env/__pycache__/comms.cpython-311.pyc
++minestudio/simulator/minerl/env/__pycache__/database_manager.cpython-311.pyc
++minestudio/simulator/minerl/env/__pycache__/exceptions.cpython-311.pyc
++minestudio/simulator/minerl/env/__pycache__/malmo.cpython-311.pyc
++minestudio/simulator/minerl/env/runtime/options.txt
++minestudio/simulator/minerl/env/runtime/optionsof.txt
++minestudio/simulator/minerl/herobraine/__init__.py
++minestudio/simulator/minerl/herobraine/env_spec.py
++minestudio/simulator/minerl/herobraine/envs.py
++minestudio/simulator/minerl/herobraine/test_env_spec.py
++minestudio/simulator/minerl/herobraine/wrapper.py
++minestudio/simulator/minerl/herobraine/__pycache__/__init__.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/__pycache__/env_spec.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/__pycache__/wrapper.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/data/pipeline_with_reward.py
++minestudio/simulator/minerl/herobraine/env_specs/__init__.py
++minestudio/simulator/minerl/herobraine/env_specs/basalt_specs.py
++minestudio/simulator/minerl/herobraine/env_specs/equip_weapon_specs.py
++minestudio/simulator/minerl/herobraine/env_specs/human_controls.py
++minestudio/simulator/minerl/herobraine/env_specs/human_survival_specs.py
++minestudio/simulator/minerl/herobraine/env_specs/navigate_specs.py
++minestudio/simulator/minerl/herobraine/env_specs/obtain_specs.py
++minestudio/simulator/minerl/herobraine/env_specs/simple_embodiment.py
++minestudio/simulator/minerl/herobraine/env_specs/survival_specs.py
++minestudio/simulator/minerl/herobraine/env_specs/test_env_regressions.py
++minestudio/simulator/minerl/herobraine/env_specs/treechop_specs.py
++minestudio/simulator/minerl/herobraine/env_specs/__pycache__/__init__.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/env_specs/__pycache__/human_controls.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/env_specs/__pycache__/human_survival_specs.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/env_specs/obfuscators/comp/size
++minestudio/simulator/minerl/herobraine/env_specs/obfuscators/comp/v2/action.secret.compat
++minestudio/simulator/minerl/herobraine/env_specs/obfuscators/comp/v2/obs.secret.compat
++minestudio/simulator/minerl/herobraine/env_specs/obfuscators/comp/v2/size
++minestudio/simulator/minerl/herobraine/env_specs/obfuscators/comp/v3/act.secret.compat.npz
++minestudio/simulator/minerl/herobraine/env_specs/obfuscators/comp/v3/obs.secret.compat.npz
++minestudio/simulator/minerl/herobraine/env_specs/obfuscators/comp/v3/size
++minestudio/simulator/minerl/herobraine/env_specs/test/README.mD
++minestudio/simulator/minerl/herobraine/env_specs/test/navigation.xml
++minestudio/simulator/minerl/herobraine/env_specs/test/navigationDense.xml
++minestudio/simulator/minerl/herobraine/env_specs/test/navigationDenseFixedMap.xml
++minestudio/simulator/minerl/herobraine/env_specs/test/navigationExtreme.xml
++minestudio/simulator/minerl/herobraine/env_specs/test/navigationExtremeDense.xml
++minestudio/simulator/minerl/herobraine/env_specs/test/obtainDebug.xml
++minestudio/simulator/minerl/herobraine/env_specs/test/obtainDebugDense.xml
++minestudio/simulator/minerl/herobraine/env_specs/test/obtainDiamond.xml
++minestudio/simulator/minerl/herobraine/env_specs/test/obtainDiamondDense.xml
++minestudio/simulator/minerl/herobraine/env_specs/test/obtainIronPickaxe.xml
++minestudio/simulator/minerl/herobraine/env_specs/test/obtainIronPickaxeDense.xml
++minestudio/simulator/minerl/herobraine/env_specs/test/treechop.xml
++minestudio/simulator/minerl/herobraine/env_specs/test/treechopDebug.xml
++minestudio/simulator/minerl/herobraine/hero/__init__.py
++minestudio/simulator/minerl/herobraine/hero/handler.py
++minestudio/simulator/minerl/herobraine/hero/mc.py
++minestudio/simulator/minerl/herobraine/hero/mc_constants.1.16.json
++minestudio/simulator/minerl/herobraine/hero/mc_constants.json
++minestudio/simulator/minerl/herobraine/hero/mission.xml.j2
++minestudio/simulator/minerl/herobraine/hero/spaces.py
++minestudio/simulator/minerl/herobraine/hero/test_spaces.py
++minestudio/simulator/minerl/herobraine/hero/__pycache__/__init__.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/__pycache__/handler.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/__pycache__/mc.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/__pycache__/spaces.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/__init__.py
++minestudio/simulator/minerl/herobraine/hero/handlers/test_handlers.py
++minestudio/simulator/minerl/herobraine/hero/handlers/translation.py
++minestudio/simulator/minerl/herobraine/hero/handlers/util.py
++minestudio/simulator/minerl/herobraine/hero/handlers/__pycache__/__init__.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/__pycache__/translation.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/__init__.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/action.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/misc.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/quit.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/reward.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/start.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/__init__.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/action.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/misc.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/quit.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/reward.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/start.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__init__.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/camera.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/chat.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/craft.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/equip.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/keyboard.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/mob.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/mousewheel.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/place.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/smelt.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/voxel.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/__init__.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/camera.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/chat.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/craft.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/equip.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/keyboard.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/mob.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/mousewheel.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/place.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/smelt.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/voxel.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__init__.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/compass.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/equipped_item.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/guicontainer.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/inventory.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/is_gui_open.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/lifestats.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/location_stats.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/mc_base_stats.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/pov.py
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/__init__.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/compass.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/equipped_item.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/guicontainer.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/inventory.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/is_gui_open.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/lifestats.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/location_stats.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/mc_base_stats.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/pov.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/server/__init__.py
++minestudio/simulator/minerl/herobraine/hero/handlers/server/misc.py
++minestudio/simulator/minerl/herobraine/hero/handlers/server/navigation.py
++minestudio/simulator/minerl/herobraine/hero/handlers/server/quit.py
++minestudio/simulator/minerl/herobraine/hero/handlers/server/start.py
++minestudio/simulator/minerl/herobraine/hero/handlers/server/world.py
++minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/__init__.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/misc.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/navigation.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/quit.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/start.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/world.cpython-311.pyc
++minestudio/simulator/minerl/herobraine/wrappers/__init__.py
++minestudio/simulator/minerl/herobraine/wrappers/compat_v0.py
++minestudio/simulator/minerl/herobraine/wrappers/obfuscation_wrapper.py
++minestudio/simulator/minerl/herobraine/wrappers/test_util.py
++minestudio/simulator/minerl/herobraine/wrappers/test_wrappers.py
++minestudio/simulator/minerl/herobraine/wrappers/util.py
++minestudio/simulator/minerl/herobraine/wrappers/vector_wrapper.py
++minestudio/simulator/minerl/human_play_interface/__init__.py
++minestudio/simulator/minerl/human_play_interface/human_play_interface.py
++minestudio/simulator/minerl/interactor/__init__.py
++minestudio/simulator/minerl/interactor/__main__.py
++minestudio/simulator/minerl/tmp/database/cache.db
++minestudio/simulator/minerl/utils/__init__.py
++minestudio/simulator/minerl/utils/documentation.py
++minestudio/simulator/minerl/utils/hierarchical_action_space.py
++minestudio/simulator/minerl/utils/inventory.py
++minestudio/simulator/minerl/utils/launch.py
++minestudio/simulator/minerl/utils/process_watcher.py
++minestudio/simulator/minerl/utils/test.py
++minestudio/simulator/utils/__init__.py
++minestudio/simulator/utils/constants.py
++minestudio/simulator/utils/gui.py
++minestudio/simulator/utils/__pycache__/__init__.cpython-311.pyc
++minestudio/simulator/utils/__pycache__/constants.cpython-311.pyc
++minestudio/simulator/utils/__pycache__/gui.cpython-311.pyc
++minestudio/tutorials/__init__.py
++minestudio/tutorials/inference/__init__.py
++minestudio/tutorials/inference/evaluate_groot/main.py
++minestudio/tutorials/inference/evaluate_rocket/__init__.py
++minestudio/tutorials/inference/evaluate_rocket/rocket_gradio.py
++minestudio/tutorials/inference/evaluate_rocket/utils.py
++minestudio/tutorials/inference/evaluate_vpts/build_portal.py
++minestudio/tutorials/inference/evaluate_vpts/mine_diamond.py
++minestudio/tutorials/inference/evaluate_vpts/shoot_animals.py
++minestudio/tutorials/offline/online_vpt.py
++minestudio/tutorials/offline/simple_policy.py
++minestudio/tutorials/offline/1_finetune_vpts/finetune.sh
++minestudio/tutorials/offline/1_finetune_vpts/main.py
++minestudio/tutorials/offline/1_finetune_vpts/vpt_config.yaml
++minestudio/tutorials/offline/1_finetune_vpts/vpt_hunt_config.yaml
++minestudio/tutorials/offline/2_pretrain_rockets/evaluate.py
++minestudio/tutorials/offline/2_pretrain_rockets/main.py
++minestudio/tutorials/offline/2_pretrain_rockets/rocket_config.yaml
++minestudio/tutorials/offline/3_pretrain_groots/groot_config.yaml
++minestudio/tutorials/offline/3_pretrain_groots/main.py
++minestudio/tutorials/simulator/test_play.py
++minestudio/tutorials/simulator/test_sim.py
++minestudio/utils/__init__.py
++minestudio/utils/register.py
++minestudio/utils/temp.py
++minestudio/utils/__pycache__/__init__.cpython-311.pyc
++minestudio/utils/__pycache__/register.cpython-311.pyc
++minestudio/utils/__pycache__/temp.cpython-311.pyc
++minestudio/utils/mineclip_lib/__init__.py
++minestudio/utils/mineclip_lib/license
++minestudio/utils/mineclip_lib/__pycache__/__init__.cpython-311.pyc
++minestudio/utils/mineclip_lib/mineclip/__init__.py
++minestudio/utils/mineclip_lib/mineclip/base.py
++minestudio/utils/mineclip_lib/mineclip/clip.py
++minestudio/utils/mineclip_lib/mineclip/head.py
++minestudio/utils/mineclip_lib/mineclip/mineclip.py
++minestudio/utils/mineclip_lib/mineclip/pooling.py
++minestudio/utils/mineclip_lib/mineclip/pos_embed.py
++minestudio/utils/mineclip_lib/mineclip/tokenization.py
++minestudio/utils/mineclip_lib/mineclip/transformer.py
++minestudio/utils/mineclip_lib/mineclip/__pycache__/__init__.cpython-311.pyc
++minestudio/utils/mineclip_lib/mineclip/__pycache__/base.cpython-311.pyc
++minestudio/utils/mineclip_lib/mineclip/__pycache__/clip.cpython-311.pyc
++minestudio/utils/mineclip_lib/mineclip/__pycache__/head.cpython-311.pyc
++minestudio/utils/mineclip_lib/mineclip/__pycache__/mineclip.cpython-311.pyc
++minestudio/utils/mineclip_lib/mineclip/__pycache__/pooling.cpython-311.pyc
++minestudio/utils/mineclip_lib/mineclip/__pycache__/pos_embed.cpython-311.pyc
++minestudio/utils/mineclip_lib/mineclip/__pycache__/tokenization.cpython-311.pyc
++minestudio/utils/mineclip_lib/mineclip/__pycache__/transformer.cpython-311.pyc
++minestudio/utils/mineclip_lib/utils/__init__.py
++minestudio/utils/mineclip_lib/utils/convert_utils.py
++minestudio/utils/mineclip_lib/utils/file_utils.py
++minestudio/utils/mineclip_lib/utils/image_utils.py
++minestudio/utils/mineclip_lib/utils/misc_utils.py
++minestudio/utils/mineclip_lib/utils/mlp.py
++minestudio/utils/mineclip_lib/utils/once.py
++minestudio/utils/mineclip_lib/utils/torch_utils.py
++minestudio/utils/mineclip_lib/utils/__pycache__/__init__.cpython-311.pyc
++minestudio/utils/mineclip_lib/utils/__pycache__/convert_utils.cpython-311.pyc
++minestudio/utils/mineclip_lib/utils/__pycache__/file_utils.cpython-311.pyc
++minestudio/utils/mineclip_lib/utils/__pycache__/image_utils.cpython-311.pyc
++minestudio/utils/mineclip_lib/utils/__pycache__/misc_utils.cpython-311.pyc
++minestudio/utils/mineclip_lib/utils/__pycache__/mlp.cpython-311.pyc
++minestudio/utils/mineclip_lib/utils/__pycache__/once.cpython-311.pyc
++minestudio/utils/mineclip_lib/utils/__pycache__/torch_utils.cpython-311.pyc
++minestudio/utils/realtime_sam/.clang-format
++minestudio/utils/realtime_sam/.gitignore
++minestudio/utils/realtime_sam/CODE_OF_CONDUCT.md
++minestudio/utils/realtime_sam/CONTRIBUTING.md
++minestudio/utils/realtime_sam/LICENSE
++minestudio/utils/realtime_sam/LICENSE_cctorch
++minestudio/utils/realtime_sam/README.md
++minestudio/utils/realtime_sam/pyproject.toml
++minestudio/utils/realtime_sam/setup.py
++minestudio/utils/realtime_sam/assets/blackswan.gif
++minestudio/utils/realtime_sam/checkpoints/download_ckpts.sh
++minestudio/utils/realtime_sam/demo/demo.py
++minestudio/utils/realtime_sam/sam2/__init__.py
++minestudio/utils/realtime_sam/sam2/automatic_mask_generator.py
++minestudio/utils/realtime_sam/sam2/build_sam.py
++minestudio/utils/realtime_sam/sam2/sam2_camera_predictor.py
++minestudio/utils/realtime_sam/sam2/sam2_image_predictor.py
++minestudio/utils/realtime_sam/sam2/sam2_video_predictor.py
++minestudio/utils/realtime_sam/sam2/csrc/connected_components.cu
++minestudio/utils/realtime_sam/sam2/modeling/__init__.py
++minestudio/utils/realtime_sam/sam2/modeling/memory_attention.py
++minestudio/utils/realtime_sam/sam2/modeling/memory_encoder.py
++minestudio/utils/realtime_sam/sam2/modeling/position_encoding.py
++minestudio/utils/realtime_sam/sam2/modeling/sam2_base.py
++minestudio/utils/realtime_sam/sam2/modeling/sam2_utils.py
++minestudio/utils/realtime_sam/sam2/modeling/backbones/__init__.py
++minestudio/utils/realtime_sam/sam2/modeling/backbones/hieradet.py
++minestudio/utils/realtime_sam/sam2/modeling/backbones/image_encoder.py
++minestudio/utils/realtime_sam/sam2/modeling/backbones/utils.py
++minestudio/utils/realtime_sam/sam2/modeling/sam/__init__.py
++minestudio/utils/realtime_sam/sam2/modeling/sam/mask_decoder.py
++minestudio/utils/realtime_sam/sam2/modeling/sam/prompt_encoder.py
++minestudio/utils/realtime_sam/sam2/modeling/sam/transformer.py
++minestudio/utils/realtime_sam/sam2/sam2_configs/__init__.py
++minestudio/utils/realtime_sam/sam2/sam2_configs/sam2_hiera_b+.yaml
++minestudio/utils/realtime_sam/sam2/sam2_configs/sam2_hiera_l.yaml
++minestudio/utils/realtime_sam/sam2/sam2_configs/sam2_hiera_s.yaml
++minestudio/utils/realtime_sam/sam2/sam2_configs/sam2_hiera_t.yaml
++minestudio/utils/realtime_sam/sam2/utils/__init__.py
++minestudio/utils/realtime_sam/sam2/utils/amg.py
++minestudio/utils/realtime_sam/sam2/utils/misc.py
++minestudio/utils/realtime_sam/sam2/utils/transforms.py
++minestudio/utils/vpt_lib/__init__.py
++minestudio/utils/vpt_lib/action_head.py
++minestudio/utils/vpt_lib/action_mapping.py
++minestudio/utils/vpt_lib/action_translator.py
++minestudio/utils/vpt_lib/actions.py
++minestudio/utils/vpt_lib/env_worker.py
++minestudio/utils/vpt_lib/impala_cnn.py
++minestudio/utils/vpt_lib/masked_attention.py
++minestudio/utils/vpt_lib/mc.py
++minestudio/utils/vpt_lib/mc_constants.1.16.json
++minestudio/utils/vpt_lib/minecraft_util.py
++minestudio/utils/vpt_lib/misc.py
++minestudio/utils/vpt_lib/mlp.py
++minestudio/utils/vpt_lib/normalize_ewma.py
++minestudio/utils/vpt_lib/policy.py
++minestudio/utils/vpt_lib/scaled_mse_head.py
++minestudio/utils/vpt_lib/serialize.py
++minestudio/utils/vpt_lib/torch_util.py
++minestudio/utils/vpt_lib/tree_util.py
++minestudio/utils/vpt_lib/util.py
++minestudio/utils/vpt_lib/xf.py
++minestudio/utils/vpt_lib/__pycache__/__init__.cpython-311.pyc
++minestudio/utils/vpt_lib/__pycache__/action_head.cpython-311.pyc
++minestudio/utils/vpt_lib/__pycache__/action_mapping.cpython-311.pyc
++minestudio/utils/vpt_lib/__pycache__/actions.cpython-311.pyc
++minestudio/utils/vpt_lib/__pycache__/impala_cnn.cpython-311.pyc
++minestudio/utils/vpt_lib/__pycache__/masked_attention.cpython-311.pyc
++minestudio/utils/vpt_lib/__pycache__/mc.cpython-311.pyc
++minestudio/utils/vpt_lib/__pycache__/minecraft_util.cpython-311.pyc
++minestudio/utils/vpt_lib/__pycache__/misc.cpython-311.pyc
++minestudio/utils/vpt_lib/__pycache__/mlp.cpython-311.pyc
++minestudio/utils/vpt_lib/__pycache__/normalize_ewma.cpython-311.pyc
++minestudio/utils/vpt_lib/__pycache__/scaled_mse_head.cpython-311.pyc
++minestudio/utils/vpt_lib/__pycache__/torch_util.cpython-311.pyc
++minestudio/utils/vpt_lib/__pycache__/tree_util.cpython-311.pyc
++minestudio/utils/vpt_lib/__pycache__/util.cpython-311.pyc
++minestudio/utils/vpt_lib/__pycache__/xf.cpython-311.pyc
+\ No newline at end of file
+diff --git a/MineStudio/minestudio/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/__pycache__/__init__.cpython-311.pyc
+index bed10dc..6109dd2 100644
+Binary files a/MineStudio/minestudio/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/models/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/models/__pycache__/__init__.cpython-311.pyc
+index 987a2fc..99e9e66 100644
+Binary files a/MineStudio/minestudio/models/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/models/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/models/__pycache__/base_policy.cpython-311.pyc b/MineStudio/minestudio/models/__pycache__/base_policy.cpython-311.pyc
+index 7ebc285..03fed2a 100644
+Binary files a/MineStudio/minestudio/models/__pycache__/base_policy.cpython-311.pyc and b/MineStudio/minestudio/models/__pycache__/base_policy.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/models/groot_one/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/models/groot_one/__pycache__/__init__.cpython-311.pyc
+index e73d3f5..0e4fffc 100644
+Binary files a/MineStudio/minestudio/models/groot_one/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/models/groot_one/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/models/groot_one/__pycache__/body.cpython-311.pyc b/MineStudio/minestudio/models/groot_one/__pycache__/body.cpython-311.pyc
+index 54fac71..e0a723c 100644
+Binary files a/MineStudio/minestudio/models/groot_one/__pycache__/body.cpython-311.pyc and b/MineStudio/minestudio/models/groot_one/__pycache__/body.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/models/rocket_one/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/models/rocket_one/__pycache__/__init__.cpython-311.pyc
+index 042f9b0..13956ed 100644
+Binary files a/MineStudio/minestudio/models/rocket_one/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/models/rocket_one/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/models/rocket_one/__pycache__/body.cpython-311.pyc b/MineStudio/minestudio/models/rocket_one/__pycache__/body.cpython-311.pyc
+index 72e8e87..c1a9ecc 100644
+Binary files a/MineStudio/minestudio/models/rocket_one/__pycache__/body.cpython-311.pyc and b/MineStudio/minestudio/models/rocket_one/__pycache__/body.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/models/shell/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/models/shell/__pycache__/__init__.cpython-311.pyc
+index 9e52a9e..a08fbd6 100644
+Binary files a/MineStudio/minestudio/models/shell/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/models/shell/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/models/shell/__pycache__/craft_agent.cpython-311.pyc b/MineStudio/minestudio/models/shell/__pycache__/craft_agent.cpython-311.pyc
+index a175211..8931e72 100644
+Binary files a/MineStudio/minestudio/models/shell/__pycache__/craft_agent.cpython-311.pyc and b/MineStudio/minestudio/models/shell/__pycache__/craft_agent.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/models/shell/__pycache__/equipe_agent.cpython-311.pyc b/MineStudio/minestudio/models/shell/__pycache__/equipe_agent.cpython-311.pyc
+index bc6af0b..bee6bdc 100644
+Binary files a/MineStudio/minestudio/models/shell/__pycache__/equipe_agent.cpython-311.pyc and b/MineStudio/minestudio/models/shell/__pycache__/equipe_agent.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/models/shell/__pycache__/gui_agent.cpython-311.pyc b/MineStudio/minestudio/models/shell/__pycache__/gui_agent.cpython-311.pyc
+index ec0ab55..911d8a3 100644
+Binary files a/MineStudio/minestudio/models/shell/__pycache__/gui_agent.cpython-311.pyc and b/MineStudio/minestudio/models/shell/__pycache__/gui_agent.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/models/shell/__pycache__/smelt_agent.cpython-311.pyc b/MineStudio/minestudio/models/shell/__pycache__/smelt_agent.cpython-311.pyc
+index 4ea4a58..02d9b10 100644
+Binary files a/MineStudio/minestudio/models/shell/__pycache__/smelt_agent.cpython-311.pyc and b/MineStudio/minestudio/models/shell/__pycache__/smelt_agent.cpython-311.pyc differ
 diff --git a/MineStudio/minestudio/models/shell/craft_agent.py b/MineStudio/minestudio/models/shell/craft_agent.py
 index 6518880..2b15e2b 100644
 --- a/MineStudio/minestudio/models/shell/craft_agent.py
@@ -42,6 +1949,375 @@ index e23e387..92c284e 100644
              relative_path = os.path.join("assets/recipes", target + '.json')
              recipe_json_path = os.path.join(root_path, relative_path)
              try:
+diff --git a/MineStudio/minestudio/models/steve_one/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/models/steve_one/__pycache__/__init__.cpython-311.pyc
+index 2e77fc8..48b121c 100644
+Binary files a/MineStudio/minestudio/models/steve_one/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/models/steve_one/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/models/steve_one/__pycache__/body.cpython-311.pyc b/MineStudio/minestudio/models/steve_one/__pycache__/body.cpython-311.pyc
+index f42b192..c877a88 100644
+Binary files a/MineStudio/minestudio/models/steve_one/__pycache__/body.cpython-311.pyc and b/MineStudio/minestudio/models/steve_one/__pycache__/body.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/models/vpt/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/models/vpt/__pycache__/__init__.cpython-311.pyc
+index 4e4741c..298da5e 100644
+Binary files a/MineStudio/minestudio/models/vpt/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/models/vpt/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/models/vpt/__pycache__/body.cpython-311.pyc b/MineStudio/minestudio/models/vpt/__pycache__/body.cpython-311.pyc
+index 632d9ca..69c81aa 100644
+Binary files a/MineStudio/minestudio/models/vpt/__pycache__/body.cpython-311.pyc and b/MineStudio/minestudio/models/vpt/__pycache__/body.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/online/utils/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/online/utils/__pycache__/__init__.cpython-311.pyc
+index c0e6292..ee7cf7a 100644
+Binary files a/MineStudio/minestudio/online/utils/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/online/utils/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/simulator/__pycache__/__init__.cpython-311.pyc
+index fa2652c..664eb92 100644
+Binary files a/MineStudio/minestudio/simulator/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/simulator/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/__pycache__/entry.cpython-311.pyc b/MineStudio/minestudio/simulator/__pycache__/entry.cpython-311.pyc
+index fb9d150..2e38355 100644
+Binary files a/MineStudio/minestudio/simulator/__pycache__/entry.cpython-311.pyc and b/MineStudio/minestudio/simulator/__pycache__/entry.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/__init__.cpython-311.pyc
+index 374ab97..efc557d 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/callback.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/callback.cpython-311.pyc
+index 2d2782d..1a749bd 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/callback.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/callback.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/commands.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/commands.cpython-311.pyc
+index bafd79e..a3296c8 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/commands.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/commands.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/demonstration.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/demonstration.cpython-311.pyc
+index 3189aa5..eb0a9de 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/demonstration.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/demonstration.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/fast_reset.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/fast_reset.cpython-311.pyc
+index de7c84e..414c6e1 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/fast_reset.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/fast_reset.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/init_inventory.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/init_inventory.cpython-311.pyc
+index aa167c8..2034c73 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/init_inventory.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/init_inventory.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/judgereset.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/judgereset.cpython-311.pyc
+index 4a96ea1..279f402 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/judgereset.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/judgereset.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/mask_actions.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/mask_actions.cpython-311.pyc
+index 1e41296..d4c2ef3 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/mask_actions.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/mask_actions.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/play.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/play.cpython-311.pyc
+index c0161a1..e62702d 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/play.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/play.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/point.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/point.cpython-311.pyc
+index b38b6cb..07ad8e9 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/point.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/point.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/record.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/record.cpython-311.pyc
+index ced78c2..9fa1ff2 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/record.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/record.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/reward_gate.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/reward_gate.cpython-311.pyc
+index a4a2d4a..83e3543 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/reward_gate.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/reward_gate.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/rewards.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/rewards.cpython-311.pyc
+index 90e6603..eb6846f 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/rewards.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/rewards.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/speed_test.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/speed_test.cpython-311.pyc
+index 007aa15..a7ad693 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/speed_test.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/speed_test.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/summon_mobs.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/summon_mobs.cpython-311.pyc
+index 7d00735..25b4cc6 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/summon_mobs.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/summon_mobs.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/task.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/task.cpython-311.pyc
+index 1b5357a..0f98057 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/task.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/task.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/callbacks/__pycache__/voxels.cpython-311.pyc b/MineStudio/minestudio/simulator/callbacks/__pycache__/voxels.cpython-311.pyc
+index 17cb709..922a3c8 100644
+Binary files a/MineStudio/minestudio/simulator/callbacks/__pycache__/voxels.cpython-311.pyc and b/MineStudio/minestudio/simulator/callbacks/__pycache__/voxels.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/__pycache__/__init__.cpython-311.pyc
+index db9aac7..19d0619 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/env/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/env/__pycache__/__init__.cpython-311.pyc
+index 34e609b..191b6d0 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/env/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/env/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/env/__pycache__/_multiagent.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/env/__pycache__/_multiagent.cpython-311.pyc
+index b96c3fe..e6ad10f 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/env/__pycache__/_multiagent.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/env/__pycache__/_multiagent.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/env/__pycache__/_singleagent.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/env/__pycache__/_singleagent.cpython-311.pyc
+index b62abc6..a8449cd 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/env/__pycache__/_singleagent.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/env/__pycache__/_singleagent.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/env/__pycache__/comms.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/env/__pycache__/comms.cpython-311.pyc
+index 080d20e..b7ea115 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/env/__pycache__/comms.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/env/__pycache__/comms.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/env/__pycache__/database_manager.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/env/__pycache__/database_manager.cpython-311.pyc
+index d2cd96d..7b5fbbf 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/env/__pycache__/database_manager.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/env/__pycache__/database_manager.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/env/__pycache__/exceptions.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/env/__pycache__/exceptions.cpython-311.pyc
+index ed8ab0c..cd46a19 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/env/__pycache__/exceptions.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/env/__pycache__/exceptions.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/env/__pycache__/malmo.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/env/__pycache__/malmo.cpython-311.pyc
+index 8379ad0..de74775 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/env/__pycache__/malmo.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/env/__pycache__/malmo.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/__pycache__/__init__.cpython-311.pyc
+index 1903081..7e3eb01 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/__pycache__/env_spec.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/__pycache__/env_spec.cpython-311.pyc
+index eaa9661..c979cf0 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/__pycache__/env_spec.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/__pycache__/env_spec.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/__pycache__/wrapper.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/__pycache__/wrapper.cpython-311.pyc
+index 6dedfaa..295acf9 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/__pycache__/wrapper.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/__pycache__/wrapper.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/env_specs/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/env_specs/__pycache__/__init__.cpython-311.pyc
+index 70a5dfa..55eb02c 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/env_specs/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/env_specs/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/env_specs/__pycache__/human_controls.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/env_specs/__pycache__/human_controls.cpython-311.pyc
+index 563513f..67dc1d8 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/env_specs/__pycache__/human_controls.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/env_specs/__pycache__/human_controls.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/env_specs/__pycache__/human_survival_specs.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/env_specs/__pycache__/human_survival_specs.cpython-311.pyc
+index 834db10..f24f357 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/env_specs/__pycache__/human_survival_specs.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/env_specs/__pycache__/human_survival_specs.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/__pycache__/__init__.cpython-311.pyc
+index 8fe845d..83eac1f 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/__pycache__/handler.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/__pycache__/handler.cpython-311.pyc
+index b42a842..3dfff35 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/__pycache__/handler.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/__pycache__/handler.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/__pycache__/mc.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/__pycache__/mc.cpython-311.pyc
+index e967bfb..65b862a 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/__pycache__/mc.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/__pycache__/mc.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/__pycache__/spaces.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/__pycache__/spaces.cpython-311.pyc
+index 1de7451..1adf90f 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/__pycache__/spaces.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/__pycache__/spaces.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/__pycache__/__init__.cpython-311.pyc
+index 16e0118..274d1c4 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/__pycache__/translation.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/__pycache__/translation.cpython-311.pyc
+index 25a5c31..486a2a7 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/__pycache__/translation.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/__pycache__/translation.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/__init__.cpython-311.pyc
+index 8ddd1c0..e719c3e 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/action.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/action.cpython-311.pyc
+index 843d4b0..7d22363 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/action.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/action.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/misc.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/misc.cpython-311.pyc
+index 91d1f34..aac55be 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/misc.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/misc.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/quit.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/quit.cpython-311.pyc
+index 09214ee..8e9a8bc 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/quit.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/quit.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/reward.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/reward.cpython-311.pyc
+index 74aadca..476d54a 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/reward.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/reward.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/start.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/start.cpython-311.pyc
+index b88ebf7..6f49de8 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/start.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/__pycache__/start.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/__init__.cpython-311.pyc
+index 84e6a9f..28bd1dd 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/camera.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/camera.cpython-311.pyc
+index a9f468e..0bbe0e0 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/camera.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/camera.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/chat.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/chat.cpython-311.pyc
+index 98d549a..6614656 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/chat.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/chat.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/craft.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/craft.cpython-311.pyc
+index be217e2..45f6ea0 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/craft.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/craft.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/equip.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/equip.cpython-311.pyc
+index c6cf1b4..e2215ff 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/equip.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/equip.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/keyboard.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/keyboard.cpython-311.pyc
+index 5a761ab..bfa3a1a 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/keyboard.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/keyboard.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/mob.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/mob.cpython-311.pyc
+index a9be023..17d6c16 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/mob.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/mob.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/mousewheel.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/mousewheel.cpython-311.pyc
+index 9156fa7..6926629 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/mousewheel.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/mousewheel.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/place.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/place.cpython-311.pyc
+index 6faa8f6..f84ba43 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/place.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/place.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/smelt.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/smelt.cpython-311.pyc
+index 4fb18c0..805777f 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/smelt.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/smelt.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/voxel.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/voxel.cpython-311.pyc
+index ecff8ac..d201c83 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/voxel.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/actions/__pycache__/voxel.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/__init__.cpython-311.pyc
+index bbf06fd..e2302bf 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/compass.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/compass.cpython-311.pyc
+index f14c4bf..a88efb5 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/compass.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/compass.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/equipped_item.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/equipped_item.cpython-311.pyc
+index 2114add..3b8ae25 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/equipped_item.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/equipped_item.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/guicontainer.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/guicontainer.cpython-311.pyc
+index 632e1d6..4804a9f 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/guicontainer.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/guicontainer.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/inventory.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/inventory.cpython-311.pyc
+index be36030..2d269ba 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/inventory.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/inventory.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/is_gui_open.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/is_gui_open.cpython-311.pyc
+index 396e929..dcd8c77 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/is_gui_open.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/is_gui_open.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/lifestats.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/lifestats.cpython-311.pyc
+index e6ec33d..d195ca5 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/lifestats.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/lifestats.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/location_stats.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/location_stats.cpython-311.pyc
+index ac6133e..1ee3557 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/location_stats.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/location_stats.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/mc_base_stats.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/mc_base_stats.cpython-311.pyc
+index 1773d2b..5298bd4 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/mc_base_stats.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/mc_base_stats.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/pov.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/pov.cpython-311.pyc
+index 7730938..e03b8fb 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/pov.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/agent/observations/__pycache__/pov.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/__init__.cpython-311.pyc
+index ea27eb1..ac10fb3 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/misc.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/misc.cpython-311.pyc
+index e0b35cf..fd29b8e 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/misc.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/misc.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/navigation.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/navigation.cpython-311.pyc
+index c62227e..d3ba339 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/navigation.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/navigation.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/quit.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/quit.cpython-311.pyc
+index 324d5a4..db93713 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/quit.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/quit.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/start.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/start.cpython-311.pyc
+index 4855fd0..c12c052 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/start.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/start.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/world.cpython-311.pyc b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/world.cpython-311.pyc
+index 89a8401..214fa36 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/world.cpython-311.pyc and b/MineStudio/minestudio/simulator/minerl/herobraine/hero/handlers/server/__pycache__/world.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/minerl/tmp/database/cache.db b/MineStudio/minestudio/simulator/minerl/tmp/database/cache.db
+index 683328a..30cd9ac 100644
+Binary files a/MineStudio/minestudio/simulator/minerl/tmp/database/cache.db and b/MineStudio/minestudio/simulator/minerl/tmp/database/cache.db differ
+diff --git a/MineStudio/minestudio/simulator/utils/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/simulator/utils/__pycache__/__init__.cpython-311.pyc
+index 188a6ca..15db7de 100644
+Binary files a/MineStudio/minestudio/simulator/utils/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/simulator/utils/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/utils/__pycache__/constants.cpython-311.pyc b/MineStudio/minestudio/simulator/utils/__pycache__/constants.cpython-311.pyc
+index 8b4ddb8..efbb13a 100644
+Binary files a/MineStudio/minestudio/simulator/utils/__pycache__/constants.cpython-311.pyc and b/MineStudio/minestudio/simulator/utils/__pycache__/constants.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/simulator/utils/__pycache__/gui.cpython-311.pyc b/MineStudio/minestudio/simulator/utils/__pycache__/gui.cpython-311.pyc
+index 57d7251..29a7328 100644
+Binary files a/MineStudio/minestudio/simulator/utils/__pycache__/gui.cpython-311.pyc and b/MineStudio/minestudio/simulator/utils/__pycache__/gui.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/utils/__pycache__/__init__.cpython-311.pyc
+index 0020af1..109c92c 100644
+Binary files a/MineStudio/minestudio/utils/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/utils/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/__pycache__/register.cpython-311.pyc b/MineStudio/minestudio/utils/__pycache__/register.cpython-311.pyc
+index b7d3e4d..4ea2205 100644
+Binary files a/MineStudio/minestudio/utils/__pycache__/register.cpython-311.pyc and b/MineStudio/minestudio/utils/__pycache__/register.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/__pycache__/temp.cpython-311.pyc b/MineStudio/minestudio/utils/__pycache__/temp.cpython-311.pyc
+index f2fef92..ee3a3e8 100644
+Binary files a/MineStudio/minestudio/utils/__pycache__/temp.cpython-311.pyc and b/MineStudio/minestudio/utils/__pycache__/temp.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/__pycache__/__init__.cpython-311.pyc
+index fdaa7b0..a8ab566 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/__init__.cpython-311.pyc
+index 79ce516..326891a 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/base.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/base.cpython-311.pyc
+index af33b69..7342b63 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/base.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/base.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/clip.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/clip.cpython-311.pyc
+index 8f05bfd..3d0378b 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/clip.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/clip.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/head.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/head.cpython-311.pyc
+index 63a9aca..e770bd2 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/head.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/head.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/mineclip.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/mineclip.cpython-311.pyc
+index b89cec5..1353712 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/mineclip.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/mineclip.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/pooling.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/pooling.cpython-311.pyc
+index cab8cf6..8f7e149 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/pooling.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/pooling.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/pos_embed.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/pos_embed.cpython-311.pyc
+index fb744f9..ad7f1ea 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/pos_embed.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/pos_embed.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/tokenization.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/tokenization.cpython-311.pyc
+index 726801e..d4f7045 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/tokenization.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/tokenization.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/transformer.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/transformer.cpython-311.pyc
+index e23ad31..4ec8c8e 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/transformer.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/mineclip/__pycache__/transformer.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/__init__.cpython-311.pyc
+index 015d808..1279c96 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/convert_utils.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/convert_utils.cpython-311.pyc
+index 1b98c2e..5a69ba8 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/convert_utils.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/convert_utils.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/file_utils.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/file_utils.cpython-311.pyc
+index 781c9fb..f4601d2 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/file_utils.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/file_utils.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/image_utils.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/image_utils.cpython-311.pyc
+index 9613480..033321c 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/image_utils.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/image_utils.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/misc_utils.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/misc_utils.cpython-311.pyc
+index 4847b65..004bcb7 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/misc_utils.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/misc_utils.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/mlp.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/mlp.cpython-311.pyc
+index 5dee40e..9c534e7 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/mlp.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/mlp.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/once.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/once.cpython-311.pyc
+index 8665aed..91ee24d 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/once.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/once.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/torch_utils.cpython-311.pyc b/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/torch_utils.cpython-311.pyc
+index d24d55e..25bc25c 100644
+Binary files a/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/torch_utils.cpython-311.pyc and b/MineStudio/minestudio/utils/mineclip_lib/utils/__pycache__/torch_utils.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/vpt_lib/__pycache__/__init__.cpython-311.pyc b/MineStudio/minestudio/utils/vpt_lib/__pycache__/__init__.cpython-311.pyc
+index 5319758..592fcea 100644
+Binary files a/MineStudio/minestudio/utils/vpt_lib/__pycache__/__init__.cpython-311.pyc and b/MineStudio/minestudio/utils/vpt_lib/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/vpt_lib/__pycache__/action_head.cpython-311.pyc b/MineStudio/minestudio/utils/vpt_lib/__pycache__/action_head.cpython-311.pyc
+index 11e3373..a4d7eee 100644
+Binary files a/MineStudio/minestudio/utils/vpt_lib/__pycache__/action_head.cpython-311.pyc and b/MineStudio/minestudio/utils/vpt_lib/__pycache__/action_head.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/vpt_lib/__pycache__/action_mapping.cpython-311.pyc b/MineStudio/minestudio/utils/vpt_lib/__pycache__/action_mapping.cpython-311.pyc
+index d391e31..980430b 100644
+Binary files a/MineStudio/minestudio/utils/vpt_lib/__pycache__/action_mapping.cpython-311.pyc and b/MineStudio/minestudio/utils/vpt_lib/__pycache__/action_mapping.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/vpt_lib/__pycache__/actions.cpython-311.pyc b/MineStudio/minestudio/utils/vpt_lib/__pycache__/actions.cpython-311.pyc
+index 8131a7a..b2d749c 100644
+Binary files a/MineStudio/minestudio/utils/vpt_lib/__pycache__/actions.cpython-311.pyc and b/MineStudio/minestudio/utils/vpt_lib/__pycache__/actions.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/vpt_lib/__pycache__/impala_cnn.cpython-311.pyc b/MineStudio/minestudio/utils/vpt_lib/__pycache__/impala_cnn.cpython-311.pyc
+index 676a5cc..725e7f1 100644
+Binary files a/MineStudio/minestudio/utils/vpt_lib/__pycache__/impala_cnn.cpython-311.pyc and b/MineStudio/minestudio/utils/vpt_lib/__pycache__/impala_cnn.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/vpt_lib/__pycache__/masked_attention.cpython-311.pyc b/MineStudio/minestudio/utils/vpt_lib/__pycache__/masked_attention.cpython-311.pyc
+index d9873d9..ede5c6b 100644
+Binary files a/MineStudio/minestudio/utils/vpt_lib/__pycache__/masked_attention.cpython-311.pyc and b/MineStudio/minestudio/utils/vpt_lib/__pycache__/masked_attention.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/vpt_lib/__pycache__/mc.cpython-311.pyc b/MineStudio/minestudio/utils/vpt_lib/__pycache__/mc.cpython-311.pyc
+index f8da964..30921f8 100644
+Binary files a/MineStudio/minestudio/utils/vpt_lib/__pycache__/mc.cpython-311.pyc and b/MineStudio/minestudio/utils/vpt_lib/__pycache__/mc.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/vpt_lib/__pycache__/minecraft_util.cpython-311.pyc b/MineStudio/minestudio/utils/vpt_lib/__pycache__/minecraft_util.cpython-311.pyc
+index 865ea28..fcfce59 100644
+Binary files a/MineStudio/minestudio/utils/vpt_lib/__pycache__/minecraft_util.cpython-311.pyc and b/MineStudio/minestudio/utils/vpt_lib/__pycache__/minecraft_util.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/vpt_lib/__pycache__/misc.cpython-311.pyc b/MineStudio/minestudio/utils/vpt_lib/__pycache__/misc.cpython-311.pyc
+index 1b77842..995b0e2 100644
+Binary files a/MineStudio/minestudio/utils/vpt_lib/__pycache__/misc.cpython-311.pyc and b/MineStudio/minestudio/utils/vpt_lib/__pycache__/misc.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/vpt_lib/__pycache__/mlp.cpython-311.pyc b/MineStudio/minestudio/utils/vpt_lib/__pycache__/mlp.cpython-311.pyc
+index 972a252..0cd3c5a 100644
+Binary files a/MineStudio/minestudio/utils/vpt_lib/__pycache__/mlp.cpython-311.pyc and b/MineStudio/minestudio/utils/vpt_lib/__pycache__/mlp.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/vpt_lib/__pycache__/normalize_ewma.cpython-311.pyc b/MineStudio/minestudio/utils/vpt_lib/__pycache__/normalize_ewma.cpython-311.pyc
+index 5653482..e3058fa 100644
+Binary files a/MineStudio/minestudio/utils/vpt_lib/__pycache__/normalize_ewma.cpython-311.pyc and b/MineStudio/minestudio/utils/vpt_lib/__pycache__/normalize_ewma.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/vpt_lib/__pycache__/scaled_mse_head.cpython-311.pyc b/MineStudio/minestudio/utils/vpt_lib/__pycache__/scaled_mse_head.cpython-311.pyc
+index 93d3080..fa7ca9f 100644
+Binary files a/MineStudio/minestudio/utils/vpt_lib/__pycache__/scaled_mse_head.cpython-311.pyc and b/MineStudio/minestudio/utils/vpt_lib/__pycache__/scaled_mse_head.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/vpt_lib/__pycache__/torch_util.cpython-311.pyc b/MineStudio/minestudio/utils/vpt_lib/__pycache__/torch_util.cpython-311.pyc
+index 815d93c..411e31e 100644
+Binary files a/MineStudio/minestudio/utils/vpt_lib/__pycache__/torch_util.cpython-311.pyc and b/MineStudio/minestudio/utils/vpt_lib/__pycache__/torch_util.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/vpt_lib/__pycache__/tree_util.cpython-311.pyc b/MineStudio/minestudio/utils/vpt_lib/__pycache__/tree_util.cpython-311.pyc
+index d31a7e7..6965294 100644
+Binary files a/MineStudio/minestudio/utils/vpt_lib/__pycache__/tree_util.cpython-311.pyc and b/MineStudio/minestudio/utils/vpt_lib/__pycache__/tree_util.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/vpt_lib/__pycache__/util.cpython-311.pyc b/MineStudio/minestudio/utils/vpt_lib/__pycache__/util.cpython-311.pyc
+index 09c9330..6665aab 100644
+Binary files a/MineStudio/minestudio/utils/vpt_lib/__pycache__/util.cpython-311.pyc and b/MineStudio/minestudio/utils/vpt_lib/__pycache__/util.cpython-311.pyc differ
+diff --git a/MineStudio/minestudio/utils/vpt_lib/__pycache__/xf.cpython-311.pyc b/MineStudio/minestudio/utils/vpt_lib/__pycache__/xf.cpython-311.pyc
+index b45e377..3988a32 100644
+Binary files a/MineStudio/minestudio/utils/vpt_lib/__pycache__/xf.cpython-311.pyc and b/MineStudio/minestudio/utils/vpt_lib/__pycache__/xf.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/__pycache__/__init__.cpython-311.pyc b/src/minecraftoptimus/__pycache__/__init__.cpython-311.pyc
+index 07d0a3a..1b62d2f 100644
+Binary files a/src/minecraftoptimus/__pycache__/__init__.cpython-311.pyc and b/src/minecraftoptimus/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/__pycache__/__init__.cpython-311.pyc b/src/minecraftoptimus/model/__pycache__/__init__.cpython-311.pyc
+index 0d64aae..1b72ec8 100644
+Binary files a/src/minecraftoptimus/model/__pycache__/__init__.cpython-311.pyc and b/src/minecraftoptimus/model/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/agent/__pycache__/__init__.cpython-311.pyc b/src/minecraftoptimus/model/agent/__pycache__/__init__.cpython-311.pyc
+index 06c3dda..f6024d0 100644
+Binary files a/src/minecraftoptimus/model/agent/__pycache__/__init__.cpython-311.pyc and b/src/minecraftoptimus/model/agent/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/agent/__pycache__/base.cpython-311.pyc b/src/minecraftoptimus/model/agent/__pycache__/base.cpython-311.pyc
+index 92450a5..89a1a1d 100644
+Binary files a/src/minecraftoptimus/model/agent/__pycache__/base.cpython-311.pyc and b/src/minecraftoptimus/model/agent/__pycache__/base.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/agent/__pycache__/optimus3.cpython-311.pyc b/src/minecraftoptimus/model/agent/__pycache__/optimus3.cpython-311.pyc
+index 9bf103c..22e9852 100644
+Binary files a/src/minecraftoptimus/model/agent/__pycache__/optimus3.cpython-311.pyc and b/src/minecraftoptimus/model/agent/__pycache__/optimus3.cpython-311.pyc differ
 diff --git a/src/minecraftoptimus/model/agent/optimus3.py b/src/minecraftoptimus/model/agent/optimus3.py
 index fe0dee6..90a7176 100644
 --- a/src/minecraftoptimus/model/agent/optimus3.py
@@ -60,6 +2336,24 @@ index fe0dee6..90a7176 100644
          )
          self.processor = AutoProcessor.from_pretrained(mllm_model_path)
          self.task_router = TaskRouterModel.from_pretrained(task_router_ckpt_path)
+diff --git a/src/minecraftoptimus/model/optimus3/__pycache__/__init__.cpython-311.pyc b/src/minecraftoptimus/model/optimus3/__pycache__/__init__.cpython-311.pyc
+index 02db782..13d63cd 100644
+Binary files a/src/minecraftoptimus/model/optimus3/__pycache__/__init__.cpython-311.pyc and b/src/minecraftoptimus/model/optimus3/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/optimus3/__pycache__/configuration_optimus3.cpython-311.pyc b/src/minecraftoptimus/model/optimus3/__pycache__/configuration_optimus3.cpython-311.pyc
+index e63c2f5..3ed2707 100644
+Binary files a/src/minecraftoptimus/model/optimus3/__pycache__/configuration_optimus3.cpython-311.pyc and b/src/minecraftoptimus/model/optimus3/__pycache__/configuration_optimus3.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/optimus3/__pycache__/configuration_optimus3_token_level.cpython-311.pyc b/src/minecraftoptimus/model/optimus3/__pycache__/configuration_optimus3_token_level.cpython-311.pyc
+index 1f5937e..502be65 100644
+Binary files a/src/minecraftoptimus/model/optimus3/__pycache__/configuration_optimus3_token_level.cpython-311.pyc and b/src/minecraftoptimus/model/optimus3/__pycache__/configuration_optimus3_token_level.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/optimus3/__pycache__/modeling_optimus3.cpython-311.pyc b/src/minecraftoptimus/model/optimus3/__pycache__/modeling_optimus3.cpython-311.pyc
+index 629b342..d43ada2 100644
+Binary files a/src/minecraftoptimus/model/optimus3/__pycache__/modeling_optimus3.cpython-311.pyc and b/src/minecraftoptimus/model/optimus3/__pycache__/modeling_optimus3.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/optimus3/__pycache__/modeling_optimus3_token_level.cpython-311.pyc b/src/minecraftoptimus/model/optimus3/__pycache__/modeling_optimus3_token_level.cpython-311.pyc
+index f8ba47e..779d216 100644
+Binary files a/src/minecraftoptimus/model/optimus3/__pycache__/modeling_optimus3_token_level.cpython-311.pyc and b/src/minecraftoptimus/model/optimus3/__pycache__/modeling_optimus3_token_level.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/optimus3/__pycache__/modeling_task_router.cpython-311.pyc b/src/minecraftoptimus/model/optimus3/__pycache__/modeling_task_router.cpython-311.pyc
+index ec5ac04..09c093a 100644
+Binary files a/src/minecraftoptimus/model/optimus3/__pycache__/modeling_task_router.cpython-311.pyc and b/src/minecraftoptimus/model/optimus3/__pycache__/modeling_task_router.cpython-311.pyc differ
 diff --git a/src/minecraftoptimus/model/optimus3/modeling_task_router.py b/src/minecraftoptimus/model/optimus3/modeling_task_router.py
 index 65e5407..80c0e20 100644
 --- a/src/minecraftoptimus/model/optimus3/modeling_task_router.py
@@ -78,6 +2372,81 @@ index 65e5407..80c0e20 100644
          self.head = nn.Sequential(nn.Linear(768, 768 * 4), nn.ReLU(), nn.Linear(768 * 4, 5))
  
      def forward(self, x):
+diff --git a/src/minecraftoptimus/model/steve1/VPT/__pycache__/__init__.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/__pycache__/__init__.cpython-311.pyc
+index 53893e3..7475ec2 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/__pycache__/__init__.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/__pycache__/agent.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/__pycache__/agent.cpython-311.pyc
+index 74f8e39..096705e 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/__pycache__/agent.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/__pycache__/agent.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/__init__.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/__init__.cpython-311.pyc
+index 8f207bf..43bbdf8 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/__init__.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/action_head.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/action_head.cpython-311.pyc
+index f91ee17..b0385b6 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/action_head.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/action_head.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/action_mapping.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/action_mapping.cpython-311.pyc
+index 8ad6aad..41fa0cd 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/action_mapping.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/action_mapping.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/actions.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/actions.cpython-311.pyc
+index 53cff53..e26039b 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/actions.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/actions.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/impala_cnn.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/impala_cnn.cpython-311.pyc
+index 9048519..4e28043 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/impala_cnn.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/impala_cnn.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/masked_attention.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/masked_attention.cpython-311.pyc
+index 3e0ff64..3571233 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/masked_attention.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/masked_attention.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/minecraft_util.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/minecraft_util.cpython-311.pyc
+index dce0690..9aacbc2 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/minecraft_util.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/minecraft_util.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/misc.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/misc.cpython-311.pyc
+index 8f433ec..593365c 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/misc.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/misc.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/mlp.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/mlp.cpython-311.pyc
+index 9c9cfec..a7ae1c4 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/mlp.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/mlp.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/normalize_ewma.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/normalize_ewma.cpython-311.pyc
+index bd291b3..d40a462 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/normalize_ewma.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/normalize_ewma.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/policy.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/policy.cpython-311.pyc
+index 7defb96..1908f48 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/policy.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/policy.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/scaled_mse_head.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/scaled_mse_head.cpython-311.pyc
+index d297353..306a595 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/scaled_mse_head.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/scaled_mse_head.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/torch_util.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/torch_util.cpython-311.pyc
+index dbfe33e..3dd1772 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/torch_util.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/torch_util.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/tree_util.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/tree_util.cpython-311.pyc
+index 6e0c037..3cfaaf7 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/tree_util.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/tree_util.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/util.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/util.cpython-311.pyc
+index e0d0f15..d67b40c 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/util.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/util.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/xf.cpython-311.pyc b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/xf.cpython-311.pyc
+index c402127..1ecd769 100644
+Binary files a/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/xf.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/VPT/lib/__pycache__/xf.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/__pycache__/MineRLConditionalAgent.cpython-311.pyc b/src/minecraftoptimus/model/steve1/__pycache__/MineRLConditionalAgent.cpython-311.pyc
+index e5394fa..8154446 100644
+Binary files a/src/minecraftoptimus/model/steve1/__pycache__/MineRLConditionalAgent.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/__pycache__/MineRLConditionalAgent.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/__pycache__/__init__.cpython-311.pyc b/src/minecraftoptimus/model/steve1/__pycache__/__init__.cpython-311.pyc
+index 813be84..9927e9d 100644
+Binary files a/src/minecraftoptimus/model/steve1/__pycache__/__init__.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/__pycache__/agent.cpython-311.pyc b/src/minecraftoptimus/model/steve1/__pycache__/agent.cpython-311.pyc
+index 032476a..439813c 100644
+Binary files a/src/minecraftoptimus/model/steve1/__pycache__/agent.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/__pycache__/agent.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/__pycache__/config.cpython-311.pyc b/src/minecraftoptimus/model/steve1/__pycache__/config.cpython-311.pyc
+index f77dfde..b299900 100644
+Binary files a/src/minecraftoptimus/model/steve1/__pycache__/config.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/__pycache__/config.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/__pycache__/embed_conditioned_policy.cpython-311.pyc b/src/minecraftoptimus/model/steve1/__pycache__/embed_conditioned_policy.cpython-311.pyc
+index 40a9343..0c38f00 100644
+Binary files a/src/minecraftoptimus/model/steve1/__pycache__/embed_conditioned_policy.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/__pycache__/embed_conditioned_policy.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/__pycache__/helpers.cpython-311.pyc b/src/minecraftoptimus/model/steve1/__pycache__/helpers.cpython-311.pyc
+index e90776a..6f0eaae 100644
+Binary files a/src/minecraftoptimus/model/steve1/__pycache__/helpers.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/__pycache__/helpers.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/model/steve1/__pycache__/vae.cpython-311.pyc b/src/minecraftoptimus/model/steve1/__pycache__/vae.cpython-311.pyc
+index 71794e1..e1f087a 100644
+Binary files a/src/minecraftoptimus/model/steve1/__pycache__/vae.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/__pycache__/vae.cpython-311.pyc differ
 diff --git a/src/minecraftoptimus/model/steve1/mineclip/mineclip/tokenization.py b/src/minecraftoptimus/model/steve1/mineclip/mineclip/tokenization.py
 index 2dbe7fd..4281c2a 100644
 --- a/src/minecraftoptimus/model/steve1/mineclip/mineclip/tokenization.py
@@ -91,3 +2460,12 @@ index 2dbe7fd..4281c2a 100644
      )
      return tokenizer
  
+diff --git a/src/minecraftoptimus/model/steve1/utils/__pycache__/embed_utils.cpython-311.pyc b/src/minecraftoptimus/model/steve1/utils/__pycache__/embed_utils.cpython-311.pyc
+index 501ca02..50f0b7b 100644
+Binary files a/src/minecraftoptimus/model/steve1/utils/__pycache__/embed_utils.cpython-311.pyc and b/src/minecraftoptimus/model/steve1/utils/__pycache__/embed_utils.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/utils/__pycache__/__init__.cpython-311.pyc b/src/minecraftoptimus/utils/__pycache__/__init__.cpython-311.pyc
+index 13796ee..25d7001 100644
+Binary files a/src/minecraftoptimus/utils/__pycache__/__init__.cpython-311.pyc and b/src/minecraftoptimus/utils/__pycache__/__init__.cpython-311.pyc differ
+diff --git a/src/minecraftoptimus/utils/__pycache__/mc_slot.cpython-311.pyc b/src/minecraftoptimus/utils/__pycache__/mc_slot.cpython-311.pyc
+index 3507427..4dd1feb 100644
+Binary files a/src/minecraftoptimus/utils/__pycache__/mc_slot.cpython-311.pyc and b/src/minecraftoptimus/utils/__pycache__/mc_slot.cpython-311.pyc differ

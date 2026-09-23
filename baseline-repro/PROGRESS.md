@@ -87,3 +87,6 @@ Running: Stage A (12 chains, launched 07:54), Stage A2 (Optimus-1 with the autho
 
 ### 09-23 08:45 — Stage A2 restarted
 The authors' full Optimus-1 memory contains 4 corrupt JSON files (DEVIATIONS: Optimus-1 full memory). One A2 episode crashed on it three times; others could have silently used the example plan. A2 was stopped after ~5 episodes, the files repaired (all records kept except two truncated last records and one duplicated tail), A2 results wiped, and A2 relaunched from scratch. Rerun reason recorded here. Also added a reaper that kills Minecraft instances no episode is using (killed episodes can leave them behind).
+
+### 09-23 09:05 — Optimus-1 degenerates with Gemini → added a labelled `goalfix` variant (Stage A3)
+Faithful Optimus-1 (empty memory, Env O, order1): after its first success every episode ends at step 0 (14/15 `method_exception`): the first saved plan stores Gemini's list-style goal, fuzzy retrieval then returns that file for every task, `retrieve_graph` raises KeyError and the released `UnboundLocalError` bug ends the episode. Faithful runs continue unchanged; the `goalfix` variant (only change: keep the first item of the goal inference) runs alongside (12 chains, D29). **Needs the user's call: which Optimus-1 row goes in the paper.**

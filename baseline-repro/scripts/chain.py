@@ -89,8 +89,10 @@ class Chain:
             "mineevolve" if a.env == "M" else "optimus1")
         if a.method == "optimus1":
             from optimus_workdir import make_workdir
-            self.wd = make_workdir(self.state / "wd", a.variant or "empty")
+            self.wd = make_workdir(self.state / "wd", (a.variant or "empty").split("-")[0])
             self.memory = self.wd / "src" / "optimus1" / "memories" / "v1"
+            if "goalfix" in (a.variant or ""):
+                self.env_vars["OPTIMUS_GOALFIX"] = "1"
         elif a.method == "mineevolve":
             self.memory = self.state / "kb"
             self.memory.mkdir(exist_ok=True)

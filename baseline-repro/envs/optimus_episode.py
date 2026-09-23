@@ -122,6 +122,20 @@ def main() -> int:
     if args.env == "O":
         om.env_make = env_make
 
+    if os.environ.get("OPTIMUS_GOALFIX") == "1":
+        # Variant "goalfix" (DECISIONS D29): Gemini answers <goal inference> with a
+        # list ("stone pickaxe, cobblestone, sticks, ..."), the prompt's own example
+        # with a single item. Keep the first listed item; nothing else changes.
+        import re as _re
+        _orig_info = om.get_info_from_plan
+
+        def get_info_from_plan(data):
+            goal, visual, env_ = _orig_info(data)
+            first = _re.split(r"[,;(/]|\band\b", goal)[0].strip().rstrip(".").strip()
+            return (first or goal), visual, env_
+
+        om.get_info_from_plan = get_info_from_plan
+
     native = {}
     orig_do = om.agent_do
 
