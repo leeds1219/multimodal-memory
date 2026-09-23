@@ -1,5 +1,5 @@
---- a/src/main/java/com/minerl/multiagent/env/EnvServer.java	2026-09-22 06:00:15.144877652 +0000
-+++ b/src/main/java/com/minerl/multiagent/env/EnvServer.java	2026-09-22 05:59:26.737071079 +0000
+--- a/src/main/java/com/minerl/multiagent/env/EnvServer.java	2026-09-23 03:55:10.827143394 +0000
++++ b/src/main/java/com/minerl/multiagent/env/EnvServer.java	2026-09-23 03:53:13.357179352 +0000
 @@ -419,7 +419,8 @@
          }
  
@@ -10,7 +10,7 @@
          DimensionGeneratorSettings dms = DimensionGeneratorSettings.fromDynamicRegistries(DynamicRegistries.getImpl(), seed, generateFeatures, bonusChest);
          mc.createWorld(worldName, worldSettings, DynamicRegistries.getImpl(), dms);
      }
-@@ -557,17 +558,74 @@
+@@ -557,17 +558,87 @@
          }
  
          infoJson.addProperty("isGuiOpen", mc.currentScreen != null);
@@ -26,6 +26,18 @@
  
 +    private static final String[] LANDMARK_SUFFIXES = {"_log", "_ore", "crafting_table", "furnace", "water", "lava"};
 +    private static final int LANDMARK_RADIUS = 16, LANDMARK_HEIGHT = 8, LANDMARK_KEEP = 3;
++    // "X-ray off": report a block only if one of its faces touches air, i.e. only what a
++    // player could actually see. Controlled by -Dmineevolve.landmarks.exposedOnly=true.
++    private static final boolean LANDMARK_EXPOSED_ONLY =
++            Boolean.parseBoolean(System.getProperty("mineevolve.landmarks.exposedOnly", "false"));
++
++    private static boolean isExposed(net.minecraft.util.math.BlockPos p) {
++        Minecraft mc = Minecraft.getInstance();
++        for (net.minecraft.util.Direction dir : net.minecraft.util.Direction.values()) {
++            if (mc.world.getBlockState(p.offset(dir)).getBlock() == net.minecraft.block.Blocks.AIR) return true;
++        }
++        return false;
++    }
 +
 +    public static JsonObject getNearbyBlocksJson() {
 +        Minecraft mc = Minecraft.getInstance();
@@ -46,6 +58,7 @@
 +                    boolean hit = false;
 +                    for (String suf : LANDMARK_SUFFIXES) { if (name.endsWith(suf)) { hit = true; break; } }
 +                    if (!hit) continue;
++                    if (LANDMARK_EXPOSED_ONLY && !isExposed(pos)) continue;
 +                    double d = Math.sqrt(dx * dx + dy * dy + dz * dz);
 +                    java.util.List<double[]> l = best.computeIfAbsent(name, k -> new java.util.ArrayList<>());
 +                    l.add(new double[]{pos.getX(), pos.getY(), pos.getZ(), d});
@@ -86,7 +99,7 @@
                  result.add(stack);
              }
          }
-@@ -596,7 +654,32 @@
+@@ -596,7 +667,32 @@
          return result.toString();
      }
  
@@ -119,7 +132,7 @@
          KeyboardListener.State keysState = constructKeyboardState(actions);
          MouseHelper.State mouseState = constructMouseState(actions);
          PlayRecorder.getInstance().setMouseKeyboardState(mouseState, keysState);
-@@ -607,7 +690,7 @@
+@@ -607,7 +703,7 @@
          List<String> keysPressed = new ArrayList<>();
          for (String action: actions.split("\n")) {
             String[] splitAction = action.trim().split(" ");
@@ -128,7 +141,7 @@
                 if (splitAction.length > 1 && Integer.parseInt(splitAction[1]) == 1) {
                     String key = actionToKey(splitAction[0]);
                     if (key != null) {
-@@ -638,7 +721,7 @@
+@@ -638,7 +734,7 @@
                  dy = Double.parseDouble(splitAction[1]) * sensitivity;
              } else if (splitAction[0].equals("dwheel")) {
                  dwheel = Double.parseDouble(splitAction[1]);

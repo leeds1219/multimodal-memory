@@ -139,9 +139,13 @@ class _ApproachScript:
         self.block = str(params.get("block") or params.get("target") or "log")
         self.stop_dist = float(params.get("stop_dist", 2.0) or 2.0)
         self.max_steps = int(np.clip(int(params.get("steps", 300) or 300), 1, 600))
+        self.scan_steps = 40       # look around this long before giving up on a missing target
         self.i = 0
         self.reached = False
         self.target = None
+        self._last_xz = None
+        self._stuck = 0            # steps without horizontal progress
+        self._attack_until = 0     # while i < this, hold attack to clear leaves / dirt in front
 
     def next(self, info: Mapping[str, Any]):
         from .env.nearby_blocks import nearest_matching
@@ -152,9 +156,17 @@ class _ApproachScript:
         noop = self.env.action_space.noop()
         tgt = nearest_matching(info.get("nearby_blocks") or {}, self.block)
         if tgt is None:
-            if self.target is None:
-                return None  # nothing of that kind within the landmark box
-            tgt = self.target  # keep the last known position while the block is out of the box
+            if self.target is not None:
+                tgt = self.target          # keep the last known position while it is out of the box
+            elif self.i <= self.scan_steps:
+                # Nothing of that kind in range (or the chunks are still loading after a
+                # teleport): turn in place and look again. Returning None here would make a
+                # 0-step subgoal, which the dead-env backstop cannot tell from a crash.
+                a = dict(noop)
+                a["camera"] = np.array([0.0, 20.0], dtype=np.float32)
+                return a
+            else:
+                return None
         self.target = tgt
         x, y, z = (info.get("coords") or [0, 64, 0])[:3]
         dx, dz = tgt[0] + 0.5 - x, tgt[2] + 0.5 - z
@@ -162,15 +174,30 @@ class _ApproachScript:
         if dist <= self.stop_dist:
             self.reached = True
             return None
-        want_yaw = float(np.degrees(np.arctan2(-dx, dz)))          # minecraft: yaw 0 = +z, 90 = -x
+        # progress tracking
+        if self._last_xz is not None and float(np.hypot(x - self._last_xz[0], z - self._last_xz[1])) < 0.05:
+            self._stuck += 1
+        else:
+            self._stuck = 0
+        self._last_xz = (x, z)
+        if self._stuck >= 40 and dist <= self.stop_dist + 2.5:
+            # close but not standable-next-to (canopy block, cliff edge): good enough
+            self.reached = True
+            return None
+        if self._stuck >= 15:
+            self._attack_until = self.i + 20   # walked into leaves or a wall: break it briefly
+            self._stuck = 0
+        want_yaw = float(np.degrees(np.arctan2(-dx, dz)))                 # minecraft: yaw 0 = +z, 90 = -x
         d_yaw = (want_yaw - float(info.get("yaw", 0.0)) + 180.0) % 360.0 - 180.0
-        want_pitch = float(np.degrees(np.arctan2(-(tgt[1] - y), dist)))  # look at the block (+ = down)
+        want_pitch = float(np.degrees(np.arctan2(-(tgt[1] - y), dist)))   # look at the block (+ = down)
         d_pitch = float(np.clip(want_pitch, -60, 30) - float(info.get("pitch", 0.0)))
         a = dict(noop)
         a["camera"] = np.array([float(np.clip(d_pitch, -30, 30)), float(np.clip(d_yaw, -30, 30))], dtype=np.float32)
         if abs(d_yaw) < 45:  # walk once roughly facing the target
             a["forward"] = np.array(1); a["sprint"] = np.array(1)
             a["jump"] = np.array(int(self.i % 2 == 0))
+            if self.i < self._attack_until:
+                a["attack"] = np.array(1); a["jump"] = np.array(0)
         return a
 
 

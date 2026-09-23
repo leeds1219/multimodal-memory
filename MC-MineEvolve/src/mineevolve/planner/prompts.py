@@ -162,13 +162,13 @@ def render_planner_user_prompt(
 
     return (
         f"<task_goal>{task_goal}</task_goal>\n\n"
-        f"<current_state>\n{json.dumps(dict(state), ensure_ascii=False, indent=2)}\n</current_state>\n\n"
+        f"<current_state>\n{json.dumps(dict(state), ensure_ascii=False, separators=(',',':'))}\n</current_state>\n\n"
         f"<completed_prefix>{list(completed_prefix)}</completed_prefix>\n\n"
         f"<retrieved_skills count={len(retrieved_skills)}>\n"
-        f"{json.dumps([dict(k) for k in retrieved_skills], ensure_ascii=False, indent=2)}\n"
+        f"{json.dumps([dict(k) for k in retrieved_skills], ensure_ascii=False, separators=(',',':'))}\n"
         f"</retrieved_skills>\n\n"
         f"<active_remedies count={len(active_remedies)}>\n"
-        f"{json.dumps([dict(k) for k in active_remedies], ensure_ascii=False, indent=2)}\n"
+        f"{json.dumps([dict(k) for k in active_remedies], ensure_ascii=False, separators=(',',':'))}\n"
         f"</active_remedies>\n\n"
         f"Now produce the plan JSON for the task goal above. Output JSON ONLY."
     )

@@ -11,6 +11,10 @@ defaults:
 # `python scripts/fetch_spawns.py oak_forest 10` prints more. Plain integers are
 # also accepted (seed only, random spawn point); [] falls back to `env.times` runs
 # on random worlds. CLI: seeds='[{seed: 19961103, pos: [-79, 64, -512]}]'
+# Per-tier splits live in conf/seeds/<tier>.yaml (generated from JARVIS-1's spawn table,
+# biome-matched: wooden -> oak_forest, the rest -> plains). Use them with
+#   python -m mineevolve.main benchmark=stone +seeds@_global_=stone
+# The three entries below stay as the default (wooden) so existing commands keep working.
 seeds:
   - {seed: 19961103, pos: [-79, 64, -512]}
   - {seed: 19961103, pos: [-145, 67, -495]}

@@ -1,0 +1,8 @@
+# @package _global_
+# Fixed task-seed split (the paper uses one but does not publish it).
+# Source: JARVIS-1 jarvis/assets/spawn.json, first 3 `oak_forest` entries.
+# Regenerate with: python scripts/fetch_spawns.py oak_forest 3
+seeds:
+  - {seed: 19961103, pos: [-79, 64, -512]}
+  - {seed: 19961103, pos: [-145, 67, -495]}
+  - {seed: 12345, pos: [195, 73, 812]}

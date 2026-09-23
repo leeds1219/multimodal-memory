@@ -154,7 +154,7 @@ def render_skill_user_prompt(
     return (
         f"<task_goal>{task_goal}</task_goal>\n\n"
         f"<successful_feedback_segment count={len(successful_segment)}>\n"
-        f"{json.dumps([dict(e) for e in successful_segment], ensure_ascii=False, indent=2)}\n"
+        f"{json.dumps([dict(e) for e in successful_segment], ensure_ascii=False, separators=(',',':'))}\n"
         f"</successful_feedback_segment>\n\n"
         "Produce the skill JSON now. Output JSON ONLY."
     )
@@ -385,14 +385,14 @@ def render_remedy_user_prompt(
     if deadlock_signal:
         deadlock_block = (
             f"<deadlock_signal>\n"
-            f"{json.dumps(dict(deadlock_signal), ensure_ascii=False, indent=2)}\n"
+            f"{json.dumps(dict(deadlock_signal), ensure_ascii=False, separators=(',',':'))}\n"
             f"</deadlock_signal>\n\n"
             "STRONG PRIOR: prefer scope=task_global, category=deadlock_pattern.\n\n"
         )
     return (
         f"<current_subgoal>{current_subgoal}</current_subgoal>\n\n"
         f"<recent_feedback count={len(recent_segment)}>\n"
-        f"{json.dumps([dict(e) for e in recent_segment], ensure_ascii=False, indent=2)}\n"
+        f"{json.dumps([dict(e) for e in recent_segment], ensure_ascii=False, separators=(',',':'))}\n"
         f"</recent_feedback>\n\n"
         f"{deadlock_block}"
         "Produce the remedy JSON now. Output JSON ONLY."
