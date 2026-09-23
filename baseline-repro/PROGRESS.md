@@ -90,3 +90,9 @@ The authors' full Optimus-1 memory contains 4 corrupt JSON files (DEVIATIONS: Op
 
 ### 09-23 09:05 — Optimus-1 degenerates with Gemini → added a labelled `goalfix` variant (Stage A3)
 Faithful Optimus-1 (empty memory, Env O, order1): after its first success every episode ends at step 0 (14/15 `method_exception`): the first saved plan stores Gemini's list-style goal, fuzzy retrieval then returns that file for every task, `retrieve_graph` raises KeyError and the released `UnboundLocalError` bug ends the episode. Faithful runs continue unchanged; the `goalfix` variant (only change: keep the first item of the goal inference) runs alongside (12 chains, D29). **Needs the user's call: which Optimus-1 row goes in the paper.**
+
+### 09-23 09:40 — Stage C: Optimus-3 launched (own models, own simulator, env "C3")
+Setup (by a sub-agent, stopped by an API usage limit after finishing setup; resumed here): separate conda env `optimus3` (py3.11, torch 2.7.1+cu128, transformers 4.51.3, sdpa instead of flash-attn), weights ≈23 GB (`iLearn-Lab/Optimus-3` preview + action head + router), headless harness `baselines/optimus3/run_episode.py` re-implementing the released GUI server loop, compat patches in `baselines/optimus3/optimus3.patch`, decisions C1–C5, deviations section "Optimus-3".
+Planner dry run over the 70 tasks: the released planner only works with its trained input form "obtain N <item>" (verbatim instructions: 38/70 truncated, 29/70 empty plans) → C1.
+Smoke (3 tasks): wooden_00 ✓ 831 steps, stone_00 ✓ 1,826 steps, wooden_06 ✗ horizon; ≈10 steps/s; 5–8 MLLM calls/episode; ≈28 GB GPU per worker.
+Full run: 3 shards on GPU 6 (`run_all.py --shard i/3`), results in `runs/C3/optimus3/order0/`; reported in a separate table (different setting: own policy + MLLM, not Gemini + STEVE-1).
