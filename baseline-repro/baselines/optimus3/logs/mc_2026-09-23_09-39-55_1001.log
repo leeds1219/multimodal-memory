@@ -283,3 +283,16 @@ java.io.FileNotFoundException: minecraft:optifine/ctm/default/empty.png
 [09:40:17] [Render thread/INFO]: [MineRLAgent0: Set the time to 0]
 [09:40:17] [Render thread/INFO]: [MineRLAgent0: Gamerule doImmediateRespawn is now set to: true]
 [09:40:17] [Render thread/INFO]: [MineRLAgent0: Set spawn point to 6074, 69, -2180 [0.0] in minecraft:overworld for MineRLAgent0]
+[09:45:28] [Render thread/INFO]: [STDOUT]: Starting new video null
+[09:46:50] [Render thread/INFO]: Loaded 4 advancements
+[09:50:43] [Render thread/INFO]: [STDOUT]: Starting new video null
+[09:51:22] [Render thread/INFO]: Loaded 5 advancements
+[09:55:38] [Render thread/INFO]: [STDOUT]: Starting new video null
+[09:58:21] [Render thread/INFO]: Loaded 17 advancements
+[09:58:24] [Render thread/INFO]: Loaded 20 advancements
+[09:58:27] [Render thread/INFO]: Loaded 29 advancements
+[09:58:42] [Render thread/INFO]: MineRLAgent0 has made the advancement [Stone Age]
+[09:58:42] [Render thread/INFO]: [CHAT] MineRLAgent0 has made the advancement [Stone Age]
+[09:58:42] [Render thread/INFO]: Loaded 44 advancements
+[09:59:53] [Render thread/INFO]: [STDOUT]: Starting new video null
+[09:59:56] [EnvServerSocketHandler/INFO]: [STDOUT]: *** Stopping the replay, returning control to the inputs

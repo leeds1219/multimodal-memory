@@ -93,7 +93,7 @@ def main() -> int:
     result = {
         "env": a.env, "method": a.method, "task": a.task, "group": task["group"],
         "instruction": task["instruction"], "seed": seed, "order_id": a.order_id,
-        "status": "anomaly" if (ep / "ANOMALY").exists() else status,
+        "status": "budget_stopped" if (ep / "BUDGET_STOP").exists() else ("anomaly" if (ep / "ANOMALY").exists() else status),
         "end_reason": mon.end_reason if mon.over else end,
         "success": mon.success_step is not None, "success_step": mon.success_step,
         "native_success": end == "task_done", "steps": mon.steps, "horizon_steps": env.horizon,

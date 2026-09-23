@@ -283,3 +283,29 @@ java.io.FileNotFoundException: minecraft:optifine/ctm/default/empty.png
 [09:40:36] [Render thread/INFO]: [MineRLAgent0: Set the time to 0]
 [09:40:36] [Render thread/INFO]: [MineRLAgent0: Gamerule doImmediateRespawn is now set to: true]
 [09:40:36] [Render thread/INFO]: [MineRLAgent0: Set spawn point to -4158, 68, 1722 [0.0] in minecraft:overworld for MineRLAgent0]
+[09:42:31] [Render thread/INFO]: Loaded 4 advancements
+[09:42:34] [Render thread/INFO]: Loaded 16 advancements
+[09:42:39] [Render thread/INFO]: Loaded 25 advancements
+[09:42:42] [Render thread/INFO]: Loaded 28 advancements
+[09:43:07] [Render thread/INFO]: MineRLAgent0 has made the advancement [Stone Age]
+[09:43:07] [Render thread/INFO]: [CHAT] MineRLAgent0 has made the advancement [Stone Age]
+[09:43:07] [Render thread/INFO]: Loaded 43 advancements
+[09:43:21] [Render thread/INFO]: Loaded 53 advancements
+[09:44:44] [Render thread/INFO]: Loaded 54 advancements
+[09:44:46] [Render thread/INFO]: Loaded 55 advancements
+[09:45:58] [Render thread/INFO]: [STDOUT]: Starting new video null
+[09:46:08] [Render thread/INFO]: MineRLAgent0 has made the advancement [Getting an Upgrade]
+[09:46:08] [Render thread/INFO]: [CHAT] MineRLAgent0 has made the advancement [Getting an Upgrade]
+[09:46:08] [Render thread/INFO]: Loaded 59 advancements
+[09:46:28] [Render thread/INFO]: [MineRLAgent0: Changed the block at -4128, 45, 1724]
+[09:46:29] [Render thread/INFO]: [MineRLAgent0: Changed the block at -4128, 46, 1724]
+[09:46:33] [Render thread/INFO]: Loaded 60 advancements
+[09:46:36] [Render thread/INFO]: [MineRLAgent0: Changed the block at -4128, 39, 1724]
+[09:46:37] [Render thread/INFO]: [MineRLAgent0: Changed the block at -4128, 38, 1724]
+[09:46:38] [Render thread/INFO]: [MineRLAgent0: Changed the block at -4128, 36, 1724]
+[09:47:07] [Render thread/INFO]: [MineRLAgent0: Changed the block at -4126, 35, 1725]
+[09:47:09] [Render thread/INFO]: Loaded 62 advancements
+[09:47:20] [Render thread/INFO]: MineRLAgent0 has made the advancement [Acquire Hardware]
+[09:47:20] [Render thread/INFO]: [CHAT] MineRLAgent0 has made the advancement [Acquire Hardware]
+[09:47:20] [Render thread/INFO]: Loaded 88 advancements
+[09:47:46] [EnvServerSocketHandler/INFO]: [STDOUT]: *** Stopping the replay, returning control to the inputs

@@ -79,6 +79,7 @@ def main() -> int:
     procs: dict[str, subprocess.Popen] = {}
     restarts: dict[str, int] = {}
     done: set[str] = set()
+    started: dict[str, float] = {}
     last_day = None
     logs = RUNS / "supervisor"
     logs.mkdir(exist_ok=True)
@@ -94,6 +95,12 @@ def main() -> int:
                 rc = p.returncode
                 if rc == 0:
                     log(f"{name}: finished"); done.add(name); continue
+                if rc == 4:  # the same chain is already running (started earlier): check later
+                    if time.time() - started.get(name, 0) < 600:
+                        continue
+                    started[name] = time.time()
+                    procs.pop(name)
+                    continue
                 if rc == 2:
                     log(f"{name}: STOP condition (exit 2) -> stopping supervisor")
                     for q in procs.values():
@@ -116,9 +123,9 @@ def main() -> int:
             log(f"{name}: launched on GPU {gpu} port {port}")
             time.sleep(20)  # stagger Minecraft launches
         if len(done) == len(chains):
-            log("all chains done"); daily_summary(); return 0
+            log("all chains done"); return 0
         today = dt.date.today()
-        if last_day is not None and today != last_day:
+        if last_day is not None and today != last_day and plan.get("daily_summary", False):
             daily_summary()
         last_day = today
         time.sleep(60)

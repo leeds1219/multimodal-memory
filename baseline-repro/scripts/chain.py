@@ -240,6 +240,9 @@ class Chain:
             if not self.a.mock and ledger_total() >= CFG["global_cap_usd"]:
                 log("STOP: global LLM cap reached")
                 return 2
+            if not self.a.mock and (RUNS_ROOT / "STOP_BUDGET").exists():
+                log("STOP: STOP_BUDGET present (tripwire) -> " + (RUNS_ROOT / "STOP_BUDGET").read_text().strip())
+                return 2
             for attempt in range(1, self.a.retries + 2):
                 self.restore_memory()
                 if ep.exists():
@@ -276,8 +279,27 @@ def main() -> int:
     ap.add_argument("--stall-min", type=float, default=20.0)
     ap.add_argument("--mock", action="store_true")
     a = ap.parse_args()
+    if already_running(a):
+        log(f"chain {a.env}/{a.method}/{a.variant}/{a.order} already running -> exit 4")
+        return 4
     tasks = a.tasks.split(",") if a.tasks else ORDERS[a.order]
     return Chain(a).run(tasks)
+
+
+def already_running(a) -> bool:
+    """True if another live chain.py has the same (env, method, variant, order),
+    so a restarted supervisor / watchdog can never launch a duplicate."""
+    import psutil
+    me = os.getpid()
+    want = {"--env": a.env, "--method": a.method, "--variant": a.variant or "", "--order": a.order}
+    for p in psutil.process_iter(["pid", "cmdline"]):
+        c = p.info["cmdline"] or []
+        if p.info["pid"] == me or not any(x.endswith("scripts/chain.py") for x in c):
+            continue
+        got = {k: (c[c.index(k) + 1] if k in c and c.index(k) + 1 < len(c) else "") for k in want}
+        if got == want:
+            return True
+    return False
 
 
 if __name__ == "__main__":

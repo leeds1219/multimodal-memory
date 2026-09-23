@@ -23,6 +23,11 @@ price_out_per_m: 3.00
 
 # Runaway guards (safety, not a budget).
 global_cap_usd: 3000.0                  # summed over all processes via ledger
+# Tripwires against unattended waste (DECISIONS D30): either one writes
+# <log_root>/STOP_BUDGET; from then on every call fails at $0 until a human
+# removes that file (see RESUME.md).
+soft_cap_usd: 1500.0                    # ~1.25x the projected upper bound
+max_usd_per_hour: 40.0                  # projected average ~$8/h
 ledger_path: /home/rag/data/repro_runs/llm_ledger.jsonl
 episode_cost_multiplier: 10.0           # anomaly if > 10x smoke-test rate x episode horizon
 episode_call_multiplier: 10.0

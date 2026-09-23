@@ -88,7 +88,7 @@ def _log_dir(ctx: dict) -> Path:
 # Global ledger (all processes)
 # ----------------------------------------------------------------------------
 
-def ledger_total() -> float:
+def ledger_total(since: float = 0.0) -> float:
     p = Path(CFG["ledger_path"])
     if not p.exists():
         return 0.0
@@ -96,10 +96,43 @@ def ledger_total() -> float:
     with open(p) as f:
         for line in f:
             try:
-                total += json.loads(line)["cost"]
+                r = json.loads(line)
+                if r.get("ts", 0) >= since:
+                    total += r["cost"]
             except (ValueError, KeyError):
                 pass
     return total
+
+
+def stop_file() -> Path:
+    return Path(CFG["log_root"]) / "STOP_BUDGET"
+
+
+def _tripwire(ctx: dict) -> None:
+    """Soft cap / hourly rate tripwires (checked with the ledger re-read)."""
+    sf = stop_file()
+    reason = None
+    if sf.exists():
+        reason = "STOP_BUDGET present: " + sf.read_text().strip()[:200]
+    else:
+        spent = _global_spent()
+        if CFG.get("soft_cap_usd") and spent >= CFG["soft_cap_usd"]:
+            reason = f"soft cap ${CFG['soft_cap_usd']} reached (${spent:.2f})"
+        elif CFG.get("max_usd_per_hour") and time.time() - _RATE_CACHE["t"] > 60:
+            _RATE_CACHE.update(t=time.time(), v=ledger_total(since=time.time() - 3600))
+            if _RATE_CACHE["v"] >= CFG["max_usd_per_hour"]:
+                reason = f"spend rate ${_RATE_CACHE['v']:.2f} in the last hour >= ${CFG['max_usd_per_hour']}/h"
+        if reason:
+            sf.parent.mkdir(parents=True, exist_ok=True)
+            sf.write_text(f"{time.ctime()}  {reason}\n")
+    if reason:
+        if ctx.get("episode_dir"):
+            Path(ctx["episode_dir"]).mkdir(parents=True, exist_ok=True)
+            (Path(ctx["episode_dir"]) / "BUDGET_STOP").write_text(reason + "\n")
+        raise BudgetExceeded(reason)
+
+
+_RATE_CACHE = {"t": 0.0, "v": 0.0}
 
 
 def _ledger_append(rec: dict) -> float:
@@ -224,6 +257,8 @@ class _Completions:
             spent = _global_spent()
             if spent >= CFG["global_cap_usd"]:
                 raise BudgetExceeded(f"global cap ${CFG['global_cap_usd']} reached (${spent:.2f})")
+            if os.environ.get("LLM_MOCK") != "1":
+                _tripwire(ctx)
             _check_episode_guard(ctx, method)
 
         log_dir = _log_dir(ctx)

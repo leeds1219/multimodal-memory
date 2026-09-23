@@ -207,7 +207,7 @@ def main() -> int:
     result = {
         "env": args.env, "method": os.environ.get("METHOD", "optimus1"), "task": args.task,
         "group": task["group"], "instruction": task["instruction"], "seed": seed, "order_id": args.order_id,
-        "status": "anomaly" if anomaly else status,
+        "status": "budget_stopped" if (ep / "BUDGET_STOP").exists() else ("anomaly" if anomaly else status),
         "end_reason": mon.end_reason or ("plan_finished" if native.get("status") == "success" else "plan_failed_or_timeout"),
         "success": mon.success_step is not None, "success_step": mon.success_step,
         "native_success": (native.get("status") == "success") if native else None,

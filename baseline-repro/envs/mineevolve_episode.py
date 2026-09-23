@@ -169,7 +169,7 @@ def main() -> int:
     result = {
         "env": args.env, "method": os.environ.get("METHOD", "mineevolve"), "task": args.task,
         "group": task["group"], "instruction": task["instruction"], "seed": seed, "order_id": args.order_id,
-        "status": "anomaly" if anomaly else status, "end_reason": mon.end_reason or end,
+        "status": "budget_stopped" if (ep / "BUDGET_STOP").exists() else ("anomaly" if anomaly else status), "end_reason": mon.end_reason or end,
         "success": mon.success_step is not None, "success_step": mon.success_step,
         "native_success": native.get("success"), "steps": mon.steps, "horizon_steps": horizon,
         "wall_time_s": round(time.time() - t0, 1), "final_inventory": mon.last_inventory,
