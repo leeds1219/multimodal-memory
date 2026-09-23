@@ -105,7 +105,7 @@ def main() -> int:
                 if restarts[name] > a.max_restarts:
                     log(f"{name}: too many restarts, giving up"); done.add(name); continue
             gpu = gpus[i % len(gpus)]
-            port = 9300 + i
+            port = int(plan.get("port_base", 9300)) + i
             cmd = [PY, str(REPRO / "scripts" / "chain.py"), "--env", c["env"], "--method", c["method"],
                    "--order", c["order"], "--gpu", str(gpu), "--port", str(port)]
             if c.get("variant"):

@@ -177,13 +177,20 @@ def _check_episode_guard(ctx: dict, method: str):
         _EPISODE.update(key=key, cost=0.0, calls=0)
     if key and (Path(key) / "ANOMALY").exists():
         raise EpisodeAnomaly(f"episode already marked anomalous: {key}")
+    # Thresholds = multiplier x (smoke-test rate per env step) x this episode's
+    # horizon, with small floors (DECISIONS D28); legacy per-episode means kept.
+    rate = (CFG.get("episode_rates_per_step") or {}).get(method) or {}
+    horizon = ctx.get("horizon_steps")
     mean_cost = (CFG.get("episode_mean_cost_usd") or {}).get(method)
     mean_calls = (CFG.get("episode_mean_calls") or {}).get(method)
+    if rate and horizon:
+        mean_cost = max(rate["cost_per_step"] * horizon, 0.05)
+        mean_calls = max(rate["calls_per_step"] * horizon, 3)
     reason = None
     if mean_cost and _EPISODE["cost"] > CFG["episode_cost_multiplier"] * mean_cost:
-        reason = f"episode cost ${_EPISODE['cost']:.3f} > {CFG['episode_cost_multiplier']}x mean ${mean_cost}"
+        reason = f"episode cost ${_EPISODE['cost']:.3f} > {CFG['episode_cost_multiplier']}x expected ${mean_cost:.3f}"
     if mean_calls and _EPISODE["calls"] > CFG["episode_call_multiplier"] * mean_calls:
-        reason = f"episode calls {_EPISODE['calls']} > {CFG['episode_call_multiplier']}x mean {mean_calls}"
+        reason = f"episode calls {_EPISODE['calls']} > {CFG['episode_call_multiplier']}x expected {mean_calls:.1f}"
     if reason:
         if key:
             Path(key).mkdir(parents=True, exist_ok=True)

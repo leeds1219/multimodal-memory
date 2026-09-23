@@ -58,3 +58,25 @@ Fairness: same seed → identical spawn position (570.5, 63.0, -659.5) under bot
 - **MineEvolve as released cannot craft** (helper stub) and **cannot hold a pickaxe** (auto-pickaxe dead) in its own env; its success check passes "Craft a wooden pickaxe" with one oak log.
 - **Optimus-1 with Gemini often never plans:** goal inference returns e.g. "wood logs"; `retrieve_graph` raises KeyError; `main.py` silently executes the built-in example plan (D20). Tracked per episode as `plan_source`.
 - MineEvolve's LLM cost is dominated by the Inducer (≈10k input tokens per call, one call per subgoal).
+
+### Disk freed on the host (≈217 GB free) — deferred items revisited
+- Optimus-1 **full pre-built memory** (HF, 9.9 GB tar.gz): downloading; the `prebuilt` variant will use it (D21b). The repo-shipped 5-plan memory is dropped.
+- **Optimus-3**: weights now fit; a feasibility study of its released code (live rollout / missing harness) is running → `docs/optimus3_feasibility.md`.
+- Keyframes (320×180 every 100 steps) now saved per episode for visual failure analysis (D26).
+- Kept on purpose (not disk-driven): one MineRL build, STEVE-1 via the `steve1` package with the shared weight files (D27).
+
+### Real smoke tests (Gemini, 3 easy tasks × 1 seed per method/env) and projection
+| env | method | wooden_00 (pickaxe) | wooden_06 (table) | stone_00 (stone pickaxe) | steps/s | $ / 1k steps | calls / 1k steps |
+|-----|--------|------|------|------|------|------|------|
+| M | MineEvolve | ✗ horizon, $0.20 | ✓ 175 steps, $0.07 | ✗ horizon, $0.31 | 3.9 | 0.094 | 7.9 |
+| O | MineEvolve | ✗ horizon, $0.27 | ✓ 288 steps, $0.07 | ✗ plan ended, $0.17 | 4.0 | 0.081 | 6.2 |
+| M | Optimus-1 (empty) | ✓ (fallback plan) | ✓ (fallback plan) | ✓ (fallback plan) | 10.2 | 0.003 | 0.95 |
+| O | Optimus-1 (empty) | ✓ | ✓ | ✓ | 13.9 | 0.003 | 0.74 |
+Stage B (DEPS, JARVIS-1) smoke: DEPS 3.0 / 6.4 steps/s, JARVIS-1 2.4 / 4.9 steps/s (M / O); still running at time of writing.
+
+Checks: plans parse (MineEvolve JSON, Optimus retrieval/reflection formats); Optimus-1 image calls work (retrieval + reflection with 2 images). Two MineEvolve calls were truncated by thinking → headroom raised to 32k (D3b).
+**Optimus-1 with Gemini never reached its planner in any smoke episode:** goal inference returns a list ("stone pickaxe, cobblestone, sticks, …"), `retrieve_graph` raises KeyError, and the built-in example plan is executed (D20). Kept as released; flagged per episode (`plan_source`).
+
+**Projection** (every episode to its horizon = upper bound; mid = 60 %): LLM cost for all 22 planned chains ≈ **$1,224 upper / $735 mid** (cap $3,000). Longest chain ≈ 149 h (JARVIS-1, Env M), MineEvolve 92–114 h, Optimus-1 33–44 h — all chains run in parallel, so the run fits before 10/06 if started by ~09/27.
+
+**Launch (09-23):** Stage A part 1 (12 chains: MineEvolve + Optimus-1 empty × 3 orders × 2 envs) via `scripts/supervise.py --plan configs/run_plan_stageA.yaml`. Optimus-1 full-memory chains (Stage A2) start once the authors' memory download finishes; Stage B chains after their smoke tests.

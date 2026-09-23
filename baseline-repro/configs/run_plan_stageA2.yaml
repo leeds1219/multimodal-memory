@@ -1,0 +1,33 @@
+stage: A2
+exclude_gpus:
+- 3
+- 4
+- 5
+max_gpus: 4
+note: Optimus-1 with the authors' full pre-built memory (D21b), 3 orders x 2 envs.
+chains:
+- env: M
+  method: optimus1
+  variant: prebuilt
+  order: order0
+- env: M
+  method: optimus1
+  variant: prebuilt
+  order: order1
+- env: M
+  method: optimus1
+  variant: prebuilt
+  order: order2
+- env: O
+  method: optimus1
+  variant: prebuilt
+  order: order0
+- env: O
+  method: optimus1
+  variant: prebuilt
+  order: order1
+- env: O
+  method: optimus1
+  variant: prebuilt
+  order: order2
+port_base: 9400

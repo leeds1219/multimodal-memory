@@ -131,6 +131,8 @@ def _compact_action(action: Mapping[str, Any]) -> Dict[str, Any]:
 class EpisodeMonitor:
     """Counts steps, records a gzip JSONL trajectory, checks success."""
 
+    KEYFRAME_EVERY = 100
+
     def __init__(self, episode_dir: Path, task_uid: str, horizon_steps: int) -> None:
         self.dir = Path(episode_dir)
         self.dir.mkdir(parents=True, exist_ok=True)
@@ -150,10 +152,15 @@ class EpisodeMonitor:
     def on_step(self, action: Mapping[str, Any], obs: Mapping[str, Any], done: bool, info: Mapping[str, Any] | None = None) -> None:
         self.steps += 1
         self.last_obs = obs
-        if self.steps == 1 and isinstance(obs, Mapping) and "pov" in obs:
-            try:  # first frame, for the same-seed fairness check
+        if isinstance(obs, Mapping) and "pov" in obs and (self.steps == 1 or self.steps % self.KEYFRAME_EVERY == 0 or done):
+            try:
                 from PIL import Image
-                Image.fromarray(np.asarray(obs["pov"], dtype=np.uint8)).save(self.dir / "first_frame.png")
+                img = Image.fromarray(np.asarray(obs["pov"], dtype=np.uint8))
+                if self.steps == 1:  # full-res first frame, for the same-seed fairness check
+                    img.save(self.dir / "first_frame.png")
+                kf = self.dir / "keyframes"
+                kf.mkdir(exist_ok=True)  # low-res keyframes for visual failure analysis
+                img.resize((320, 180)).save(kf / f"{self.steps:06d}.jpg", quality=70)
             except Exception:
                 pass
         inv = _inventory_of(obs)

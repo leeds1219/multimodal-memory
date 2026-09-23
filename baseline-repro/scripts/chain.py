@@ -150,7 +150,10 @@ class Chain:
     # --------------------------------------------------------------- episode
     def run_episode(self, task: str, ep: Path) -> dict:
         seed = SEEDS[task]
+        from cross_glue import env_m_group, env_o_group
+        genv = (env_m_group if self.a.env == "M" else env_o_group)(TASKS[task]["group"])
         write_ctx(self.ctx_file, {"env": self.a.env, "method": self.a.method, "chain": self.chain_id,
+                                  "horizon_steps": int(genv["max_minutes"]) * MINUTE,
                                   "order_id": self.a.order, "task": task, "seed": seed,
                                   "instruction": TASKS[task]["instruction"], "episode_dir": str(ep),
                                   "run_id": f"{self.a.env}/{self.chain_id}/{self.a.order}/{task}"})
