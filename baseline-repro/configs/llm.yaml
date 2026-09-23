@@ -1,0 +1,38 @@
+# Single source of truth for the planner backbone (every method, every env).
+model: gemini-3-flash-preview
+base_url: https://generativelanguage.googleapis.com/v1beta/openai/
+api_key_file: /home/rag/data/env.yaml   # GOOGLE_API_KEY="..." (never printed/logged)
+request_timeout_s: 300
+
+# Retries: exponential backoff 2^k s (capped at 60 s), then raise.
+max_retries: 6
+
+# Gemini counts thinking tokens against max_tokens. Methods' max_tokens were
+# set for non-thinking models (GPT-4o / Qwen) and bound the visible answer, so
+# the layer sends method_max_tokens + thinking_headroom (see DECISIONS.md D3).
+thinking_headroom_tokens: 16384
+
+# Fallbacks used ONLY when a method's original code does not set them.
+default_temperature: null     # null -> provider default
+default_max_tokens: null
+
+# Cost accounting (USD per 1M tokens). Thinking tokens are billed as output.
+# gemini-3-flash-preview list price; re-check against billing console.
+price_in_per_m: 0.50
+price_out_per_m: 3.00
+
+# Runaway guards (safety, not a budget).
+global_cap_usd: 3000.0                  # summed over all processes via ledger
+ledger_path: /home/rag/data/repro_runs/llm_ledger.jsonl
+episode_cost_multiplier: 10.0           # anomaly if > 10x smoke-test mean
+episode_call_multiplier: 10.0
+# Filled in after the smoke test (per method); null disables the guard.
+episode_mean_cost_usd: {}
+episode_mean_calls: {}
+
+# Response cache: OFF for evaluation; only for debugging.
+cache: false
+cache_dir: /home/rag/data/repro_runs/llm_cache
+
+# Mock mode (offline checks): LLM_MOCK=1 routes calls to llm/mock.py.
+log_root: /home/rag/data/repro_runs

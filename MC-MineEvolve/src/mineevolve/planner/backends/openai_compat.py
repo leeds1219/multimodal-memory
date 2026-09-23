@@ -52,11 +52,11 @@ class OpenAICompatibleBackend(PlannerBackend):
                 api_key_env,
                 self.name,
             )
-        self._client = OpenAI(
-            api_key=resolved_key or "missing",
-            base_url=base_url,
-            timeout=timeout,
-        )
+        # DEVIATION (allowed a): route every call through the shared Gemini
+        # layer (baseline-repro/llm); model comes from baseline-repro/configs/llm.yaml.
+        from gemini_client import GeminiClient
+
+        self._client = GeminiClient()
         self._model = model
         self._default_temperature = default_temperature
         self._default_max_tokens = default_max_tokens

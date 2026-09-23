@@ -1,0 +1,56 @@
+diff --git a/src/optimus1/models/gpt4_planning.py b/src/optimus1/models/gpt4_planning.py
+index 51af6f1..f1355f4 100644
+--- a/src/optimus1/models/gpt4_planning.py
++++ b/src/optimus1/models/gpt4_planning.py
+@@ -5,11 +5,10 @@ import openai
+ 
+ from .base_model import BasePlanningModel, BaseReflectionModel
+ 
+-client = openai.OpenAI(
+-    api_key="<your api key>",
+-    timeout=2000,
+-    max_retries=3,
+-)
++# DEVIATION: GPT-4o -> Gemini via shared client (model set in common/llm.yaml)
++from gemini_client import GeminiClient
++
++client = GeminiClient()
+ 
+ ## retrieval_prompt
+ retrieval_prompt = """
+@@ -152,7 +151,7 @@ class PlanningModel(BasePlanningModel, BaseReflectionModel):
+                     ],
+                 },
+             ],
+-            model="gpt-4o",
++            model="FROM_CONFIG",
+             max_tokens=2000,
+         )
+         return response.choices[0].message.content
+@@ -189,7 +188,7 @@ class PlanningModel(BasePlanningModel, BaseReflectionModel):
+                     ],
+                 },
+             ],
+-            model="gpt-4o",
++            model="FROM_CONFIG",
+             max_tokens=2000,
+         )
+         return response.choices[0].message.content
+@@ -252,7 +251,7 @@ class PlanningModel(BasePlanningModel, BaseReflectionModel):
+                     ],
+                 }
+             ],
+-            model="gpt-4o",
++            model="FROM_CONFIG",
+             max_tokens=2000,
+         )
+         return response.choices[0].message.content
+@@ -371,7 +370,7 @@ class PlanningModel(BasePlanningModel, BaseReflectionModel):
+                     "content": content,
+                 }
+             ],
+-            model="gpt-4o",
++            model="FROM_CONFIG",
+             max_tokens=2000,
+         )
+         return result.choices[0].message.content

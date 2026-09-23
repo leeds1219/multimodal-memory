@@ -1,0 +1,12 @@
+# @package _global_
+# Shared Gemini backbone for the baseline reproduction. The model id here is
+# ignored: baseline-repro/configs/llm.yaml is the single source of truth.
+# temperature / max_tokens are upstream's own values (conf/llm/gemini_flash.yaml).
+llm:
+  provider: gemini
+  model: see-baseline-repro-configs-llm.yaml
+  base_url: https://generativelanguage.googleapis.com/v1beta/openai/
+  api_key: null
+  timeout: 120.0
+  temperature: 0.2
+  max_tokens: 1536

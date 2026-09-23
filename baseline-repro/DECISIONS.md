@@ -1,0 +1,14 @@
+# Decisions
+
+Ambiguous choices made while working autonomously. Format: options → choice → reason.
+
+| ID | Date | Decision | Options considered | Choice | Reason |
+|----|------|----------|--------------------|--------|--------|
+| D1 | 09-23 | Planner model | gemini-3-flash-preview, gemini-3.1-pro-preview | `gemini-3-flash-preview` for every LLM call of every method | User: the MineEvolve paper uses Gemini 3.0; the only 3.0 text model on the key is 3-flash-preview. Vision verified. Set once in `configs/llm.yaml`. |
+| D2 | 09-23 | STEVE-1 weights | Official STEVE-1 release / MineStudio HF mirror / Optimus-1's bundle | Optimus-1's `optimus1_steve1_ckpt.zip` (VPT 2x.model, steve1.weights, steve1_prior.pt, MineCLIP attn.pth) for every method | One download, same files layout MineEvolve expects (`checkpoints/`); guarantees identical controller weights across methods. MineEvolve's checkpoints/ is a symlink to it. |
+| D3 | 09-23 | `max_tokens` with a thinking model | (a) send literally, (b) lower thinking effort, (c) method max_tokens + fixed thinking headroom | (c) `thinking_headroom_tokens: 16384` added in the shared layer, same for all methods | Verified: Gemini counts thinking tokens against max_tokens (max_tokens=100 → 1 visible char; an Optimus-1 image call used 1,916 thinking tokens of its 2,000). The methods' limits were set for non-thinking models and bound the *answer*; sending them literally would truncate answers because of the model swap, not the method. (b) would change the chosen model's behaviour. Logged per call: `method_max_tokens` and sent value. |
+| D4 | 09-23 | Base branch | main / `fix/mineevolve-env-and-runtime` / `feature/gemini-repro-fixes` | `fix/mineevolve-env-and-runtime` | Its 4 fixes are compatibility-only (docs/fixes.md). `feature/gemini-repro-fixes` changes the algorithm (prompt cuts, new approach primitive, scripted executor) → not faithful, not used. |
+| D5 | 09-23 | Python env | one env per repo / one shared env | one conda env `mcagent` (py3.10, torch 2.9.1+cu128) | Disk (~15 GB free); both baselines' deps coexist. Env-specific MineRL builds handled separately (see env comparison). |
+| D6 | 09-23 | transformers version for Optimus-1 | latest 5.x / 4.44.2 | 4.44.2 | 5.x breaks the (unused but imported) DeepSeek-VL module at import; 4.44.2 is the minimum in Optimus-1's requirements.txt (uv.lock is empty). |
+| D7 | 09-23 | Task list / seeds / orders | — | `configs/tasks.yaml` from MineEvolve's 7 benchmark yamls (70 tasks); `configs/seeds.yaml` 1 seed per task (`random.Random(12345)`); `configs/task_orders.yaml` 3 orders (`random.Random(20260923)`) | Generated once, reused by every method and both envs. |
+| D8 | 09-23 | Run output location | inside repo / separate dir | `/home/rag/data/repro_runs/runs/{env}/{method}/{order_id}/{task}/{seed}/` (git-ignored, symlinked as `baseline-repro/runs`) | Keeps large outputs out of git. |

@@ -1,0 +1,360 @@
+source: MC-MineEvolve/src/mineevolve/conf/benchmark/*.yaml (upstream a0a5f9b)
+horizon_minutes:
+  wooden: 2
+  stone: 3
+  iron: 20
+  gold: 10
+  redstone: 15
+  diamond: 30
+  armor: 25
+tasks:
+- uid: wooden_00
+  group: wooden
+  local_id: 0
+  type: craft
+  instruction: Craft a wooden pickaxe
+- uid: wooden_01
+  group: wooden
+  local_id: 1
+  type: craft
+  instruction: Craft a wooden axe
+- uid: wooden_02
+  group: wooden
+  local_id: 2
+  type: craft
+  instruction: Craft a wooden shovel
+- uid: wooden_03
+  group: wooden
+  local_id: 3
+  type: craft
+  instruction: Craft a wooden hoe
+- uid: wooden_04
+  group: wooden
+  local_id: 4
+  type: craft
+  instruction: Craft a wooden sword
+- uid: wooden_05
+  group: wooden
+  local_id: 5
+  type: craft
+  instruction: Craft a stick
+- uid: wooden_06
+  group: wooden
+  local_id: 6
+  type: craft
+  instruction: Craft a crafting table
+- uid: wooden_07
+  group: wooden
+  local_id: 7
+  type: craft
+  instruction: Craft an oak plank
+- uid: wooden_08
+  group: wooden
+  local_id: 8
+  type: mine
+  instruction: Chop an oak log from a tree
+- uid: wooden_09
+  group: wooden
+  local_id: 9
+  type: mine
+  instruction: Collect a sapling from a tree
+- uid: wooden_10
+  group: wooden
+  local_id: 10
+  type: mine
+  instruction: Punch a tree to gather wood without tools
+- uid: stone_00
+  group: stone
+  local_id: 0
+  type: craft
+  instruction: Craft a stone pickaxe
+- uid: stone_01
+  group: stone
+  local_id: 1
+  type: craft
+  instruction: Craft a stone axe
+- uid: stone_02
+  group: stone
+  local_id: 2
+  type: craft
+  instruction: Craft a stone shovel
+- uid: stone_03
+  group: stone
+  local_id: 3
+  type: craft
+  instruction: Craft a stone hoe
+- uid: stone_04
+  group: stone
+  local_id: 4
+  type: craft
+  instruction: Craft a stone sword
+- uid: stone_05
+  group: stone
+  local_id: 5
+  type: craft
+  instruction: Craft a furnace
+- uid: stone_06
+  group: stone
+  local_id: 6
+  type: craft
+  instruction: Upgrade a wooden pickaxe to a stone pickaxe
+- uid: stone_07
+  group: stone
+  local_id: 7
+  type: mine
+  instruction: Mine cobblestone with a wooden pickaxe
+- uid: stone_08
+  group: stone
+  local_id: 8
+  type: mine
+  instruction: Mine stone slab material from a stone outcrop
+- uid: stone_09
+  group: stone
+  local_id: 9
+  type: mine
+  instruction: Mine eight cobblestone blocks for a furnace
+- uid: iron_00
+  group: iron
+  local_id: 0
+  type: craft
+  instruction: Craft an iron pickaxe
+- uid: iron_01
+  group: iron
+  local_id: 1
+  type: craft
+  instruction: Craft an iron axe
+- uid: iron_02
+  group: iron
+  local_id: 2
+  type: craft
+  instruction: Craft an iron shovel
+- uid: iron_03
+  group: iron
+  local_id: 3
+  type: craft
+  instruction: Craft an iron hoe
+- uid: iron_04
+  group: iron
+  local_id: 4
+  type: craft
+  instruction: Craft an iron sword
+- uid: iron_05
+  group: iron
+  local_id: 5
+  type: craft
+  instruction: Craft a bucket
+- uid: iron_06
+  group: iron
+  local_id: 6
+  type: craft
+  instruction: Craft a hopper
+- uid: iron_07
+  group: iron
+  local_id: 7
+  type: craft
+  instruction: Craft a rail
+- uid: iron_08
+  group: iron
+  local_id: 8
+  type: craft
+  instruction: Craft shears
+- uid: iron_09
+  group: iron
+  local_id: 9
+  type: craft
+  instruction: Craft a smithing table
+- uid: iron_10
+  group: iron
+  local_id: 10
+  type: craft
+  instruction: Craft an iron nugget
+- uid: iron_11
+  group: iron
+  local_id: 11
+  type: craft
+  instruction: Craft iron bars
+- uid: iron_12
+  group: iron
+  local_id: 12
+  type: smelt
+  instruction: Smelt iron ore into iron ingot
+- uid: iron_13
+  group: iron
+  local_id: 13
+  type: mine
+  instruction: Dig down to mine iron ore
+- uid: iron_14
+  group: iron
+  local_id: 14
+  type: mine
+  instruction: Mine three iron ore blocks
+- uid: iron_15
+  group: iron
+  local_id: 15
+  type: craft
+  instruction: Trade with a villager to obtain an iron ingot
+- uid: gold_00
+  group: gold
+  local_id: 0
+  type: craft
+  instruction: Craft a golden pickaxe
+- uid: gold_01
+  group: gold
+  local_id: 1
+  type: craft
+  instruction: Craft a golden axe
+- uid: gold_02
+  group: gold
+  local_id: 2
+  type: craft
+  instruction: Craft a golden sword
+- uid: gold_03
+  group: gold
+  local_id: 3
+  type: craft
+  instruction: Craft a golden hoe
+- uid: gold_04
+  group: gold
+  local_id: 4
+  type: craft
+  instruction: Craft a golden apple
+- uid: gold_05
+  group: gold
+  local_id: 5
+  type: craft
+  instruction: Craft a golden carrot
+- uid: gold_06
+  group: gold
+  local_id: 6
+  type: smelt
+  instruction: Smelt gold ore into gold ingot
+- uid: redstone_00
+  group: redstone
+  local_id: 0
+  type: mine
+  instruction: Mine redstone ore using an iron pickaxe
+- uid: redstone_01
+  group: redstone
+  local_id: 1
+  type: craft
+  instruction: Craft a redstone torch
+- uid: redstone_02
+  group: redstone
+  local_id: 2
+  type: craft
+  instruction: Craft a redstone repeater
+- uid: redstone_03
+  group: redstone
+  local_id: 3
+  type: craft
+  instruction: Craft a redstone comparator
+- uid: redstone_04
+  group: redstone
+  local_id: 4
+  type: craft
+  instruction: Craft a piston
+- uid: redstone_05
+  group: redstone
+  local_id: 5
+  type: craft
+  instruction: Craft a clock
+- uid: diamond_00
+  group: diamond
+  local_id: 0
+  type: mine
+  instruction: Dig down and mine a diamond
+- uid: diamond_01
+  group: diamond
+  local_id: 1
+  type: craft
+  instruction: Craft a diamond pickaxe
+- uid: diamond_02
+  group: diamond
+  local_id: 2
+  type: craft
+  instruction: Craft a diamond axe
+- uid: diamond_03
+  group: diamond
+  local_id: 3
+  type: craft
+  instruction: Craft a diamond shovel
+- uid: diamond_04
+  group: diamond
+  local_id: 4
+  type: craft
+  instruction: Craft a diamond hoe
+- uid: diamond_05
+  group: diamond
+  local_id: 5
+  type: craft
+  instruction: Craft a diamond sword
+- uid: diamond_06
+  group: diamond
+  local_id: 6
+  type: craft
+  instruction: Craft a jukebox
+- uid: armor_00
+  group: armor
+  local_id: 0
+  type: craft
+  instruction: Craft a leather helmet
+- uid: armor_01
+  group: armor
+  local_id: 1
+  type: craft
+  instruction: Craft a leather chestplate
+- uid: armor_02
+  group: armor
+  local_id: 2
+  type: craft
+  instruction: Craft leather leggings
+- uid: armor_03
+  group: armor
+  local_id: 3
+  type: craft
+  instruction: Craft leather boots
+- uid: armor_04
+  group: armor
+  local_id: 4
+  type: craft
+  instruction: Craft an iron helmet
+- uid: armor_05
+  group: armor
+  local_id: 5
+  type: craft
+  instruction: Craft an iron chestplate
+- uid: armor_06
+  group: armor
+  local_id: 6
+  type: craft
+  instruction: Craft iron leggings
+- uid: armor_07
+  group: armor
+  local_id: 7
+  type: craft
+  instruction: Craft iron boots
+- uid: armor_08
+  group: armor
+  local_id: 8
+  type: craft
+  instruction: Craft a shield
+- uid: armor_09
+  group: armor
+  local_id: 9
+  type: craft
+  instruction: Craft a turtle shell helmet
+- uid: armor_10
+  group: armor
+  local_id: 10
+  type: craft
+  instruction: Wash a leather chestplate in a cauldron
+- uid: armor_11
+  group: armor
+  local_id: 11
+  type: craft
+  instruction: Repair an iron helmet at a smithing table
+- uid: armor_12
+  group: armor
+  local_id: 12
+  type: kill
+  instruction: Kill a cow to obtain leather
