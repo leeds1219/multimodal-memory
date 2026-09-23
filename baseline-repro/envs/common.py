@@ -142,12 +142,20 @@ class EpisodeMonitor:
         self.end_reason: Optional[str] = None
         self.last_inventory: Dict[str, int] = {}
         self.last_pos: Optional[list] = None
+        self.last_obs: Any = None
         self.deaths = 0
         self._traj = gzip.open(self.dir / "trajectory.jsonl.gz", "wt")
         self._t0 = _time.time()
 
     def on_step(self, action: Mapping[str, Any], obs: Mapping[str, Any], done: bool, info: Mapping[str, Any] | None = None) -> None:
         self.steps += 1
+        self.last_obs = obs
+        if self.steps == 1 and isinstance(obs, Mapping) and "pov" in obs:
+            try:  # first frame, for the same-seed fairness check
+                from PIL import Image
+                Image.fromarray(np.asarray(obs["pov"], dtype=np.uint8)).save(self.dir / "first_frame.png")
+            except Exception:
+                pass
         inv = _inventory_of(obs)
         rec: Dict[str, Any] = {"t": self.steps}
         a = _compact_action(action)
@@ -209,7 +217,7 @@ class GameTime:
 def llm_summary(episode_dir: Path) -> Dict[str, Any]:
     f = Path(episode_dir) / "llm" / "calls.jsonl"
     s = {"llm_calls": 0, "tokens_in": 0, "tokens_out_billed": 0, "cost_usd": 0.0, "llm_errors": 0,
-         "llm_truncated": 0, "llm_latency_s": 0.0}
+         "llm_truncated": 0, "llm_latency_s": 0.0, "llm_calls_by_caller": {}}
     if not f.exists():
         return s
     for line in open(f):
@@ -224,6 +232,8 @@ def llm_summary(episode_dir: Path) -> Dict[str, Any]:
         s["llm_latency_s"] += r.get("latency_s") or 0.0
         s["llm_errors"] += 1 if r.get("error") else 0
         s["llm_truncated"] += 1 if r.get("finish_reason") == "length" else 0
+        fn = str(r.get("caller") or "?").split(":")[-1]
+        s["llm_calls_by_caller"][fn] = s["llm_calls_by_caller"].get(fn, 0) + 1
     s["cost_usd"] = round(s["cost_usd"], 5)
     s["llm_latency_s"] = round(s["llm_latency_s"], 1)
     return s

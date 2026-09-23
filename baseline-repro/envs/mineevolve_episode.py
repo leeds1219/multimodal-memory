@@ -56,8 +56,6 @@ def main() -> int:
     ap.add_argument("--episode-dir", required=True)
     ap.add_argument("--port", type=int, required=True)
     args = ap.parse_args()
-    if args.env != "M":
-        raise SystemExit("Env O glue for MineEvolve lives in mineevolve_episode_envO (not yet)")
 
     task = TASKS[args.task]
     seed = int(args.seed if args.seed is not None else SEEDS[args.task])
@@ -78,27 +76,42 @@ def main() -> int:
     from functional_craft import FunctionalCraftHelper
 
     cfg = compose_cfg(task["group"], args.port, ep)
-    horizon = int(me._benchmark_cfg(cfg).env.max_minutes) * MINUTE
-    mon = EpisodeMonitor(ep, args.task, horizon)
+    if args.env == "M":
+        # Env M: MineEvolve's AutoPickaxeMixin reads obs["plain_inventory"], which
+        # its env spec never requests (dead code as released). The paper's action
+        # space includes switching inventory slots, so add the per-slot inventory
+        # observation (Optimus-1's handler; our MineRL build serves it). DECISIONS D19.
+        from mineevolve.env import custom_env as me_spec
+        from optimus1.env.plain_inventory import PlainInventoryObservation
 
-    # ---- env + per-step monitor ------------------------------------------
-    env = make_env(cfg, logger=log)
-    inner_step = env.env.step
+        _orig_obs = me_spec.MineEvolveBaseSpec.create_observables
+        me_spec.MineEvolveBaseSpec.create_observables = lambda self: list(_orig_obs(self)) + [PlainInventoryObservation()]
+        horizon = int(me._benchmark_cfg(cfg).env.max_minutes) * MINUTE
+        mon = EpisodeMonitor(ep, args.task, horizon)
+        env = make_env(cfg, logger=log)
+        inner_step = env.env.step
 
-    def monitored_step(action):
-        obs, reward, done, info = inner_step(action)
-        mon.on_step(action, obs, done, info)
-        return obs, reward, done, info
+        def monitored_step(action):
+            obs, reward, done, info = inner_step(action)
+            mon.on_step(action, obs, done, info)
+            return obs, reward, done, info
 
-    env.env.step = monitored_step
-    # Optimus's MineRL build (DECISIONS D10) adds ``execute_cmd`` to the raw
-    # env; stock MineRL 1.0.2 (what Env M expects) has none, so MineEvolve's
-    # wrapper sends chat commands as a normal step. Hide it to keep that path.
-    env.env.execute_cmd = None
-    env.seed(seed)
+        env.env.step = monitored_step
+        # Optimus's MineRL build (DECISIONS D10) adds ``execute_cmd`` to the raw
+        # env; stock MineRL 1.0.2 (what Env M expects) has none, so MineEvolve's
+        # wrapper sends chat commands as a normal step. Hide it to keep that path.
+        env.env.execute_cmd = None
+        env.seed(seed)
+        me.CraftHelper = FunctionalCraftHelper
+    else:
+        # Env O: Optimus-1's env spec + wrapper under MineEvolve's wrapper,
+        # Optimus-1's GUI craft/smelt helpers (cross_glue.mineevolve_in_O).
+        from cross_glue import env_o_group, mineevolve_in_O
+        horizon = int(env_o_group(task["group"])["max_minutes"]) * MINUTE
+        mon = EpisodeMonitor(ep, args.task, horizon)
+        env, horizon = mineevolve_in_O(me, mon, task["group"], seed, cfg, log)
 
     # ---- method glue --------------------------------------------------------
-    me.CraftHelper = FunctionalCraftHelper
     me.time = GameTime(mon)
 
     native = {}

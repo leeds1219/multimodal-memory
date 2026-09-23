@@ -76,8 +76,6 @@ def main() -> int:
     ap.add_argument("--port", type=int, required=True)
     ap.add_argument("--workdir", required=True)
     args = ap.parse_args()
-    if args.env != "O":
-        raise SystemExit("Env M glue for Optimus-1 is not implemented yet")
 
     task = TASKS[args.task]
     seed = int(args.seed if args.seed is not None else SEEDS[args.task])
@@ -96,11 +94,15 @@ def main() -> int:
     import yaml
     import optimus1.main as om
 
-    bench = yaml.safe_load(open(Path(om.__file__).parent / "conf" / "benchmark" / f"{O_GROUP[task['group']]}.yaml"))
-    horizon = int(bench["env"]["max_minutes"]) * MINUTE
-    mon = EpisodeMonitor(ep, args.task, horizon)
+    from cross_glue import env_m_group, env_o_group, optimus_in_M
 
-    # ---- env: seed + per-step monitor -------------------------------------
+    genv = env_o_group(task["group"]) if args.env == "O" else env_m_group(task["group"])
+    horizon = int(genv["max_minutes"]) * MINUTE
+    mon = EpisodeMonitor(ep, args.task, horizon)
+    if args.env == "M":
+        optimus_in_M(om, mon, task["group"], seed)
+
+    # ---- Env O: seed + per-step monitor on Optimus-1's own env ------------
     orig_make = om.env_make
 
     def env_make(env_id, cfg, logger):
@@ -117,7 +119,8 @@ def main() -> int:
         env.seed(seed)
         return env
 
-    om.env_make = env_make
+    if args.env == "O":
+        om.env_make = env_make
 
     native = {}
     orig_do = om.agent_do
@@ -159,9 +162,17 @@ def main() -> int:
         om.main.__wrapped__(cfg)
     except SystemExit:
         pass
-    except BaseException:
-        status, err = "crashed", traceback.format_exc()
+    except BaseException as e:
+        err = traceback.format_exc()
         print(err)
+        # The JARVIS helpers raise RuntimeError("Timeout!") when the horizon
+        # runs out mid-GUI-action (uncaught in optimus1.main as released):
+        # that is the episode's normal end, not a crash.
+        if mon.steps >= horizon or mon.over or "Timeout!" in str(e):
+            mon.end_reason = mon.end_reason or "horizon"
+            native.setdefault("status", "failed")
+        else:
+            status = "crashed"
     finally:
         mon.close()
         stop.set()
@@ -170,6 +181,11 @@ def main() -> int:
     if not native:
         status = "crashed" if status == "finished" else status
         err = err or "agent_do did not return (see client.log)"
+    llm = llm_summary(ep)
+    # Optimus-1 silently falls back to its built-in example plan when the
+    # planning request is never made (e.g. retrieve_graph KeyError on the
+    # inferred goal): record where the executed plan came from (DECISIONS D20).
+    plan_source = "llm" if llm["llm_calls_by_caller"].get("planning") else "example_fallback"
     anomaly = (ep / "ANOMALY").exists()
     result = {
         "env": args.env, "method": os.environ.get("METHOD", "optimus1"), "task": args.task,
@@ -179,7 +195,7 @@ def main() -> int:
         "success": mon.success_step is not None, "success_step": mon.success_step,
         "native_success": (native.get("status") == "success") if native else None,
         "steps": mon.steps, "horizon_steps": horizon, "wall_time_s": round(time.time() - t0, 1),
-        "final_inventory": mon.last_inventory, **llm_summary(ep), "error": err,
+        "final_inventory": mon.last_inventory, "plan_source": plan_source, **llm, "error": err,
         "disk_free_gb": round(disk_free_gb(), 1),
     }
     write_result(ep, result)
