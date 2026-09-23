@@ -80,3 +80,7 @@ Checks: plans parse (MineEvolve JSON, Optimus retrieval/reflection formats); Opt
 **Projection** (every episode to its horizon = upper bound; mid = 60 %): LLM cost for all 22 planned chains ≈ **$1,224 upper / $735 mid** (cap $3,000). Longest chain ≈ 149 h (JARVIS-1, Env M), MineEvolve 92–114 h, Optimus-1 33–44 h — all chains run in parallel, so the run fits before 10/06 if started by ~09/27.
 
 **Launch (09-23):** Stage A part 1 (12 chains: MineEvolve + Optimus-1 empty × 3 orders × 2 envs) via `scripts/supervise.py --plan configs/run_plan_stageA.yaml`. Optimus-1 full-memory chains (Stage A2) start once the authors' memory download finishes; Stage B chains after their smoke tests.
+
+### 09-23 08:30 — Stage B smoke done, all stages launched
+Stage B smoke (DEPS / JARVIS-1, 3 tasks × 2 envs): DEPS 4/6 successes, JARVIS-1 5/6; no truncations; JARVIS-1 stone_00 in Env M hit the 12-replan cap (145 calls, $1.19). One infra crash (Minecraft socket timeout) retried successfully.
+Running: Stage A (12 chains, launched 07:54), Stage A2 (Optimus-1 with the authors' full memory, 6 chains, 08:24), Stage B (4 chains, 08:30). GPUs 0, 1, 2, 7 (idle at launch: 0 MiB + matmul test); GPU 6 used for tests and Optimus-3 setup. Stage C (Optimus-3) harness in progress.
