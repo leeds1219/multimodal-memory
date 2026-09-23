@@ -27,7 +27,10 @@ CAP=$(python -c "print(round($N * $USD_PER_EPISODE * 1.3, 2))")
 log "guard session cap \$$CAP for $N episodes"
 
 MINEEVOLVE_MEMORY_PATH="$STORE" MINEEVOLVE_PORT="$PORT" \
+MINEEVOLVE_NEARBY_BLOCKS="${NEARBY:-0}" \
 MINEEVOLVE_GUARD_MAX_USD_TOTAL="$CAP" MINEEVOLVE_GUARD_DIR="logs/llm_guard/${TAG}" \
+MINEEVOLVE_GUARD_MAX_CALLS_PER_EPISODE="${GUARD_CALLS:-150}" \
+MINEEVOLVE_GUARD_MAX_USD_PER_EPISODE="${GUARD_USD_EP:-1.20}" \
 MINEEVOLVE_LLM_LOG="logs/llm_calls_${TAG}.jsonl" \
   nohup bash scripts/server_gemini.sh > "logs/server_${TAG}.log" 2>&1 &
 for _ in $(seq 1 60); do sleep 5; grep -q "Uvicorn running" "logs/server_${TAG}.log" && break; done
