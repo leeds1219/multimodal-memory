@@ -82,6 +82,11 @@ class Chain:
         self.env_vars = {**os.environ, "LLM_CTX_FILE": str(self.ctx_file), "METHOD": a.method}
         if a.mock:
             self.env_vars["LLM_MOCK"] = "1"
+        # Which server provides STEVE-1: the method's own (Stage A) or, for the
+        # Stage B ports, the evaluation env's native one (MineEvolve server for
+        # Env M, Optimus-1 server for Env O); their LLM parts stay unused.
+        self.server_kind = a.method if a.method in ("mineevolve", "optimus1") else (
+            "mineevolve" if a.env == "M" else "optimus1")
         if a.method == "optimus1":
             from optimus_workdir import make_workdir
             self.wd = make_workdir(self.state / "wd", a.variant or "empty")
@@ -89,6 +94,14 @@ class Chain:
         elif a.method == "mineevolve":
             self.memory = self.state / "kb"
             self.memory.mkdir(exist_ok=True)
+        elif a.method in ("deps", "jarvis1"):  # no cross-task memory
+            self.memory = self.state / "no_memory"
+            self.memory.mkdir(exist_ok=True)
+            if self.server_kind == "optimus1":
+                from optimus_workdir import make_workdir
+                self.wd = make_workdir(self.state / "wd", "empty")
+            else:
+                self.kb_unused = self.state / "kb_unused"
         else:
             raise SystemExit(f"unknown method {a.method}")
         self.initial = self.snaps / "00_initial"
@@ -120,9 +133,10 @@ class Chain:
     # ---------------------------------------------------------------- server
     def start_server(self, ep: Path) -> subprocess.Popen:
         free_port(self.a.port)
-        if self.a.method == "mineevolve":
+        if self.server_kind == "mineevolve":
+            kb = self.memory if self.a.method == "mineevolve" else self.kb_unused
             cmd = [str(REPRO / "scripts" / "start_mineevolve_server.sh"), str(self.a.gpu), str(self.a.port),
-                   str(self.memory), str(self.ctx_file), str(ep / "server.log")]
+                   str(kb), str(self.ctx_file), str(ep / "server.log")]
         else:
             cmd = [str(REPRO / "scripts" / "start_optimus_server.sh"), str(self.a.gpu), str(self.a.port),
                    str(self.wd), str(self.ctx_file), str(ep / "server.log")]
@@ -141,11 +155,14 @@ class Chain:
                                   "instruction": TASKS[task]["instruction"], "episode_dir": str(ep),
                                   "run_id": f"{self.a.env}/{self.chain_id}/{self.a.order}/{task}"})
         server = self.start_server(ep)
-        script = "mineevolve_episode.py" if self.a.method == "mineevolve" else "optimus_episode.py"
+        script = {"mineevolve": "mineevolve_episode.py", "optimus1": "optimus_episode.py"}.get(
+            self.a.method, "stageb_episode.py")
         cmd = ["xvfb-run", "-a", PY, str(REPRO / "envs" / script), "--env", self.a.env, "--task", task,
                "--seed", str(seed), "--order-id", self.a.order, "--episode-dir", str(ep), "--port", str(self.a.port)]
         if self.a.method == "optimus1":
             cmd += ["--workdir", str(self.wd)]
+        if self.a.method in ("deps", "jarvis1"):
+            cmd += ["--method", self.a.method]
         t0 = time.time()
         with open(ep / "launcher.log", "a") as lf:
             p = subprocess.Popen(cmd, env=self.env_vars, stdout=lf, stderr=subprocess.STDOUT, start_new_session=True)
@@ -211,7 +228,7 @@ class Chain:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--env", required=True, choices=["M", "O"])
-    ap.add_argument("--method", required=True, choices=["mineevolve", "optimus1"])
+    ap.add_argument("--method", required=True, choices=["mineevolve", "optimus1", "deps", "jarvis1"])
     ap.add_argument("--variant", default="", help="optimus1: empty | prebuilt")
     ap.add_argument("--order", default="order0")
     ap.add_argument("--tasks", default="", help="comma list; default = the whole order")

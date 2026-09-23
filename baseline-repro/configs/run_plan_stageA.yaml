@@ -1,0 +1,75 @@
+stage: A
+exclude_gpus:
+- 3
+- 4
+- 5
+max_gpus: 4
+note: 'Stage A: MineEvolve + Optimus-1 (empty and repo-shipped prebuilt memory), 3
+  task orders, both envs. Every chain = 70 tasks x 1 seed.'
+chains:
+- env: M
+  method: mineevolve
+  order: order0
+- env: M
+  method: optimus1
+  variant: empty
+  order: order0
+- env: M
+  method: optimus1
+  variant: prebuilt
+  order: order0
+- env: M
+  method: mineevolve
+  order: order1
+- env: M
+  method: optimus1
+  variant: empty
+  order: order1
+- env: M
+  method: optimus1
+  variant: prebuilt
+  order: order1
+- env: M
+  method: mineevolve
+  order: order2
+- env: M
+  method: optimus1
+  variant: empty
+  order: order2
+- env: M
+  method: optimus1
+  variant: prebuilt
+  order: order2
+- env: O
+  method: mineevolve
+  order: order0
+- env: O
+  method: optimus1
+  variant: empty
+  order: order0
+- env: O
+  method: optimus1
+  variant: prebuilt
+  order: order0
+- env: O
+  method: mineevolve
+  order: order1
+- env: O
+  method: optimus1
+  variant: empty
+  order: order1
+- env: O
+  method: optimus1
+  variant: prebuilt
+  order: order1
+- env: O
+  method: mineevolve
+  order: order2
+- env: O
+  method: optimus1
+  variant: empty
+  order: order2
+- env: O
+  method: optimus1
+  variant: prebuilt
+  order: order2

@@ -35,7 +35,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "llm"))
 
-from common import EpisodeMonitor, SEEDS, TASKS, disk_free_gb, llm_summary, write_result  # noqa: E402
+from common import EpisodeMonitor, SEEDS, TASKS, disk_free_gb, is_method_exception, llm_summary, write_result  # noqa: E402
 
 MINUTE = 1200
 O_GROUP = {"wooden": "wooden", "stone": "stone", "iron": "iron", "gold": "golden",
@@ -170,6 +170,9 @@ def main() -> int:
         # that is the episode's normal end, not a crash.
         if mon.steps >= horizon or mon.over or "Timeout!" in str(e):
             mon.end_reason = mon.end_reason or "horizon"
+            native.setdefault("status", "failed")
+        elif is_method_exception(e):  # released code failed: episode over (D25)
+            mon.end_reason = "method_exception"
             native.setdefault("status", "failed")
         else:
             status = "crashed"

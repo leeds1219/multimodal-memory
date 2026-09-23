@@ -29,7 +29,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "llm"))
 
-from common import (EpisodeEnd, EpisodeMonitor, GameTime, SEEDS, TASKS, disk_free_gb,  # noqa: E402
+from common import (EpisodeEnd, EpisodeMonitor, GameTime, SEEDS, TASKS, disk_free_gb, is_method_exception,  # noqa: E402
                     llm_summary, write_result)
 
 MINUTE = 1200
@@ -151,9 +151,13 @@ def main() -> int:
         end = "plan_finished"
     except EpisodeEnd as e:
         end = str(e) or "done"
-    except Exception as e:  # crash inside the method
-        status, end, err = "crashed", "exception", traceback.format_exc()
+    except Exception as e:
+        err = traceback.format_exc()
         log.error(err)
+        if is_method_exception(e):  # released code failed: episode over (D25)
+            end = "method_exception"
+        else:
+            status, end = "crashed", "exception"
     finally:
         mon.close()
         try:

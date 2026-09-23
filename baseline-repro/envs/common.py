@@ -243,3 +243,16 @@ def write_result(episode_dir: Path, result: Mapping[str, Any]) -> None:
     tmp = Path(episode_dir) / "result.json.tmp"
     tmp.write_text(json.dumps(dict(result), indent=2))
     os.replace(tmp, Path(episode_dir) / "result.json")
+
+
+METHOD_CODE_DIRS = ("/home/rag/data/official/NeurIPS24-Optimus-1/src/optimus1/",
+                    "/home/rag/data/multimodal-memory/MC-MineEvolve/src/mineevolve/")
+
+
+def is_method_exception(exc: BaseException) -> bool:
+    """True if the innermost frame of the traceback is in the method's own code
+    (the released algorithm failed), False for env / server / glue errors."""
+    import traceback as _tb
+    frames = _tb.extract_tb(exc.__traceback__)
+    return bool(frames) and frames[-1].filename.startswith(METHOD_CODE_DIRS)
+
