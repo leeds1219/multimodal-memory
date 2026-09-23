@@ -65,13 +65,13 @@ def _optimus(text: str, ctx: dict) -> str | None:
 
 # MineEvolve style subgoals
 _ME_STEPS = {
-    "log": [("chop a tree", "mine", "stevei", "oak_log", 1)],
-    "planks": [("chop a tree", "mine", "stevei", "oak_log", 1), ("craft planks", "craft", "mc_craft", "oak_planks", 4)],
-    "crafting table": [("chop a tree", "mine", "stevei", "oak_log", 1),
-                       ("craft planks", "craft", "mc_craft", "oak_planks", 4),
+    "log": [("chop a tree", "mine", "stevei", "log", 1)],
+    "planks": [("chop a tree", "mine", "stevei", "log", 1), ("craft planks", "craft", "mc_craft", "planks", 4)],
+    "crafting table": [("chop a tree", "mine", "stevei", "log", 1),
+                       ("craft planks", "craft", "mc_craft", "planks", 4),
                        ("craft crafting table", "craft", "mc_craft", "crafting_table", 1)],
-    "wooden pickaxe": [("chop a tree", "mine", "stevei", "oak_log", 3),
-                       ("craft planks", "craft", "mc_craft", "oak_planks", 12),
+    "wooden pickaxe": [("chop a tree", "mine", "stevei", "log", 3),
+                       ("craft planks", "craft", "mc_craft", "planks", 12),
                        ("craft sticks", "craft", "mc_craft", "stick", 4),
                        ("craft crafting table", "craft", "mc_craft", "crafting_table", 1),
                        ("craft wooden pickaxe", "craft", "mc_craft", "wooden_pickaxe", 1)],

@@ -1,0 +1,18 @@
+diff --git a/mineclip/__init__.py b/mineclip/__init__.py
+index 2c091a2..6e55145 100644
+--- a/mineclip/__init__.py
++++ b/mineclip/__init__.py
+@@ -1,8 +1,11 @@
+ from .mineclip import MineCLIP
+-from .dense_reward import (
++try:  # REPRO compat: dense_reward needs minedojo, unused by STEVE-1
++    from .dense_reward import (
+     AnimalZooDenseRewardWrapper,
+     HuntCowDenseRewardEnv,
+     MobCombatDenseRewardWrapper,
+     CombatSpiderDenseRewardEnv,
+-)
++    )
++except ImportError:
++    pass
+ from .mineagent import *

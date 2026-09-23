@@ -1,0 +1,295 @@
+rule: success iff sum(inventory[i] for i in any_of) >= count at any step before the
+  horizon; '#tag' expands via Optimus-1 tag_items.json. Applied identically to every
+  method in both envs; each env's native checker is recorded as a secondary field.
+targets:
+  wooden_00:
+    any_of:
+    - wooden_pickaxe
+    count: 1
+  wooden_01:
+    any_of:
+    - wooden_axe
+    count: 1
+  wooden_02:
+    any_of:
+    - wooden_shovel
+    count: 1
+  wooden_03:
+    any_of:
+    - wooden_hoe
+    count: 1
+  wooden_04:
+    any_of:
+    - wooden_sword
+    count: 1
+  wooden_05:
+    any_of:
+    - stick
+    count: 1
+  wooden_06:
+    any_of:
+    - crafting_table
+    count: 1
+  wooden_07:
+    any_of:
+    - oak_planks
+    count: 1
+  wooden_08:
+    any_of:
+    - oak_log
+    count: 1
+  wooden_09:
+    any_of:
+    - '#saplings'
+    count: 1
+    note: any sapling
+  wooden_10:
+    any_of:
+    - '#logs'
+    count: 1
+    note: any log = wood
+  stone_00:
+    any_of:
+    - stone_pickaxe
+    count: 1
+  stone_01:
+    any_of:
+    - stone_axe
+    count: 1
+  stone_02:
+    any_of:
+    - stone_shovel
+    count: 1
+  stone_03:
+    any_of:
+    - stone_hoe
+    count: 1
+  stone_04:
+    any_of:
+    - stone_sword
+    count: 1
+  stone_05:
+    any_of:
+    - furnace
+    count: 1
+  stone_06:
+    any_of:
+    - stone_pickaxe
+    count: 1
+  stone_07:
+    any_of:
+    - cobblestone
+    count: 1
+  stone_08:
+    any_of:
+    - cobblestone
+    - stone
+    count: 1
+    note: mining stone yields cobblestone
+  stone_09:
+    any_of:
+    - cobblestone
+    count: 8
+  iron_00:
+    any_of:
+    - iron_pickaxe
+    count: 1
+  iron_01:
+    any_of:
+    - iron_axe
+    count: 1
+  iron_02:
+    any_of:
+    - iron_shovel
+    count: 1
+  iron_03:
+    any_of:
+    - iron_hoe
+    count: 1
+  iron_04:
+    any_of:
+    - iron_sword
+    count: 1
+  iron_05:
+    any_of:
+    - bucket
+    count: 1
+  iron_06:
+    any_of:
+    - hopper
+    count: 1
+  iron_07:
+    any_of:
+    - rail
+    count: 1
+  iron_08:
+    any_of:
+    - shears
+    count: 1
+  iron_09:
+    any_of:
+    - smithing_table
+    count: 1
+  iron_10:
+    any_of:
+    - iron_nugget
+    count: 1
+  iron_11:
+    any_of:
+    - iron_bars
+    count: 1
+  iron_12:
+    any_of:
+    - iron_ingot
+    count: 1
+  iron_13:
+    any_of:
+    - iron_ore
+    count: 1
+  iron_14:
+    any_of:
+    - iron_ore
+    count: 3
+  iron_15:
+    any_of:
+    - iron_ingot
+    count: 1
+    note: target item; trading itself is not detectable
+  gold_00:
+    any_of:
+    - golden_pickaxe
+    count: 1
+  gold_01:
+    any_of:
+    - golden_axe
+    count: 1
+  gold_02:
+    any_of:
+    - golden_sword
+    count: 1
+  gold_03:
+    any_of:
+    - golden_hoe
+    count: 1
+  gold_04:
+    any_of:
+    - golden_apple
+    count: 1
+  gold_05:
+    any_of:
+    - golden_carrot
+    count: 1
+  gold_06:
+    any_of:
+    - gold_ingot
+    count: 1
+  redstone_00:
+    any_of:
+    - redstone
+    - redstone_ore
+    count: 1
+    note: mining redstone ore drops redstone dust
+  redstone_01:
+    any_of:
+    - redstone_torch
+    count: 1
+  redstone_02:
+    any_of:
+    - repeater
+    count: 1
+  redstone_03:
+    any_of:
+    - comparator
+    count: 1
+    note: 'needs nether quartz: not obtainable in the overworld'
+  redstone_04:
+    any_of:
+    - piston
+    count: 1
+  redstone_05:
+    any_of:
+    - clock
+    count: 1
+  diamond_00:
+    any_of:
+    - diamond
+    count: 1
+  diamond_01:
+    any_of:
+    - diamond_pickaxe
+    count: 1
+  diamond_02:
+    any_of:
+    - diamond_axe
+    count: 1
+  diamond_03:
+    any_of:
+    - diamond_shovel
+    count: 1
+  diamond_04:
+    any_of:
+    - diamond_hoe
+    count: 1
+  diamond_05:
+    any_of:
+    - diamond_sword
+    count: 1
+  diamond_06:
+    any_of:
+    - jukebox
+    count: 1
+  armor_00:
+    any_of:
+    - leather_helmet
+    count: 1
+  armor_01:
+    any_of:
+    - leather_chestplate
+    count: 1
+  armor_02:
+    any_of:
+    - leather_leggings
+    count: 1
+  armor_03:
+    any_of:
+    - leather_boots
+    count: 1
+  armor_04:
+    any_of:
+    - iron_helmet
+    count: 1
+  armor_05:
+    any_of:
+    - iron_chestplate
+    count: 1
+  armor_06:
+    any_of:
+    - iron_leggings
+    count: 1
+  armor_07:
+    any_of:
+    - iron_boots
+    count: 1
+  armor_08:
+    any_of:
+    - shield
+    count: 1
+  armor_09:
+    any_of:
+    - turtle_helmet
+    count: 1
+    note: 'needs scutes from baby turtles: practically unobtainable'
+  armor_10:
+    any_of:
+    - leather_chestplate
+    count: 1
+    note: target item; the washing act is not detectable
+  armor_11:
+    any_of:
+    - iron_helmet
+    count: 1
+    note: target item; the repair act is not detectable
+  armor_12:
+    any_of:
+    - leather
+    count: 1
