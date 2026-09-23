@@ -84,3 +84,6 @@ Checks: plans parse (MineEvolve JSON, Optimus retrieval/reflection formats); Opt
 ### 09-23 08:30 — Stage B smoke done, all stages launched
 Stage B smoke (DEPS / JARVIS-1, 3 tasks × 2 envs): DEPS 4/6 successes, JARVIS-1 5/6; no truncations; JARVIS-1 stone_00 in Env M hit the 12-replan cap (145 calls, $1.19). One infra crash (Minecraft socket timeout) retried successfully.
 Running: Stage A (12 chains, launched 07:54), Stage A2 (Optimus-1 with the authors' full memory, 6 chains, 08:24), Stage B (4 chains, 08:30). GPUs 0, 1, 2, 7 (idle at launch: 0 MiB + matmul test); GPU 6 used for tests and Optimus-3 setup. Stage C (Optimus-3) harness in progress.
+
+### 09-23 08:45 — Stage A2 restarted
+The authors' full Optimus-1 memory contains 4 corrupt JSON files (DEVIATIONS: Optimus-1 full memory). One A2 episode crashed on it three times; others could have silently used the example plan. A2 was stopped after ~5 episodes, the files repaired (all records kept except two truncated last records and one duplicated tail), A2 results wiped, and A2 relaunched from scratch. Rerun reason recorded here. Also added a reaper that kills Minecraft instances no episode is using (killed episodes can leave them behind).

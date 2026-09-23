@@ -48,3 +48,8 @@ at run time; the few in-place edits are listed with their patch files.
 | c | same | video / action pickles off | Optional recordings |
 | c | same | `RuntimeError("Timeout!")` at the horizon treated as the episode end | D22 |
 | c | Env M (`envs/cross_glue.py:optimus_in_M`) | MineEvolve env spec (+ `PlainInventoryObservation`, `IsGuiOpen` observations) with Env M group biome/horizon, wrapped in Optimus-1's `BasaltTimeoutWrapper`; wrapper step without `/kill` heuristics and Optimus ore rule, with Env M ore bands every step; chat commands as env steps; craft/smelt/equip via the functional primitive, failures reported in Optimus-1's `missing material: {...}` format | Run Optimus-1 in MineEvolve's environment |
+
+## Optimus-1 full pre-built memory (HF `MinecraftOptimus/Optimus1_Memory`, used by the `prebuilt` variant)
+| Kind | File | Change | Why |
+|------|------|--------|-----|
+| b | 4 of 386+ memory JSON files | Repaired with `baselines/optimus1/repair_memory_json.py`; originals kept in `official/optimus1_full_memory/corrupt_originals/`; report `baselines/optimus1/memory_repair_report.txt`. `plan/success/craft_crafting_table.json`: truncated last record dropped (71 of 662,842 chars). `plan/success/dig_down_and_break_down_cobblestone.json`: a duplicated tail after the first JSON document dropped. `reflection/chop_trees.json`: truncated last record dropped (8 chars). `reflection/dig_down_and_mine_diamond.json`: missing commas / a lost bracket from interleaved writes; rebuilt exactly from its 4,184 image-name pairs (names encode env and category). | The released files are invalid JSON; as released, Optimus-1 crashes when reflection retrieval opens one, or silently falls back to its example plan when a corrupt plan file is matched. |
