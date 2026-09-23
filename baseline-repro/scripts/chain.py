@@ -106,28 +106,61 @@ class Chain:
             raise SystemExit(f"unknown method {a.method}")
         self.initial = self.snaps / "00_initial"
         if not self.initial.exists():
-            shutil.copytree(self.memory, self.initial)
+            shutil.copytree(self.memory, self.initial, copy_function=self._link_or_copy)
 
     # ---------------------------------------------------------------- memory
+    # Snapshots are deltas against 00_initial (every file whose content differs
+    # or that is new), so a 200k-file pre-built memory is not copied per episode.
+    # Restore = initial + latest delta, done only when memory may be dirty
+    # (an episode started after the last clean snapshot).
+    @staticmethod
+    def _link_or_copy(src, dst):
+        if str(src).endswith(".json"):  # methods rewrite JSON in place: never share inodes
+            return shutil.copy2(src, dst)
+        return os.link(src, dst)
+
     def last_snapshot(self) -> Path:
         snaps = sorted(p for p in self.snaps.iterdir() if p.is_dir() and not p.name.startswith("00_initial"))
         return snaps[-1] if snaps else self.initial
 
+    def _clean_marker(self) -> Path:
+        return self.state / "memory_clean"
+
     def restore_memory(self) -> None:
-        src = self.last_snapshot()
+        last = self.last_snapshot()
+        m = self._clean_marker()
+        if m.exists() and m.read_text() == last.name and self.memory.exists():
+            m.unlink()  # memory == last snapshot; it becomes dirty from here on
+            return
+        if m.exists():
+            m.unlink()
         shutil.rmtree(self.memory, ignore_errors=True)
-        shutil.copytree(src, self.memory, copy_function=os.link)  # hardlinks: cheap
-        # hardlinks are shared with the snapshot: break them before writing
-        for f in self.memory.rglob("*.json"):
-            data = f.read_bytes(); f.unlink(); f.write_bytes(data)
+        shutil.copytree(self.initial, self.memory, copy_function=self._link_or_copy)
+        if last != self.initial:
+            for f in last.rglob("*"):
+                if f.is_file():
+                    dst = self.memory / f.relative_to(last)
+                    dst.parent.mkdir(parents=True, exist_ok=True)
+                    if dst.exists():
+                        dst.unlink()
+                    shutil.copy2(f, dst)
 
     def snapshot(self, idx: int, task: str) -> Path:
         dst = self.snaps / f"{idx:02d}_{task}"
         if dst.exists():
             shutil.rmtree(dst)
-        shutil.copytree(self.memory, dst, copy_function=os.link)
-        for f in self.memory.rglob("*.json"):  # keep snapshot immutable
-            data = f.read_bytes(); f.unlink(); f.write_bytes(data)
+        dst.mkdir(parents=True)
+        for f in self.memory.rglob("*"):
+            if not f.is_file():
+                continue
+            rel = f.relative_to(self.memory)
+            base = self.initial / rel
+            if base.exists() and base.stat().st_size == f.stat().st_size and (
+                    not str(f).endswith(".json") or base.read_bytes() == f.read_bytes()):
+                continue
+            (dst / rel).parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(f, dst / rel)
+        self._clean_marker().write_text(dst.name)
         return dst
 
     # ---------------------------------------------------------------- server

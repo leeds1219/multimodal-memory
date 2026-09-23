@@ -6,11 +6,13 @@
 """
 from __future__ import annotations
 
+import os
 import shutil
 import sys
 from pathlib import Path
 
 OPT = Path("/home/rag/data/official/NeurIPS24-Optimus-1")
+FULL_MEMORY = Path("/home/rag/data/official/optimus1_full_memory/v1")
 
 
 def make_workdir(wd: Path, memory: str) -> Path:
@@ -25,7 +27,14 @@ def make_workdir(wd: Path, memory: str) -> Path:
     mem = wd / "src" / "optimus1" / "memories" / "v1"
     if not mem.exists():
         if memory == "prebuilt":
-            shutil.copytree(OPT / "src/optimus1/memories/v1", mem)
+            # The authors' full released memory (HF MinecraftOptimus/Optimus1_Memory,
+            # DECISIONS D21b). Images are hard-linked (never modified); JSON files
+            # are real copies because Optimus-1 rewrites them in place.
+            def _copy(src, dst):
+                if str(src).endswith(".json"):
+                    return shutil.copy2(src, dst)
+                return os.link(src, dst)
+            shutil.copytree(FULL_MEMORY, mem, copy_function=_copy)
         elif memory == "empty":
             (mem / "reflection" / "img").mkdir(parents=True)
             (mem / "plan" / "success").mkdir(parents=True)

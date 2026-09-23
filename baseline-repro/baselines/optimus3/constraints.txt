@@ -1,0 +1,16 @@
+# Pins for the optimus3 env (Blackwell sm_120 + Optimus-3 modeling code window)
+torch==2.7.1+cu128
+torchvision==0.22.1+cu128
+torchaudio==2.7.1+cu128
+transformers==4.51.3
+x_transformers==0.27.1
+sentence-transformers==4.1.0
+qwen-vl-utils==0.0.11
+minecraft_data==3.20.0
+av==12.3.0
+pyrender==0.1.45
+pyglet==1.5.27
+accelerate<=1.7.0
+peft<=0.15.2
+trl<=0.9.6
+numpy<2
