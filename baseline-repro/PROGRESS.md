@@ -139,3 +139,46 @@ O   optimus1-prebuilt-goalfix order2   50/70    44.0     1.86    514    0     0 
 
 LLM spend (ledger, all runs incl. smoke/debug): $244.63 / cap $3000   per env: {'C3': 0.0, 'O': 118.74, 'M': 103.02}   disk free: 636.3 GB
 ```
+
+## 2026-09-24 — daily summary (auto)
+
+```
+env chain                  order      done  succ%    cost$  calls anom crash fallbk  wall_h  running
+C3  optimus3               order0   70/70    28.6     0.00    521    0     0      0    14.4  
+M   deps                   order0   22/70    22.7     6.15    360    0     0      0    14.8  redstone_04 @10100
+M   jarvis1                order0   32/70    21.9    22.61   3837    0     0      0    14.5  wooden_09 @500
+M   mineevolve             order0   35/70    11.4    18.12    858    0     0      0    14.7  armor_07 @9800
+M   mineevolve             order1   30/70    13.3    21.04   1075    0     0      0    15.7  iron_07 @2600
+M   mineevolve             order2   31/70    16.1    19.62    963    0     0      0    14.8  armor_04 @6700
+M   optimus1-empty         order0   70/70     7.1     1.39    380    0     0     64    12.2  
+M   optimus1-empty         order1   70/70     8.6     0.51    144    0     0     63     3.7  
+M   optimus1-empty         order2   70/70     2.9     0.49    149    0     0     65     3.6  
+M   optimus1-empty-goalfix order0   70/70    17.1     0.67    193    0     0     53     5.5  
+M   optimus1-empty-goalfix order1   70/70    11.4     1.11    273    0     0     55     9.2  
+M   optimus1-empty-goalfix order2   70/70    14.3     1.59    404    0     0     43    14.0  
+M   optimus1-prebuilt      order0   49/70    36.7     1.63    469    0     1     39    14.4  
+M   optimus1-prebuilt      order1   38/70    26.3     1.61    446    0     0     35    14.3  stone_07 @2200
+M   optimus1-prebuilt      order2   33/70    24.2     1.75    433    0     1     26    14.5  stone_09 @1300
+M   optimus1-prebuilt-goalfix order0   35/70    28.6     1.48    396    0     1     20    13.7  armor_07 @27900
+M   optimus1-prebuilt-goalfix order1   35/70    31.4     1.49    406    0     0     15    13.7  armor_08 @18900
+M   optimus1-prebuilt-goalfix order2   27/70    14.8     1.76    430    0     1     12    14.2  diamond_06 @6000
+O   deps                   order0   22/70    27.3    10.64    554    0     0      0    14.2  redstone_04 @6100
+O   jarvis1                order0   34/70    14.7    24.69   4237    0     0      0    13.6  gold_03 @3200
+O   mineevolve             order0   22/70    13.6    25.59   1258    0     0      0    15.6  redstone_04 @4900
+O   mineevolve             order1   21/70     9.5    24.45   1422    0     0      0    15.8  stone_00 @2000
+O   mineevolve             order2   26/70     7.7    19.61   1056    0     0      0    12.9  diamond_01 @20700
+O   optimus1-empty         order0   70/70    18.6     0.53    187    0     0     58     5.0  
+O   optimus1-empty         order1   70/70     1.4     0.24     91    0     0     70     1.5  
+O   optimus1-empty         order2   70/70     5.7     0.38    133    0     0     66     3.5  
+O   optimus1-empty-goalfix order0   70/70    20.0     1.46    387    0     0     39    11.4  
+O   optimus1-empty-goalfix order1   70/70     1.4     0.24     96    0     0     70     1.7  
+O   optimus1-empty-goalfix order2   70/70    15.7     1.28    356    0     0     48    11.5  
+O   optimus1-prebuilt      order0   60/70    46.7     1.48    423    0     0     47    12.9  diamond_01 @7300
+O   optimus1-prebuilt      order1   70/70    48.6     1.62    437    0     0     54    12.1  
+O   optimus1-prebuilt      order2   43/70    41.9     1.46    402    0     0     32    11.7  armor_09 @28300
+O   optimus1-prebuilt-goalfix order0   45/70    57.8     1.62    417    0     0     19    12.7  iron_00 @8900
+O   optimus1-prebuilt-goalfix order1   37/70    43.2     1.60    417    0     0     17    12.4  diamond_06 @6300
+O   optimus1-prebuilt-goalfix order2   50/70    44.0     1.86    514    0     0     23    13.7  iron_06 @2500
+
+LLM spend (ledger, all runs incl. smoke/debug): $244.67 / cap $3000   per env: {'C3': 0.0, 'O': 118.74, 'M': 103.02}   disk free: 636.3 GB
+```
