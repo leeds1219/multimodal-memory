@@ -18,7 +18,7 @@ sys.path.insert(0, str(REPRO / "envs"))
 sys.path.insert(0, str(REPRO / "llm"))
 from common import ORDERS, RUNS_ROOT, TASKS  # noqa: E402
 
-EXCLUDE_ORDERS = {"smoke", "mocktest"}
+EXCLUDE_ORDERS = {"smoke", "mocktest", "mockfix"}
 
 
 def collect():

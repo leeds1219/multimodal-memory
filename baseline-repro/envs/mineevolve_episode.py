@@ -55,6 +55,8 @@ def main() -> int:
     ap.add_argument("--order-id", default="order0")
     ap.add_argument("--episode-dir", required=True)
     ap.add_argument("--port", type=int, required=True)
+    ap.add_argument("--steve-port", type=int, default=None, help="env-native STEVE-1 server (Env O)")
+    ap.add_argument("--steve-workdir", default=None)
     args = ap.parse_args()
 
     task = TASKS[args.task]
@@ -137,6 +139,26 @@ def main() -> int:
     me._run_helper_subgoal = guard(me._run_helper_subgoal)
     client = MineEvolveClient(base_url=f"{cfg.server.url}:{cfg.server.port}", timeout=float(cfg.server.timeout))
     client.repair = guard(client.repair)
+
+    if args.env == "O":
+        # D32: every method in Env O takes its STEVE-1 actions from Env O's
+        # wrapper (Optimus-1 server: cond_scale 6.0, JPEG, reset per episode).
+        if args.steve_port is None:
+            raise SystemExit("Env O needs --steve-port (Optimus-1 STEVE-1 server)")
+        import threading
+        from omegaconf import OmegaConf
+        from optimus1.util import ServerAPI
+        from optimus_episode import janitor
+        srv = OmegaConf.create({"url": "http://127.0.0.1", "port": args.steve_port, "timeout": 2000})
+        ServerAPI.reset(srv).join()
+        if args.steve_workdir:
+            _stop = threading.Event()
+            threading.Thread(target=janitor, args=(Path(args.steve_workdir) / "imgs", _stop), daemon=True).start()
+
+        def native_action(condition, obs):
+            return {"action": ServerAPI.get_action(srv, env.cache_obs, str(condition), step=mon.steps)}
+
+        client.action = native_action
 
     status, err = "finished", None
     t0 = time.time()

@@ -75,6 +75,8 @@ def main() -> int:
     ap.add_argument("--episode-dir", required=True)
     ap.add_argument("--port", type=int, required=True)
     ap.add_argument("--workdir", required=True)
+    ap.add_argument("--steve-port", type=int, default=None, help="env-native STEVE-1 server (Env M)")
+    ap.add_argument("--steve-workdir", default=None)
     args = ap.parse_args()
 
     task = TASKS[args.task]
@@ -100,7 +102,9 @@ def main() -> int:
     horizon = int(genv["max_minutes"]) * MINUTE
     mon = EpisodeMonitor(ep, args.task, horizon)
     if args.env == "M":
-        optimus_in_M(om, mon, task["group"], seed)
+        if args.steve_port is None:
+            raise SystemExit("Env M needs --steve-port (MineEvolve STEVE-1 server)")
+        optimus_in_M(om, mon, task["group"], seed, steve_port=args.steve_port)
 
     # ---- Env O: seed + per-step monitor on Optimus-1's own env ------------
     orig_make = om.env_make

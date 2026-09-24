@@ -268,3 +268,12 @@ O   optimus1-prebuilt-goalfix order2   50/70    44.0     1.86    514    0     0 
 
 LLM spend (ledger, all runs incl. smoke/debug): $244.81 / cap $3000   per env: {'C3': 0.0, 'O': 118.74, 'M': 103.02}   disk free: 636.3 GB
 ```
+
+## 2026-09-24 — MineEvolve reproduction gap: investigation and a fairness fix
+Question: MineEvolve reaches ≈10–13 % (paper 52 %), Stone ≈10 % (paper 93 %). Findings so far:
+- The functional craft primitive is not the cause (crafts fail only when materials are really missing).
+- Most failed Stone episodes hit the 3-minute horizon while still collecting wood/stone: STEVE-1 is slow.
+- Same method + same prompts (JARVIS-1): first log at median step 450 in Env M vs 165 in Env O. Controlled STEVE-1 test: **cond_scale 4.0 (MineEvolve's runner default) gives about half the log yield of 6.0** (3.4 vs 6.6 logs / 1200 steps; 3/5 vs 5/5 episodes get any log).
+- This exposed a **fairness bug**: Stage A cross pairs used their own STEVE-1 wrapper instead of the env's (D32). Fixed; 15 chains rerun from scratch (old results archived as invalid).
+- Dead-Minecraft episodes were recorded as method failures by MineEvolve's loop (6 of ~1,700) → now infra crashes, retried (D31).
+- Remaining explanations for the MineEvolve gap (open): (1) released code ≠ the code behind the paper's numbers (stub crafting, broken success check, dead auto-pickaxe in the release); (2) STEVE-1 settings (the paper does not state cond_scale); (3) our strict target check ("oak log" task fails with a dark-oak log; 3 of 9 wooden failures).

@@ -31,7 +31,7 @@ from common import ORDERS, RUNS_ROOT, TASKS  # noqa: E402
 OUT = REPRO / "analysis" / "out"
 GROUPS = ["wooden", "stone", "iron", "gold", "redstone", "diamond", "armor"]
 HARD5 = ["iron", "gold", "diamond", "redstone", "armor"]
-SKIP_ORDERS = {"smoke", "mocktest"}
+SKIP_ORDERS = {"smoke", "mocktest", "mockfix"}
 
 
 def load():

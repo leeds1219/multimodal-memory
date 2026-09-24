@@ -126,8 +126,31 @@ class FunctionalOptimusHelper:
         return (True, None) if ok else (False, self._missing(target))
 
 
-def optimus_in_M(om, mon, group: str, seed: int) -> int:
+def optimus_in_M(om, mon, group: str, seed: int, steve_port: Optional[int] = None) -> int:
     """Patch ``optimus1.main`` so its episode runs in Env M. Returns horizon."""
+    if steve_port is not None:
+        # D32: STEVE-1 actions from Env M's wrapper (MineEvolve server:
+        # cond_scale 4.0, PNG frames, state reset when the prompt changes).
+        from mineevolve.client.server_api import MineEvolveClient
+        from mineevolve.main import _safe_pov
+        from optimus1.util import ServerAPI
+        mc = MineEvolveClient(base_url=f"http://127.0.0.1:{steve_port}", timeout=600)
+        _orig_reset = ServerAPI.reset
+
+        def reset(server_cfg):
+            t = _orig_reset(server_cfg)   # Optimus-1 server (planner / reflector)
+            mc.reset(task_goal="steve")   # Env M STEVE-1 runner
+            return t
+
+        def get_action(server_cfg, obs, task, step=0):
+            r = mc.action(condition=str(task), obs={"image": _safe_pov(obs), "pov": _safe_pov(obs)})
+            a = r.get("action")
+            if a is None:
+                raise RuntimeError(f"Env M STEVE-1 server returned no action: {r.get('error')}")
+            return {k: np.array(v) for k, v in a.items()}
+
+        ServerAPI.reset = staticmethod(reset)
+        ServerAPI.get_action = staticmethod(get_action)
     import optimus1.env.wrapper as ow
     from mineevolve.env import custom_env as me_spec
     from mineevolve.env.wrapper import DynamicOreSpawnMixin

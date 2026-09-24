@@ -87,6 +87,12 @@ class Chain:
         # Env M, Optimus-1 server for Env O); their LLM parts stay unused.
         self.server_kind = a.method if a.method in ("mineevolve", "optimus1") else (
             "mineevolve" if a.env == "M" else "optimus1")
+        # The env's native STEVE-1 server (D16/D32): every method in an env gets
+        # its low-level actions from the same wrapper. Stage A cross pairs
+        # (MineEvolve in O, Optimus-1 in M) need it as a second server.
+        native = "mineevolve" if a.env == "M" else "optimus1"
+        self.steve_kind = native if (a.method in ("mineevolve", "optimus1") and a.method != native) else None
+        self.steve_port = a.port + 1000
         if a.method == "optimus1":
             from optimus_workdir import make_workdir
             self.wd = make_workdir(self.state / "wd", (a.variant or "empty").split("-")[0])
@@ -106,6 +112,11 @@ class Chain:
                 self.kb_unused = self.state / "kb_unused"
         else:
             raise SystemExit(f"unknown method {a.method}")
+        if self.steve_kind == "optimus1":
+            from optimus_workdir import make_workdir
+            self.steve_wd = make_workdir(self.state / "steve_wd", "empty")
+        elif self.steve_kind == "mineevolve":
+            self.steve_kb = self.state / "steve_kb_unused"
         self.initial = self.snaps / "00_initial"
         if not self.initial.exists():
             shutil.copytree(self.memory, self.initial, copy_function=self._link_or_copy)
@@ -166,6 +177,23 @@ class Chain:
         return dst
 
     # ---------------------------------------------------------------- server
+    def start_steve_server(self, ep: Path):
+        if self.steve_kind is None:
+            return None
+        free_port(self.steve_port)
+        if self.steve_kind == "mineevolve":
+            cmd = [str(REPRO / "scripts" / "start_mineevolve_server.sh"), str(self.a.gpu), str(self.steve_port),
+                   str(self.steve_kb), str(self.ctx_file), str(ep / "steve_server.log")]
+        else:
+            cmd = [str(REPRO / "scripts" / "start_optimus_server.sh"), str(self.a.gpu), str(self.steve_port),
+                   str(self.steve_wd), str(self.ctx_file), str(ep / "steve_server.log")]
+        p = subprocess.Popen(cmd, env=self.env_vars, start_new_session=True,
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if not wait_port(self.steve_port):
+            kill_tree(p)
+            raise RuntimeError("STEVE-1 server did not come up")
+        return p
+
     def start_server(self, ep: Path) -> subprocess.Popen:
         free_port(self.a.port)
         if self.server_kind == "mineevolve":
@@ -193,6 +221,11 @@ class Chain:
                                   "instruction": TASKS[task]["instruction"], "episode_dir": str(ep),
                                   "run_id": f"{self.a.env}/{self.chain_id}/{self.a.order}/{task}"})
         server = self.start_server(ep)
+        try:
+            steve_server = self.start_steve_server(ep)
+        except Exception:
+            kill_tree(server)
+            raise
         script = {"mineevolve": "mineevolve_episode.py", "optimus1": "optimus_episode.py"}.get(
             self.a.method, "stageb_episode.py")
         cmd = ["xvfb-run", "-a", PY, str(REPRO / "envs" / script), "--env", self.a.env, "--task", task,
@@ -201,6 +234,10 @@ class Chain:
             cmd += ["--workdir", str(self.wd)]
         if self.a.method in ("deps", "jarvis1"):
             cmd += ["--method", self.a.method]
+        if self.steve_kind is not None:
+            cmd += ["--steve-port", str(self.steve_port)]
+            if self.steve_kind == "optimus1":
+                cmd += ["--steve-workdir", str(self.steve_wd)]
         t0 = time.time()
         with open(ep / "launcher.log", "a") as lf:
             p = subprocess.Popen(cmd, env=self.env_vars, stdout=lf, stderr=subprocess.STDOUT, start_new_session=True)
@@ -219,6 +256,9 @@ class Chain:
                     break
         kill_tree(server)
         free_port(self.a.port)
+        if steve_server is not None:
+            kill_tree(steve_server)
+            free_port(self.steve_port)
         res_f = ep / "result.json"
         if res_f.exists():
             return json.loads(res_f.read_text())
@@ -294,7 +334,9 @@ def already_running(a) -> bool:
     want = {"--env": a.env, "--method": a.method, "--variant": a.variant or "", "--order": a.order}
     for p in psutil.process_iter(["pid", "cmdline"]):
         c = p.info["cmdline"] or []
-        if p.info["pid"] == me or not any(x.endswith("scripts/chain.py") for x in c):
+        # only a python interpreter running chain.py (not wrappers like `timeout`)
+        if p.info["pid"] == me or len(c) < 2 or "python" not in os.path.basename(c[0]) \
+                or not c[1].endswith("scripts/chain.py"):
             continue
         got = {k: (c[c.index(k) + 1] if k in c and c.index(k) + 1 < len(c) else "") for k in want}
         if got == want:
