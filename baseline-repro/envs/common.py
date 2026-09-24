@@ -40,6 +40,12 @@ SEEDS = load_yaml("seeds.yaml")["seeds"]
 ORDERS = load_yaml("task_orders.yaml")["orders"]
 
 
+class EnvDead(BaseException):
+    """The Minecraft instance died (socket timeout / stepping a closed env).
+    BaseException so a method's ``except Exception`` cannot treat it as an
+    ordinary subgoal failure; the episode is recorded as an infra crash."""
+
+
 class EpisodeEnd(BaseException):
     """Raised to leave a method's loop once the env reported done.
 

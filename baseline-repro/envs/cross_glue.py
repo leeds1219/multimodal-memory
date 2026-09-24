@@ -318,7 +318,11 @@ def mineevolve_in_O(me, mon, group: str, seed: int, cfg_m, log) -> tuple:
     inner_step = raw.step
 
     def monitored_step(action):
-        obs, reward, done, info = inner_step(action)
+        try:
+            obs, reward, done, info = inner_step(action)
+        except Exception as exc:  # Minecraft died: infra crash (common.EnvDead)
+            from common import EnvDead
+            raise EnvDead(repr(exc)) from exc
         mon.on_step(action, obs, done, info)
         return obs, reward, done, info
 

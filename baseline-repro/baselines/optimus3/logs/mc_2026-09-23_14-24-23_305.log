@@ -285,3 +285,23 @@ java.io.FileNotFoundException: minecraft:optifine/ctm/default/empty.png
 [14:24:45] [Render thread/INFO]: [MineRLAgent0: Set spawn point to -5950, 73, -1542 [0.0] in minecraft:overworld for MineRLAgent0]
 [14:29:50] [Render thread/INFO]: [STDOUT]: Starting new video null
 [14:34:19] [Render thread/INFO]: [STDOUT]: Starting new video null
+[14:38:30] [Render thread/INFO]: [STDOUT]: Starting new video null
+[14:42:07] [Render thread/INFO]: Loaded 7 advancements
+[14:43:38] [Render thread/INFO]: [STDOUT]: Starting new video null
+[14:44:27] [Render thread/INFO]: Loaded 10 advancements
+[14:44:34] [Render thread/INFO]: Loaded 22 advancements
+[14:44:37] [Render thread/INFO]: Loaded 25 advancements
+[14:44:39] [Render thread/INFO]: Loaded 34 advancements
+[14:44:53] [Render thread/INFO]: Loaded 43 advancements
+[14:44:59] [Render thread/INFO]: MineRLAgent0 has made the advancement [Stone Age]
+[14:44:59] [Render thread/INFO]: [CHAT] MineRLAgent0 has made the advancement [Stone Age]
+[14:44:59] [Render thread/INFO]: Loaded 58 advancements
+[14:45:42] [Render thread/INFO]: Loaded 59 advancements
+[14:45:50] [Render thread/INFO]: MineRLAgent0 has made the advancement [Getting an Upgrade]
+[14:45:50] [Render thread/INFO]: [CHAT] MineRLAgent0 has made the advancement [Getting an Upgrade]
+[14:45:50] [Render thread/INFO]: Loaded 63 advancements
+[14:45:56] [Render thread/INFO]: Loaded 65 advancements
+[14:47:11] [Render thread/INFO]: Loaded 75 advancements
+[14:47:43] [Render thread/INFO]: Loaded 85 advancements
+[14:47:55] [Render thread/INFO]: [STDOUT]: Starting new video null
+[14:47:58] [EnvServerSocketHandler/INFO]: [STDOUT]: *** Stopping the replay, returning control to the inputs
