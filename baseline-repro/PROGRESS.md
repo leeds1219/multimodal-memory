@@ -277,3 +277,46 @@ Question: MineEvolve reaches ≈10–13 % (paper 52 %), Stone ≈10 % (paper 93 
 - This exposed a **fairness bug**: Stage A cross pairs used their own STEVE-1 wrapper instead of the env's (D32). Fixed; 15 chains rerun from scratch (old results archived as invalid).
 - Dead-Minecraft episodes were recorded as method failures by MineEvolve's loop (6 of ~1,700) → now infra crashes, retried (D31).
 - Remaining explanations for the MineEvolve gap (open): (1) released code ≠ the code behind the paper's numbers (stub crafting, broken success check, dead auto-pickaxe in the release); (2) STEVE-1 settings (the paper does not state cond_scale); (3) our strict target check ("oak log" task fails with a dark-oak log; 3 of 9 wooden failures).
+
+## 2026-09-25 — daily summary (auto)
+
+```
+env chain                  order      done  succ%    cost$  calls anom crash fallbk  wall_h  running
+C3  optimus3               order0   70/70    28.6     0.00    521    0     0      0    14.4  
+M   deps                   order0   54/70    25.9    20.94   1141    0     0      0    38.7  armor_05 @700
+M   jarvis1                order0   70/70    14.3    52.17   9009    0     1      0    32.7  
+M   mineevolve             order0   70/70    10.0    46.09   2367    0     0      0    35.0  
+M   mineevolve             order1   64/70    12.5    53.01   2661    0     0      0    36.9  iron_06 @21400
+M   mineevolve             order2   70/70    14.3    47.70   2393    0     0      0    35.6  
+M   optimus1-empty         order0   70/70     4.3     0.49    148    0     0     70     4.1  
+M   optimus1-empty         order1   70/70     8.6     1.59    374    0     0     63    14.3  
+M   optimus1-empty         order2   70/70     2.9     0.35    126    0     0     65     4.1  
+M   optimus1-empty-goalfix order0   70/70     5.7     0.32    126    0     0     65     3.6  
+M   optimus1-empty-goalfix order1   70/70    11.4     0.97    257    0     0     56    10.4  
+M   optimus1-empty-goalfix order2   61/70    14.8     1.98    521    0     0     35    21.2  diamond_03 @28000
+M   optimus1-prebuilt      order0   55/70    38.2     1.99    524    0     0     49    21.4  armor_03 @5300
+M   optimus1-prebuilt      order1   53/70    28.3     2.05    549    0     0     41    21.6  diamond_01 @6200
+M   optimus1-prebuilt      order2   52/70    30.8     2.01    533    0     1     47    22.0  
+M   optimus1-prebuilt-goalfix order0   49/70    26.5     2.20    524    0     1     18    21.7  gold_05 @3400
+M   optimus1-prebuilt-goalfix order1   42/70    31.0     2.07    525    0     0     19    21.8  redstone_01 @8600
+M   optimus1-prebuilt-goalfix order2   35/70    20.0     2.00    501    0     1     11    20.9  armor_00 @26400
+O   deps                   order0   50/70    20.0    45.27   2221    0     0      0    38.7  armor_08 @400
+O   jarvis1                order0   70/70    10.0    52.60   9434    0     1      0    28.5  
+O   mineevolve             order0   43/70    14.0    32.30   1578    0     0      0    22.3  armor_04 @500
+O   mineevolve             order1   44/70     4.5    34.52   1733    0     0      0    21.9  redstone_00 @5200
+O   mineevolve             order2   35/70     8.6    34.73   1972    0     0      0    20.6  armor_00 @30700
+O   optimus1-empty         order0   70/70    18.6     0.53    187    0     0     58     5.0  
+O   optimus1-empty         order1   70/70     1.4     0.24     91    0     0     70     1.5  
+O   optimus1-empty         order2   70/70     5.7     0.38    133    0     0     66     3.5  
+O   optimus1-empty-goalfix order0   70/70    20.0     1.46    387    0     0     39    11.4  
+O   optimus1-empty-goalfix order1   70/70     1.4     0.24     96    0     0     70     1.7  
+O   optimus1-empty-goalfix order2   70/70    15.7     1.28    356    0     0     48    11.5  
+O   optimus1-prebuilt      order0   70/70    44.3     2.01    568    0     0     56    17.0  
+O   optimus1-prebuilt      order1   70/70    48.6     1.62    437    0     0     54    12.1  
+O   optimus1-prebuilt      order2   70/70    45.7     2.46    687    0     0     53    19.0  
+O   optimus1-prebuilt-goalfix order0   70/70    51.4     2.92    687    0     0     29    20.4  
+O   optimus1-prebuilt-goalfix order1   70/70    38.6     2.70    723    0     0     34    20.5  
+O   optimus1-prebuilt-goalfix order2   70/70    41.4     2.86    756    0     0     30    20.0  
+
+LLM spend (ledger, all runs incl. smoke/debug): $586.33 / cap $3000   per env: {'C3': 0.0, 'O': 218.12, 'M': 237.92}   disk free: 571.2 GB
+```
