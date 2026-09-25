@@ -320,3 +320,46 @@ O   optimus1-prebuilt-goalfix order2   70/70    41.4     2.86    756    0     0 
 
 LLM spend (ledger, all runs incl. smoke/debug): $586.33 / cap $3000   per env: {'C3': 0.0, 'O': 218.12, 'M': 237.92}   disk free: 571.2 GB
 ```
+
+## 2026-09-25 — daily summary (auto)
+
+```
+env chain                  order      done  succ%    cost$  calls anom crash fallbk  wall_h  running
+C3  optimus3               order0   70/70    28.6     0.00    521    0     0      0    14.4  
+M   deps                   order0   70/70    25.7    29.09   1559    0     0      0    52.3  
+M   jarvis1                order0   70/70    14.3    52.17   9009    0     1      0    32.7  
+M   mineevolve             order0   70/70    10.0    46.09   2367    0     0      0    35.0  
+M   mineevolve             order1   70/70    11.4    65.11   3399    0     0      0    43.0  
+M   mineevolve             order2   70/70    14.3    47.70   2393    0     0      0    35.6  
+M   optimus1-empty         order0   70/70     4.3     0.49    148    0     0     70     4.1  
+M   optimus1-empty         order1   70/70     8.6     1.59    374    0     0     63    14.3  
+M   optimus1-empty         order2   70/70     2.9     0.35    126    0     0     65     4.1  
+M   optimus1-empty-goalfix order0   70/70     5.7     0.32    126    0     0     65     3.6  
+M   optimus1-empty-goalfix order1   70/70    11.4     0.97    257    0     0     56    10.4  
+M   optimus1-empty-goalfix order2   70/70    12.9     2.39    623    0     0     40    26.1  
+M   optimus1-prebuilt      order0   70/70    34.3     2.82    747    0     0     62    30.1  
+M   optimus1-prebuilt      order1   70/70    25.7     2.76    739    0     1     55    28.5  
+M   optimus1-prebuilt      order2   70/70    31.4     2.80    742    0     1     61    30.3  
+M   optimus1-prebuilt-goalfix order0   70/70    25.7     3.73    862    0     1     25    35.4  
+M   optimus1-prebuilt-goalfix order1   70/70    27.1     3.52    918    0     1     33    37.9  
+M   optimus1-prebuilt-goalfix order2   70/70    31.4     3.50    897    0     1     24    37.0  
+O   deps                   order0   70/70    18.6    63.85   3201    0     0      0    56.8  
+O   jarvis1                order0   70/70    10.0    52.60   9434    0     1      0    28.5  
+O   mineevolve             order0   70/70    10.0    57.18   2969    0     0      0    37.2  
+O   mineevolve             order1   70/70     8.6    53.37   2755    0     0      0    33.6  
+O   mineevolve             order2   64/70    12.5    63.47   3603    0     0      0    38.1  gold_00 @700
+O   optimus1-empty         order0   70/70    18.6     0.53    187    0     0     58     5.0  
+O   optimus1-empty         order1   70/70     1.4     0.24     91    0     0     70     1.5  
+O   optimus1-empty         order2   70/70     5.7     0.38    133    0     0     66     3.5  
+O   optimus1-empty-goalfix order0   70/70    20.0     1.46    387    0     0     39    11.4  
+O   optimus1-empty-goalfix order1   70/70     1.4     0.24     96    0     0     70     1.7  
+O   optimus1-empty-goalfix order2   70/70    15.7     1.28    356    0     0     48    11.5  
+O   optimus1-prebuilt      order0   70/70    44.3     2.01    568    0     0     56    17.0  
+O   optimus1-prebuilt      order1   70/70    48.6     1.62    437    0     0     54    12.1  
+O   optimus1-prebuilt      order2   70/70    45.7     2.46    687    0     0     53    19.0  
+O   optimus1-prebuilt-goalfix order0   70/70    51.4     2.92    687    0     0     29    20.4  
+O   optimus1-prebuilt-goalfix order1   70/70    38.6     2.70    723    0     0     34    20.5  
+O   optimus1-prebuilt-goalfix order2   70/70    41.4     2.86    756    0     0     30    20.0  
+
+LLM spend (ledger, all runs incl. smoke/debug): $698.21 / cap $3000   per env: {'C3': 0.0, 'O': 309.18, 'M': 265.4}   disk free: 538.3 GB
+```
