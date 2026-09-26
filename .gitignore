@@ -14,3 +14,7 @@ __pycache__/
 
 # secrets
 .env
+
+# vendored baseline repos (cloned locally, see baselines/README.md)
+baselines/*/
+!baselines/README.md
