@@ -82,6 +82,8 @@ class Chain:
         self.env_vars = {**os.environ, "LLM_CTX_FILE": str(self.ctx_file), "METHOD": a.method}
         if a.mock:
             self.env_vars["LLM_MOCK"] = "1"
+        if "cond6" in (a.variant or ""):  # sensitivity: Env M STEVE-1 at the official 6.0
+            self.env_vars["MINEEVOLVE_STEVE_COND_SCALE"] = "6.0"
         # Which server provides STEVE-1: the method's own (Stage A) or, for the
         # Stage B ports, the evaluation env's native one (MineEvolve server for
         # Env M, Optimus-1 server for Env O); their LLM parts stay unused.
@@ -102,7 +104,7 @@ class Chain:
         elif a.method == "mineevolve":
             self.memory = self.state / "kb"
             self.memory.mkdir(exist_ok=True)
-        elif a.method in ("deps", "jarvis1"):  # no cross-task memory
+        elif a.method in ("deps", "jarvis1", "steve1"):  # no cross-task memory
             self.memory = self.state / "no_memory"
             self.memory.mkdir(exist_ok=True)
             if self.server_kind == "optimus1":
@@ -212,7 +214,7 @@ class Chain:
 
     # --------------------------------------------------------------- episode
     def run_episode(self, task: str, ep: Path) -> dict:
-        seed = SEEDS[task]
+        seed = (SEEDS[task] + self.a.seed_offset)
         from cross_glue import env_m_group, env_o_group
         genv = (env_m_group if self.a.env == "M" else env_o_group)(TASKS[task]["group"])
         write_ctx(self.ctx_file, {"env": self.a.env, "method": self.a.method, "chain": self.chain_id,
@@ -232,7 +234,7 @@ class Chain:
                "--seed", str(seed), "--order-id", self.a.order, "--episode-dir", str(ep), "--port", str(self.a.port)]
         if self.a.method == "optimus1":
             cmd += ["--workdir", str(self.wd)]
-        if self.a.method in ("deps", "jarvis1"):
+        if self.a.method in ("deps", "jarvis1", "steve1"):
             cmd += ["--method", self.a.method]
         if self.steve_kind is not None:
             cmd += ["--steve-port", str(self.steve_port)]
@@ -269,7 +271,7 @@ class Chain:
     def run(self, tasks: list[str]) -> int:
         from gemini_client import CFG, ledger_total
         for idx, task in enumerate(tasks, start=1):
-            ep = self.runs / task / str(SEEDS[task])
+            ep = self.runs / task / str((SEEDS[task] + self.a.seed_offset))
             res_f = ep / "result.json"
             if res_f.exists() and json.loads(res_f.read_text()).get("status") in DONE:
                 continue
@@ -309,7 +311,7 @@ class Chain:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--env", required=True, choices=["M", "O"])
-    ap.add_argument("--method", required=True, choices=["mineevolve", "optimus1", "deps", "jarvis1"])
+    ap.add_argument("--method", required=True, choices=["mineevolve", "optimus1", "deps", "jarvis1", "steve1"])
     ap.add_argument("--variant", default="", help="optimus1: empty | prebuilt")
     ap.add_argument("--order", default="order0")
     ap.add_argument("--tasks", default="", help="comma list; default = the whole order")
@@ -318,6 +320,7 @@ def main() -> int:
     ap.add_argument("--retries", type=int, default=2)
     ap.add_argument("--stall-min", type=float, default=20.0)
     ap.add_argument("--mock", action="store_true")
+    ap.add_argument("--seed-offset", type=int, default=0, help="extra-seed runs: seed = seeds.yaml + offset")
     a = ap.parse_args()
     if already_running(a):
         log(f"chain {a.env}/{a.method}/{a.variant}/{a.order} already running -> exit 4")

@@ -20,6 +20,7 @@ sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(HERE.parent / "llm"))
 sys.path.insert(0, str(HERE.parent / "baselines" / "deps"))
 sys.path.insert(0, str(HERE.parent / "baselines" / "jarvis1"))
+sys.path.insert(0, str(HERE.parent / "baselines" / "steve1_only"))
 
 from common import (EpisodeEnd, EpisodeMonitor, SEEDS, TARGETS, TASKS, disk_free_gb,  # noqa: E402
                     is_method_exception, llm_summary, write_result)
@@ -34,7 +35,7 @@ def task_item(uid: str) -> str:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--method", required=True, choices=["deps", "jarvis1"])
+    ap.add_argument("--method", required=True, choices=["deps", "jarvis1", "steve1"])
     ap.add_argument("--env", required=True, choices=["M", "O"])
     ap.add_argument("--task", required=True)
     ap.add_argument("--seed", type=int, default=None)
@@ -64,9 +65,12 @@ def main() -> int:
     if a.method == "deps":
         from deps_agent import DepsAgent
         agent = DepsAgent(env, client, task_item(a.task), ep / "artifacts")
-    else:
+    elif a.method == "jarvis1":
         from jarvis_agent import JarvisAgent
         agent = JarvisAgent(env, client, task_item(a.task), ep / "artifacts")
+    else:
+        from steve_only_agent import SteveOnlyAgent
+        agent = SteveOnlyAgent(env, task["instruction"], mon.checker, ep / "artifacts")
 
     status, err, end = "finished", None, None
     t0 = time.time()

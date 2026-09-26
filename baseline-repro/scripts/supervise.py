@@ -68,7 +68,9 @@ def main() -> int:
     chains = plan["chains"]
     state_f = RUNS / "state" / "gpu_assignment.json"
     state_f.parent.mkdir(parents=True, exist_ok=True)
-    if state_f.exists():
+    if plan.get("gpus"):  # plan-specific GPUs (re-checked idle when the plan is written)
+        gpus = list(plan["gpus"])
+    elif state_f.exists():
         gpus = json.loads(state_f.read_text())["gpus"]
     else:
         gpus = idle_gpus(plan.get("exclude_gpus", []))[: plan.get("max_gpus", 4)]
@@ -115,6 +117,12 @@ def main() -> int:
             port = int(plan.get("port_base", 9300)) + i
             cmd = [PY, str(REPRO / "scripts" / "chain.py"), "--env", c["env"], "--method", c["method"],
                    "--order", c["order"], "--gpu", str(gpu), "--port", str(port)]
+            if plan.get("mock"):  # API-free plans: the LLM layer cannot reach the network
+                cmd += ["--mock"]
+            if c.get("tasks"):
+                cmd += ["--tasks", ",".join(c["tasks"])]
+            if c.get("seed_offset"):
+                cmd += ["--seed-offset", str(c["seed_offset"])]
             if c.get("variant"):
                 cmd += ["--variant", c["variant"]]
             lf = open(logs / f"{name}.log", "a")

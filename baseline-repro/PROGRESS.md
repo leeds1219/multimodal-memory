@@ -363,3 +363,6 @@ O   optimus1-prebuilt-goalfix order2   70/70    41.4     2.86    756    0     0 
 
 LLM spend (ledger, all runs incl. smoke/debug): $698.21 / cap $3000   per env: {'C3': 0.0, 'O': 309.18, 'M': 265.4}   disk free: 538.3 GB
 ```
+
+### 09-26 06:05 — API-free diagnostic D1 prepared, launched, and stopped (GPUs taken by another user)
+Prepared an API-free diagnostic (`configs/run_plan_diagD1.yaml`, LLM layer in mock mode): STEVE-1 only (no planner), Wood+Stone × 3 seeds, in Env M (cond 4.0), Env M (cond 6.0) and Env O — to compare with the MineEvolve paper's STEVE-1-only row and separate env/controller effects from method effects. GPUs 0/1/6 were idle at 05:47, but another user's job (~22 GB on each of GPUs 0,1,2,3,6,7) started before our launch at 05:57, so the run was stopped at once and its partial results deleted. To rerun when GPUs are free: re-check `nvidia-smi` (memory.used 0 on the chosen GPUs), set `gpus:` in the plan, then `python scripts/supervise.py --plan configs/run_plan_diagD1.yaml`.
