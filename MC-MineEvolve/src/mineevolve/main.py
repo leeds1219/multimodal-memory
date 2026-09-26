@@ -72,6 +72,43 @@ def _benchmark_cfg(cfg: DictConfig) -> DictConfig:
     return cfg.benchmark if "benchmark" in cfg else cfg
 
 
+def _tier_sequence(cfg: DictConfig, tiers: Sequence[str]) -> List[Dict[str, Any]]:
+    """Episodes for an accumulation that spans several benchmark tiers.
+
+    The paper accumulates knowledge over ~400 episodes of the whole 70-task
+    benchmark, not of one tier. Tiers differ in horizon (2 min for wooden,
+    30 min for diamond), biome and spawn list, so the env has to be rebuilt when
+    the tier changes; episodes are therefore grouped by tier (tech-tree order)
+    while the knowledge base on the server keeps growing across the whole run.
+
+    Returns one dict per episode: tier, its env cfg, task and spawn.
+    """
+    from hydra import compose, initialize_config_dir
+
+    out: List[Dict[str, Any]] = []
+    conf_dir = str(Path(__file__).resolve().parent / "conf")
+    for tier in tiers:
+        with initialize_config_dir(config_dir=conf_dir, version_base=None):
+            tier_cfg = compose("evaluate", overrides=[f"benchmark={tier}", f"+spawns@_global_={tier}"])
+        spawns = [
+            {"seed": int(x["seed"]), "pos": [float(v) for v in x["pos"]]} if isinstance(x, Mapping) and "pos" in x
+            else int(x["seed"] if isinstance(x, Mapping) else x)
+            for x in (OmegaConf.to_container(OmegaConf.select(tier_cfg, "seeds")) or [])
+        ]
+        for task_id, task_type, instruction in _get_evaluate_tasks(tier_cfg):
+            for run_idx, spawn in enumerate(spawns):
+                out.append({
+                    "tier": tier,
+                    "env_cfg": tier_cfg,
+                    "task_id": task_id,
+                    "task_type": task_type,
+                    "instruction": instruction,
+                    "run_idx": run_idx,
+                    "seed": spawn,
+                })
+    return out
+
+
 def _state_snapshot(env_info: Mapping[str, Any], task_goal: str) -> Dict[str, Any]:
     state = {
         "task_goal": task_goal,
@@ -913,8 +950,19 @@ def main(cfg: DictConfig) -> None:
     # Episode sequence: tasks x seeds in fixed order (the task-seed split). In
     # accumulation mode the sequence is repeated until accumulate.episodes episodes
     # have run; each repetition is a "pass" with its own evidence/ plans/ subdir.
-    sequence = [(task_id, task_type, instruction, run_idx, seed)
-                for task_id, task_type, instruction in tasks for run_idx, seed in runs]
+    tiers = list(OmegaConf.select(cfg, "accumulate.tiers") or [])
+    if tiers:
+        # whole-benchmark accumulation: 70 tasks x 3 spawns = 210 episodes per pass
+        tier_eps = _tier_sequence(cfg, tiers)
+        sequence = [(e["task_id"], e["task_type"], e["instruction"], e["run_idx"], e["seed"]) for e in tier_eps]
+        tier_of = [e["tier"] for e in tier_eps]
+        env_cfg_of = [e["env_cfg"] for e in tier_eps]
+        logger.info("all-tier accumulation: %d episodes per pass across %s", len(sequence), ", ".join(tiers))
+    else:
+        sequence = [(task_id, task_type, instruction, run_idx, seed)
+                    for task_id, task_type, instruction in tasks for run_idx, seed in runs]
+        tier_of = [str(benchmark_cfg.env.name)] * len(sequence)
+        env_cfg_of = [cfg] * len(sequence)
     n_accumulate = int(OmegaConf.select(cfg, "accumulate.episodes") or 0)
     n_episodes = n_accumulate if n_accumulate > 0 else len(sequence)
     checkpoint_every = int(OmegaConf.select(cfg, "accumulate.kb_checkpoint_every") or 50)
@@ -949,6 +997,8 @@ def main(cfg: DictConfig) -> None:
     episodes_on_instance = 0
     recycle_every = int(OmegaConf.select(cfg, "env_recycle_every") or 8)
 
+    env_cfg_now = [cfg]   # the cfg the live env was built from (changes when the tier changes)
+
     def _fresh_env(reason: str):
         nonlocal env, episodes_on_instance
         logger.warning("relaunching Minecraft (%s)", reason)
@@ -956,12 +1006,28 @@ def main(cfg: DictConfig) -> None:
             env.close()
         except Exception as exc:  # the old instance may already be dead
             logger.warning("env.close() failed: %s", exc)
-        env = make_env(cfg, logger=logger)
+        env = make_env(env_cfg_now[0], logger=logger)
         episodes_on_instance = 0
 
+    current_tier = None
     for ep_idx in range(done_episodes, n_episodes):
-        task_id, task_type, instruction, run_idx, seed = sequence[ep_idx % len(sequence)]
+        slot = ep_idx % len(sequence)
+        task_id, task_type, instruction, run_idx, seed = sequence[slot]
         pass_no = ep_idx // len(sequence) + 1
+        if tier_of[slot] != current_tier:
+            # a tier brings its own horizon / biome / spawn list: rebuild the world.
+            # The knowledge base lives on the server, so accumulation keeps going.
+            if current_tier is not None:
+                logger.info("tier %s -> %s: rebuilding the env", current_tier, tier_of[slot])
+                try:
+                    env.close()
+                except Exception as exc:
+                    logger.warning("env.close() failed: %s", exc)
+            env_cfg_now[0] = env_cfg_of[slot]
+            env = make_env(env_cfg_now[0], logger=logger)
+            episodes_on_instance = 0
+            current_tier = tier_of[slot]
+            info_panel(f"tier {current_tier}: horizon {_benchmark_cfg(env_cfg_now[0]).env.max_minutes} min")
         ep_artifact_dir = str(Path(artifact_dir) / f"pass{pass_no}") if n_accumulate > 0 else artifact_dir
         seed_note = f"  seed={seed}" if seed is not None else ""
         info_panel(f"episode {ep_idx + 1}/{n_episodes} (pass {pass_no})  task {task_id} ({task_type})  run {run_idx + 1}/{len(runs)}{seed_note}: {instruction}")
@@ -1019,7 +1085,7 @@ def main(cfg: DictConfig) -> None:
                     "pos": seed["pos"] if isinstance(seed, Mapping) else None,
                     "success": bool(success), "steps": int(steps), "wall_s": round(time.time() - t_run, 1),
                     "llm": f"{cfg.llm.provider}/{cfg.llm.model}",
-                    "episode": ep_idx + 1, "pass": pass_no,
+                    "episode": ep_idx + 1, "pass": pass_no, "tier": current_tier,
                 }
                 fh.write(json.dumps(row) + "\n")
             if n_accumulate > 0:

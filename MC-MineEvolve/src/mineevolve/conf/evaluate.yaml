@@ -62,6 +62,13 @@ memory:
 # CLI: accumulate.episodes=50
 accumulate:
   episodes: 0
+  # tiers: [wooden, stone, gold, redstone, iron, armor, diamond]
+  # -> whole-benchmark accumulation, the paper's protocol: 70 tasks x 3 spawns =
+  #    210 episodes per pass, two passes ~ the paper's 400. Each tier brings its own
+  #    horizon / biome / spawn list (conf/spawns/<tier>.yaml), so the env is rebuilt
+  #    when the tier changes while the knowledge base keeps growing.
+  #    Leave empty to accumulate inside a single benchmark group.
+  tiers: []
   kb_checkpoint_every: 50
   kb_store_dir: memories/gemini-3-flash-preview
 
