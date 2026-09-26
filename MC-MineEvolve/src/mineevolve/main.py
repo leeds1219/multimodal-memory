@@ -83,18 +83,33 @@ def _tier_sequence(cfg: DictConfig, tiers: Sequence[str]) -> List[Dict[str, Any]
 
     Returns one dict per episode: tier, its env cfg, task and spawn.
     """
-    from hydra import compose, initialize_config_dir
-
+    # Read the tier yamls directly: Hydra is already initialized inside main(), so
+    # compose() cannot be called again here.
+    conf_dir = Path(__file__).resolve().parent / "conf"
     out: List[Dict[str, Any]] = []
-    conf_dir = str(Path(__file__).resolve().parent / "conf")
     for tier in tiers:
-        with initialize_config_dir(config_dir=conf_dir, version_base=None):
-            tier_cfg = compose("evaluate", overrides=[f"benchmark={tier}", f"+spawns@_global_={tier}"])
+        tier_yaml = OmegaConf.load(conf_dir / "benchmark" / f"{tier}.yaml")
+        spawn_yaml = OmegaConf.load(conf_dir / "spawns" / f"{tier}.yaml")
+        tier_cfg = OmegaConf.merge(
+            OmegaConf.create({k: v for k, v in OmegaConf.to_container(cfg, resolve=False).items()
+                              if k not in ("benchmark", "seeds", "defaults")}),
+            OmegaConf.create({"benchmark": {k: v for k, v in OmegaConf.to_container(tier_yaml).items()
+                                            if k != "defaults"}}),
+            OmegaConf.create({"seeds": OmegaConf.to_container(spawn_yaml)["seeds"]}),
+        )
+        # a global `evaluate=[...]` (and accumulate.spawns_per_task) applies to every
+        # tier, which is how a short smoke run covers one task per tier
+        sel = list(OmegaConf.select(cfg, "evaluate") or [])
+        if sel:
+            tier_cfg.benchmark.evaluate = sel
+        n_spawns = int(OmegaConf.select(cfg, "accumulate.spawns_per_task") or 0)
         spawns = [
             {"seed": int(x["seed"]), "pos": [float(v) for v in x["pos"]]} if isinstance(x, Mapping) and "pos" in x
             else int(x["seed"] if isinstance(x, Mapping) else x)
             for x in (OmegaConf.to_container(OmegaConf.select(tier_cfg, "seeds")) or [])
         ]
+        if n_spawns:
+            spawns = spawns[:n_spawns]
         for task_id, task_type, instruction in _get_evaluate_tasks(tier_cfg):
             for run_idx, spawn in enumerate(spawns):
                 out.append({

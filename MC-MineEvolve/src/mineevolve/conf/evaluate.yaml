@@ -69,6 +69,7 @@ accumulate:
   #    when the tier changes while the knowledge base keeps growing.
   #    Leave empty to accumulate inside a single benchmark group.
   tiers: []
+  spawns_per_task: 0            # 0 = every spawn of the tier's split; 1 = one per task (smoke runs)
   kb_checkpoint_every: 50
   kb_store_dir: memories/gemini-3-flash-preview
 
