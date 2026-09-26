@@ -1,0 +1,1870 @@
+{
+  "mineevolve": {
+    "source": "https://arxiv.org/html/2603.13131v3",
+    "setting": {
+      "planner": [
+        "Qwen3.5-Flash",
+        "Qwen3.5-Plus",
+        "GLM-4.7",
+        "Gemini-3-Flash",
+        "GPT-5.5"
+      ],
+      "controller": "STEVE-1 for DEPS/JARVIS-1/Optimus-1/MineEvolve; Optimus-2 uses its own native GOAP-based planner+policy (not STEVE-1)",
+      "runs_per_task": "not stated as a concrete number; paper only asserts task set, seed split, horizon and success criterion are 'held constant' across all methods/planners",
+      "horizon": "not stated as a concrete step/time number in the accessible sections (asserted constant across methods, value not published)",
+      "init_inventory": "empty inventory by default unless a task specifies otherwise",
+      "memory": "retrieval top-K and memory-token budget matched across methods; exact values not found in accessible sections",
+      "notes": "70-task benchmark = subset of the 'MCU' tech-tree suite (Zheng et al. 2025, ICML, 'MCU: An Evaluation Framework for Open-Ended Game Agents'). Group task counts: Wooden 11, Stone 10, Iron 16, Gold 7, Redstone 6, Diamond 7, Armor 13 = 70, matching our 70-task list group-for-group in both count and group description (Appendix D.1, Table 3). No individual per-task names are published, so uid-level matching is 'approx' (plausible group membership) rather than 'exact' 1:1 task identity. arXiv ID 2603.13131 = March 2026 submission (v3 dated 10 May 2026); unusual/future-dated relative to the assistant's Jan-2026 knowledge cutoff, flagged for awareness -- fetch succeeded and content was internally consistent (cross-references, bibliography, table numbering all coherent)."
+    },
+    "groups": {
+      "DEPS|Qwen3.5-Flash": {
+        "wooden": 82.91,
+        "stone": 68.37,
+        "iron": 16.48,
+        "gold": 2.79,
+        "redstone": 5.84,
+        "diamond": 2.11,
+        "armor": 7.25,
+        "overall": 28.9,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 57.69,
+        "hard_avg": 9.71,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "JARVIS-1|Qwen3.5-Flash": {
+        "wooden": 92.37,
+        "stone": 88.14,
+        "iron": 34.76,
+        "gold": 10.83,
+        "redstone": 23.41,
+        "diamond": 8.39,
+        "armor": 14.92,
+        "overall": 41.75,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 70.47,
+        "hard_avg": 22.6,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "Optimus-1|Qwen3.5-Flash": {
+        "wooden": 98.3,
+        "stone": 92.75,
+        "iron": 45.24,
+        "gold": 8.07,
+        "redstone": 28.17,
+        "diamond": 8.21,
+        "armor": 14.8,
+        "overall": 45.83,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 73.76,
+        "hard_avg": 27.21,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "Optimus-2|Qwen3.5-Flash": {
+        "wooden": 98.6,
+        "stone": 92.45,
+        "iron": 51.3,
+        "gold": 8.7,
+        "redstone": 28.1,
+        "diamond": 12.4,
+        "armor": 20.95,
+        "overall": 48.84,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 73.93,
+        "hard_avg": 32.11,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "MineEvolve|Qwen3.5-Flash": {
+        "wooden": 98.09,
+        "stone": 92.61,
+        "iron": 52.43,
+        "gold": 10.11,
+        "redstone": 30.77,
+        "diamond": 14.58,
+        "armor": 23.47,
+        "overall": 50.09,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 74.14,
+        "hard_avg": 34.06,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "DEPS|Qwen3.5-Plus": {
+        "wooden": 84.05,
+        "stone": 69.34,
+        "iron": 17.39,
+        "gold": 3.47,
+        "redstone": 8.94,
+        "diamond": 2.43,
+        "armor": 4.36,
+        "overall": 29.25,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 58.65,
+        "hard_avg": 9.66,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "JARVIS-1|Qwen3.5-Plus": {
+        "wooden": 93.08,
+        "stone": 88.73,
+        "iron": 35.57,
+        "gold": 11.12,
+        "redstone": 26.18,
+        "diamond": 9.03,
+        "armor": 15.58,
+        "overall": 42.59,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 71.04,
+        "hard_avg": 23.62,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "Optimus-1|Qwen3.5-Plus": {
+        "wooden": 97.91,
+        "stone": 93.6,
+        "iron": 46.06,
+        "gold": 7.05,
+        "redstone": 32.03,
+        "diamond": 11.42,
+        "armor": 19.09,
+        "overall": 47.42,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 73.66,
+        "hard_avg": 29.93,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "Optimus-2|Qwen3.5-Plus": {
+        "wooden": 99.05,
+        "stone": 93.2,
+        "iron": 53.2,
+        "gold": 9.2,
+        "redstone": 28.7,
+        "diamond": 13.2,
+        "armor": 21.6,
+        "overall": 49.75,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 74.5,
+        "hard_avg": 33.25,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "MineEvolve|Qwen3.5-Plus": {
+        "wooden": 98.71,
+        "stone": 93.48,
+        "iron": 55.83,
+        "gold": 13.79,
+        "redstone": 31.24,
+        "diamond": 17.06,
+        "armor": 27.63,
+        "overall": 52.52,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 75.61,
+        "hard_avg": 37.13,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "DEPS|GLM-4.7": {
+        "wooden": 82.37,
+        "stone": 66.91,
+        "iron": 15.92,
+        "gold": 1.36,
+        "redstone": 7.82,
+        "diamond": 2.18,
+        "armor": 4.12,
+        "overall": 27.93,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 56.6,
+        "hard_avg": 8.82,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "JARVIS-1|GLM-4.7": {
+        "wooden": 91.79,
+        "stone": 86.87,
+        "iron": 33.94,
+        "gold": 8.87,
+        "redstone": 21.82,
+        "diamond": 8.08,
+        "armor": 14.19,
+        "overall": 40.79,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 69.3,
+        "hard_avg": 21.79,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "Optimus-1|GLM-4.7": {
+        "wooden": 96.63,
+        "stone": 91.4,
+        "iron": 44.13,
+        "gold": 7.79,
+        "redstone": 23.06,
+        "diamond": 7.95,
+        "armor": 18.04,
+        "overall": 45.23,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 72.55,
+        "hard_avg": 27.01,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "Optimus-2|GLM-4.7": {
+        "wooden": 97.9,
+        "stone": 91.65,
+        "iron": 50.35,
+        "gold": 8.35,
+        "redstone": 26.85,
+        "diamond": 12.05,
+        "armor": 20.1,
+        "overall": 48.06,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 73.28,
+        "hard_avg": 31.25,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "MineEvolve|GLM-4.7": {
+        "wooden": 97.36,
+        "stone": 91.18,
+        "iron": 50.55,
+        "gold": 8.63,
+        "redstone": 29.08,
+        "diamond": 10.92,
+        "armor": 22.07,
+        "overall": 48.43,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 72.97,
+        "hard_avg": 32.06,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "DEPS|Gemini-3-Flash": {
+        "wooden": 84.25,
+        "stone": 69.86,
+        "iron": 17.81,
+        "gold": 4.07,
+        "redstone": 9.61,
+        "diamond": 2.76,
+        "armor": 4.66,
+        "overall": 29.66,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 59.07,
+        "hard_avg": 10.06,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "JARVIS-1|Gemini-3-Flash": {
+        "wooden": 92.99,
+        "stone": 88.58,
+        "iron": 35.21,
+        "gold": 9.79,
+        "redstone": 22.96,
+        "diamond": 8.92,
+        "armor": 15.52,
+        "overall": 42.04,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 70.62,
+        "hard_avg": 22.98,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "Optimus-1|Gemini-3-Flash": {
+        "wooden": 98.7,
+        "stone": 91.76,
+        "iron": 45.92,
+        "gold": 6.85,
+        "redstone": 24.48,
+        "diamond": 13.06,
+        "armor": 18.98,
+        "overall": 46.73,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 73.26,
+        "hard_avg": 29.04,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "Optimus-2|Gemini-3-Flash": {
+        "wooden": 99.1,
+        "stone": 93.55,
+        "iron": 54.2,
+        "gold": 10.05,
+        "redstone": 30.25,
+        "diamond": 13.8,
+        "armor": 22.35,
+        "overall": 50.45,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 74.86,
+        "hard_avg": 34.19,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "MineEvolve|Gemini-3-Flash": {
+        "wooden": 98.63,
+        "stone": 93.37,
+        "iron": 55.28,
+        "gold": 13.52,
+        "redstone": 33.73,
+        "diamond": 12.78,
+        "armor": 27.18,
+        "overall": 52.04,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 75.47,
+        "hard_avg": 36.42,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "DEPS|GPT-5.5": {
+        "wooden": 86.42,
+        "stone": 72.38,
+        "iron": 20.31,
+        "gold": 6.16,
+        "redstone": 11.84,
+        "diamond": 3.68,
+        "armor": 6.07,
+        "overall": 31.69,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 61.34,
+        "hard_avg": 11.92,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "JARVIS-1|GPT-5.5": {
+        "wooden": 94.18,
+        "stone": 90.31,
+        "iron": 38.44,
+        "gold": 12.61,
+        "redstone": 25.96,
+        "diamond": 10.34,
+        "armor": 16.14,
+        "overall": 44.01,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 72.41,
+        "hard_avg": 25.07,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "Optimus-1|GPT-5.5": {
+        "wooden": 98.62,
+        "stone": 94.82,
+        "iron": 49.28,
+        "gold": 10.71,
+        "redstone": 31.47,
+        "diamond": 15.31,
+        "armor": 17.86,
+        "overall": 48.92,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 75.29,
+        "hard_avg": 31.35,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "Optimus-2|GPT-5.5": {
+        "wooden": 99.22,
+        "stone": 94.6,
+        "iron": 56.15,
+        "gold": 11.35,
+        "redstone": 32.1,
+        "diamond": 14.7,
+        "armor": 23.5,
+        "overall": 51.66,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 75.6,
+        "hard_avg": 35.7,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "MineEvolve|GPT-5.5": {
+        "wooden": 99.16,
+        "stone": 94.77,
+        "iron": 60.12,
+        "gold": 16.7,
+        "redstone": 36.47,
+        "diamond": 18.91,
+        "armor": 28.98,
+        "overall": 54.93,
+        "overall_definition": "task-count-weighted mean over all 70 tasks (Table 4 caption); identical to Table 1's 'Weighted Overall'",
+        "easy_avg": 76.98,
+        "hard_avg": 40.23,
+        "easy_hard_definition": "Easy = Wooden+Stone+Gold (28 tasks); Hard = Iron+Redstone+Diamond+Armor (42 tasks) (Appendix D.1)"
+      },
+      "STEVE-1(low-level-only)|-": {
+        "wooden": 25.61,
+        "stone": 18.72,
+        "iron": 2.47,
+        "gold": 0.0,
+        "redstone": 0.0,
+        "diamond": 0.0,
+        "armor": 0.0,
+        "overall": 7.26,
+        "overall_definition": "STEVE-1 policy alone, no LLM planner (Table 4 bottom row)"
+      }
+    },
+    "tasks": {}
+  },
+  "optimus1": {
+    "source": "https://arxiv.org/html/2408.03615 (latest HTML = v2, NeurIPS 2024 camera-ready per abs page); Appendix F.1 cross-checked via https://ar5iv.labs.arxiv.org/html/2408.03615",
+    "setting": {
+      "planner": "GPT-4V (Knowledge-Guided Planner + Experience-Driven Reflector); generalization also tested with Deepseek-VL and InternLM-XComposer2-VL",
+      "controller": "STEVE-1 (Action Controller)",
+      "runs_per_task": "at least 30 per task using different world seeds (stated protocol); Appendix F.1 'Eval Times' column shows actual counts from 30 up to 70 for some tasks",
+      "horizon": "max steps vary by group: e.g. Wood up to 3600; harder groups (Gold/Redstone/Diamond/Armor) up to 36000; exact per-group table not fully captured",
+      "environment": "MineRL, Minecraft 1.16.5, 20 FPS",
+      "init_inventory": "survival mode, empty inventory for all tasks",
+      "memory": "Hybrid Multimodal Memory = Hierarchical Directed Knowledge Graph (long-term/semantic) + Abstracted Multimodal Experience Pool (episodic)",
+      "benchmark_size": "67 tasks across 7 groups per the paper's own count (vs our 70 -- a 3-task difference; confirmed mismatch for Wood: paper 9 vs our 11, Stone: paper 8 vs our 10, from the retrieved appendix tables)",
+      "notes": "Table 1 caveat: 'Overall' SR is the mean of Iron+Gold+Diamond+Redstone+Armor ONLY, excluding Wood and Stone (verified by arithmetic against Optimus-1's own row). Appendix F.1 (Tables 8-14) reports PER-TASK numbers for Optimus-1 ONLY (not for GPT-3.5/GPT-4V/DEPS/JARVIS-1 baselines). Only Table 8 (Wood, 9 tasks) and Table 9 (Stone, 8 tasks, last cell truncated) were retrievable; Tables for Iron/Gold/Diamond/Redstone/Armor per-task breakdowns exist in the paper but could not be fetched due to a hard content-size truncation hit identically across 4 separate WebFetch attempts (HTML and PDF); PDF fetch also failed outright (>10MB tool limit). These were NOT fabricated -- they are simply unavailable from this fetch session; a manual PDF read would be needed to fill iron/gold/diamond/redstone/armor per-task Optimus-1 numbers."
+    },
+    "groups": {
+      "GPT-3.5|-": {
+        "wooden": 40.16,
+        "stone": 20.4,
+        "iron": 0.0,
+        "gold": 0.0,
+        "diamond": 0.0,
+        "redstone": 0.0,
+        "armor": 0.0,
+        "overall": 0.0,
+        "overall_definition": "mean SR of Iron+Gold+Diamond+Redstone+Armor ONLY (verified by arithmetic: e.g. Optimus-1 (46.69+8.51+11.61+25.02+19.47)/5=22.26 matches reported Overall); Wood and Stone are EXCLUDED from Overall in this paper's Table 1",
+        "at_seconds": {
+          "wooden": 56.39,
+          "stone": 135.71,
+          "iron": null,
+          "gold": null,
+          "diamond": null,
+          "redstone": null,
+          "armor": null
+        },
+        "avg_steps": {
+          "wooden": 1127.78,
+          "stone": 2714.21,
+          "iron": null,
+          "gold": null,
+          "diamond": null,
+          "redstone": null,
+          "armor": null
+        },
+        "at_as_note": "null = paper reports '+inf' (no episode succeeded within the horizon for that group/method)"
+      },
+      "GPT-4V|-": {
+        "wooden": 41.42,
+        "stone": 20.89,
+        "iron": 0.0,
+        "gold": 0.0,
+        "diamond": 0.0,
+        "redstone": 0.0,
+        "armor": 0.0,
+        "overall": 0.0,
+        "overall_definition": "mean SR of Iron+Gold+Diamond+Redstone+Armor ONLY (verified by arithmetic: e.g. Optimus-1 (46.69+8.51+11.61+25.02+19.47)/5=22.26 matches reported Overall); Wood and Stone are EXCLUDED from Overall in this paper's Table 1",
+        "at_seconds": {
+          "wooden": 55.15,
+          "stone": 132.77,
+          "iron": null,
+          "gold": null,
+          "diamond": null,
+          "redstone": null,
+          "armor": null
+        },
+        "avg_steps": {
+          "wooden": 1103.04,
+          "stone": 2655.47,
+          "iron": null,
+          "gold": null,
+          "diamond": null,
+          "redstone": null,
+          "armor": null
+        },
+        "at_as_note": "null = paper reports '+inf' (no episode succeeded within the horizon for that group/method)"
+      },
+      "DEPS|-": {
+        "wooden": 77.01,
+        "stone": 48.52,
+        "iron": 16.37,
+        "gold": 0.0,
+        "diamond": 0.6,
+        "redstone": 0.0,
+        "armor": 9.98,
+        "overall": 5.39,
+        "overall_definition": "mean SR of Iron+Gold+Diamond+Redstone+Armor ONLY (verified by arithmetic: e.g. Optimus-1 (46.69+8.51+11.61+25.02+19.47)/5=22.26 matches reported Overall); Wood and Stone are EXCLUDED from Overall in this paper's Table 1",
+        "at_seconds": {
+          "wooden": 85.53,
+          "stone": 138.71,
+          "iron": 944.61,
+          "gold": null,
+          "diamond": 1296.96,
+          "redstone": null,
+          "armor": 997.59
+        },
+        "avg_steps": {
+          "wooden": 1710.61,
+          "stone": 2574.3,
+          "iron": 8892.24,
+          "gold": null,
+          "diamond": 23939.3,
+          "redstone": null,
+          "armor": 17951.95
+        },
+        "at_as_note": "null = paper reports '+inf' (no episode succeeded within the horizon for that group/method)"
+      },
+      "JARVIS-1|-": {
+        "wooden": 93.76,
+        "stone": 89.2,
+        "iron": 36.15,
+        "gold": 7.2,
+        "diamond": 8.98,
+        "redstone": 16.31,
+        "armor": 15.82,
+        "overall": 16.89,
+        "overall_definition": "mean SR of Iron+Gold+Diamond+Redstone+Armor ONLY (verified by arithmetic: e.g. Optimus-1 (46.69+8.51+11.61+25.02+19.47)/5=22.26 matches reported Overall); Wood and Stone are EXCLUDED from Overall in this paper's Table 1",
+        "at_seconds": {
+          "wooden": 67.76,
+          "stone": 141.5,
+          "iron": 722.78,
+          "gold": 787.37,
+          "diamond": 1255.06,
+          "redstone": 1070.42,
+          "armor": 924.6
+        },
+        "avg_steps": {
+          "wooden": 1355.25,
+          "stone": 2830.05,
+          "iron": 8455.51,
+          "gold": 15747.13,
+          "diamond": 25101.25,
+          "redstone": 17408.4,
+          "armor": 16492.96
+        },
+        "at_as_note": "null = paper reports '+inf' (no episode succeeded within the horizon for that group/method)"
+      },
+      "Optimus-1|-": {
+        "wooden": 98.6,
+        "stone": 92.35,
+        "iron": 46.69,
+        "gold": 8.51,
+        "diamond": 11.61,
+        "redstone": 25.02,
+        "armor": 19.47,
+        "overall": 22.26,
+        "overall_definition": "mean SR of Iron+Gold+Diamond+Redstone+Armor ONLY (verified by arithmetic: e.g. Optimus-1 (46.69+8.51+11.61+25.02+19.47)/5=22.26 matches reported Overall); Wood and Stone are EXCLUDED from Overall in this paper's Table 1",
+        "at_seconds": {
+          "wooden": 47.09,
+          "stone": 129.94,
+          "iron": 651.33,
+          "gold": 726.35,
+          "diamond": 1150.98,
+          "redstone": 932.5,
+          "armor": 824.53
+        },
+        "avg_steps": {
+          "wooden": 841.94,
+          "stone": 2518.88,
+          "iron": 6017.85,
+          "gold": 15527.07,
+          "diamond": 23019.64,
+          "redstone": 12709.99,
+          "armor": 16350.56
+        },
+        "at_as_note": "null = paper reports '+inf' (no episode succeeded within the horizon for that group/method)"
+      },
+      "Human-level|-": {
+        "wooden": 100.0,
+        "stone": 100.0,
+        "iron": 86.0,
+        "gold": 17.31,
+        "diamond": 16.98,
+        "redstone": 33.27,
+        "armor": 28.48,
+        "overall": 36.41,
+        "overall_definition": "mean SR of Iron+Gold+Diamond+Redstone+Armor ONLY (verified by arithmetic: e.g. Optimus-1 (46.69+8.51+11.61+25.02+19.47)/5=22.26 matches reported Overall); Wood and Stone are EXCLUDED from Overall in this paper's Table 1",
+        "at_seconds": {
+          "wooden": 31.08,
+          "stone": 80.85,
+          "iron": 434.38,
+          "gold": 557.08,
+          "diamond": 744.82,
+          "redstone": 617.89,
+          "armor": 551.3
+        },
+        "avg_steps": {
+          "wooden": 621.59,
+          "stone": 1617.0,
+          "iron": 5687.6,
+          "gold": 13141.6,
+          "diamond": 16237.54,
+          "redstone": 12357.0,
+          "armor": 11026.0
+        },
+        "at_as_note": "null = paper reports '+inf' (no episode succeeded within the horizon for that group/method)"
+      }
+    },
+    "tasks": {
+      "Optimus-1|GPT-4V": {
+        "wooden_00": {
+          "sr": 100.0,
+          "paper_task": "Craft a wooden pickaxe (Table 8)",
+          "match": "exact",
+          "avg_steps": 1153.91,
+          "at_seconds": 57.7,
+          "sub_goal_num": 5,
+          "eval_times": 30
+        },
+        "wooden_01": {
+          "sr": 96.67,
+          "paper_task": "Craft a wooden axe (Table 8)",
+          "match": "exact",
+          "avg_steps": 1010.28,
+          "at_seconds": 50.51,
+          "sub_goal_num": 5,
+          "eval_times": 30
+        },
+        "wooden_02": {
+          "sr": 95.0,
+          "paper_task": "Craft a wooden shovel (Table 8)",
+          "match": "exact",
+          "avg_steps": 995.58,
+          "at_seconds": 49.78,
+          "sub_goal_num": 6,
+          "eval_times": 40
+        },
+        "wooden_03": {
+          "sr": 100.0,
+          "paper_task": "Craft a wooden hoe (Table 8)",
+          "match": "exact",
+          "avg_steps": 1042.8,
+          "at_seconds": 52.14,
+          "sub_goal_num": 5,
+          "eval_times": 30
+        },
+        "wooden_04": {
+          "sr": 100.0,
+          "paper_task": "Craft a wooden sword (Table 8)",
+          "match": "exact",
+          "avg_steps": 1214.9,
+          "at_seconds": 60.74,
+          "sub_goal_num": 5,
+          "eval_times": 30
+        },
+        "wooden_05": {
+          "sr": 97.14,
+          "paper_task": "Craft a stick (Table 8)",
+          "match": "exact",
+          "avg_steps": 372.97,
+          "at_seconds": 18.65,
+          "sub_goal_num": 4,
+          "eval_times": 70
+        },
+        "wooden_06": {
+          "sr": 98.55,
+          "paper_task": "Craft a crafting table (Table 8)",
+          "match": "exact",
+          "avg_steps": 448.63,
+          "at_seconds": 22.43,
+          "sub_goal_num": 3,
+          "eval_times": 69
+        },
+        "stone_00": {
+          "sr": 96.77,
+          "paper_task": "Craft a stone pickaxe (Table 9)",
+          "match": "exact",
+          "avg_steps": 2310.09,
+          "at_seconds": 115.5,
+          "sub_goal_num": 10,
+          "eval_times": 31
+        },
+        "stone_01": {
+          "sr": 96.88,
+          "paper_task": "Craft a stone axe (Table 9)",
+          "match": "exact",
+          "avg_steps": 2112.59,
+          "at_seconds": 105.63,
+          "sub_goal_num": 10,
+          "eval_times": 32
+        },
+        "stone_02": {
+          "sr": 90.32,
+          "paper_task": "Craft a stone shovel (Table 9)",
+          "match": "exact",
+          "avg_steps": 2221.0,
+          "at_seconds": 111.05,
+          "sub_goal_num": 8,
+          "eval_times": 31
+        },
+        "stone_03": {
+          "sr": 94.64,
+          "paper_task": "Craft a stone hoe (Table 9)",
+          "match": "exact",
+          "avg_steps": 2684.6,
+          "at_seconds": 134.23,
+          "sub_goal_num": 8,
+          "eval_times": 56
+        },
+        "stone_04": {
+          "sr": 94.29,
+          "paper_task": "Craft a stone sword (Table 9)",
+          "match": "exact",
+          "avg_steps": 2067.92,
+          "at_seconds": 103.4,
+          "sub_goal_num": 8,
+          "eval_times": 35
+        },
+        "stone_05": {
+          "sr": 93.75,
+          "paper_task": "Craft a furnace (Table 9)",
+          "match": "exact",
+          "avg_steps": 2842.71,
+          "at_seconds": null,
+          "sub_goal_num": 9,
+          "eval_times": null,
+          "note": "AT(s) and Eval Times cells were cut off by the fetch tool mid-value (AT started '142.', exact digits/eval-count not retrievable)"
+        },
+        "stone_06": {
+          "sr": 96.77,
+          "paper_task": "Craft a stone pickaxe (Table 9) -- reused, paper does not frame this as a distinct 'upgrade' task",
+          "match": "approx"
+        },
+        "wooden_07": {
+          "sr": null,
+          "paper_task": "not in retrieved portion of Table 8 (Wood group has more tasks than the 9 listed there, e.g. planks); could not confirm",
+          "match": "none"
+        },
+        "wooden_08": {
+          "sr": null,
+          "paper_task": "no matching task found in retrieved appendix tables",
+          "match": "none"
+        },
+        "wooden_09": {
+          "sr": null,
+          "paper_task": "no matching task found",
+          "match": "none"
+        },
+        "wooden_10": {
+          "sr": null,
+          "paper_task": "no matching task found",
+          "match": "none"
+        },
+        "stone_07": {
+          "sr": null,
+          "paper_task": "no matching task found (mining-only task, not a craft task, in retrieved tables)",
+          "match": "none"
+        },
+        "stone_08": {
+          "sr": null,
+          "paper_task": "no matching task found",
+          "match": "none"
+        },
+        "stone_09": {
+          "sr": null,
+          "paper_task": "no matching task found",
+          "match": "none"
+        }
+      }
+    }
+  },
+  "jarvis1": {
+    "source": "https://ar5iv.labs.arxiv.org/html/2311.05997 (got furthest into the appendix); cross-checked against https://arxiv.org/html/2311.05997",
+    "setting": {
+      "runs_per_task": "paper states 'at least 30 tests per task with different seeds'; actual per-task 'Eval Times' in appendix tables range 30-86 (30 is a floor, not the true n for most tasks)",
+      "horizon": "Table 1: Wood/Wood-Variants 12k steps; Stone/Iron 12k; Gold/Diamond/Redstone 36k; Blocks/Armor 12k-36k; Decoration/Food 12k. At 20 FPS, 12k steps ~= 10 min, 36k steps ~= 30 min",
+      "init_inventory": "Wood and Wood-Variants groups start EMPTY; every other group (Stone, Iron, Gold, Diamond, Redstone, Blocks, Armor, Decoration, Food) starts with an iron_axe already in inventory (Table 1) -- confirms the task brief's premise",
+      "environment": "vanilla Minecraft via the native human interface (keyboard/mouse, 20 FPS) -- paper explicitly states it does NOT use MineDojo's custom interface, contrasting itself against MineDojo/GITM/Voyager",
+      "memory": "ablation variants: 'Text Memory' (text-embedding retrieval only), 'Text Memory+Reasoning', 'Multimodal Memory+Reasoning' (full JARVIS-1); after 4 learning epochs JARVIS-1 accumulated 425 successful trajectories in memory (Figs 7-8, not numerically extracted)",
+      "benchmark_size": "'Universal Benchmark' of 200+ tasks across 11 groups: Wood(34), Wood-Variants(43), Stone(10), Iron(22), Gold(9), Diamond(7), Redstone(7), Blocks(15), Armor(17), Decoration(17), Food(9) (Table 1)",
+      "baselines_in_table2": "GPT, ReAct, Inner Monologue, DEPS, JARVIS-1 (NOT VPT/Plan4MC/MineAgent as might be assumed -- those appear only narratively in Sec 4.3's single diamond-pickaxe long-horizon comparison)",
+      "notes": "Appendix Tables 5-8 (Wood/Stone/Iron/Gold per-task SR) report JARVIS-1's OWN per-task numbers only (no baseline breakdown per task). Table 5 (Wood) is only 9/34 rows retrieved; Table 8 (Gold) only 3/9 rows. Tables 9-15 (Diamond, Redstone, Blocks, Armor, Decoration, Food full per-task tables) could NOT be retrieved -- every fetch (multiple mirrors/versions/prompts) truncated at the identical point mid-Table-8, indicating a fixed content-size cutoff in the fetch pipeline, not an image/figure issue (all reached tables are genuine HTML text tables). PDF fetch failed outright (undecoded binary)."
+    },
+    "groups": {
+      "GPT|-": {
+        "wooden": 27.3,
+        "stone": 20.21,
+        "iron": 3.27,
+        "gold": 0.0,
+        "diamond": 0.0,
+        "redstone": 1.04,
+        "armor": 1.36,
+        "overall": null,
+        "overall_definition": "not extracted (Table 2 group AVG rows retrieved for Wood/Stone/Iron/Gold/Diamond/Redstone/Armor; an Overall row may exist in the paper but was not captured by the fetch)"
+      },
+      "ReAct|-": {
+        "wooden": 40.31,
+        "stone": 39.0,
+        "iron": 4.61,
+        "gold": 0.45,
+        "diamond": 0.35,
+        "redstone": 1.14,
+        "armor": 0.5,
+        "overall": null,
+        "overall_definition": "not extracted (Table 2 group AVG rows retrieved for Wood/Stone/Iron/Gold/Diamond/Redstone/Armor; an Overall row may exist in the paper but was not captured by the fetch)"
+      },
+      "Inner Monologue|-": {
+        "wooden": 60.15,
+        "stone": 52.86,
+        "iron": 5.2,
+        "gold": 0.59,
+        "diamond": 0.96,
+        "redstone": 0.69,
+        "armor": 3.1,
+        "overall": null,
+        "overall_definition": "not extracted (Table 2 group AVG rows retrieved for Wood/Stone/Iron/Gold/Diamond/Redstone/Armor; an Overall row may exist in the paper but was not captured by the fetch)"
+      },
+      "DEPS|-": {
+        "wooden": 80.23,
+        "stone": 69.27,
+        "iron": 16.92,
+        "gold": 2.2,
+        "diamond": 2.42,
+        "redstone": 6.02,
+        "armor": 3.71,
+        "overall": null,
+        "overall_definition": "not extracted (Table 2 group AVG rows retrieved for Wood/Stone/Iron/Gold/Diamond/Redstone/Armor; an Overall row may exist in the paper but was not captured by the fetch)"
+      },
+      "JARVIS-1|-": {
+        "wooden": 88.84,
+        "stone": 88.69,
+        "iron": 34.63,
+        "gold": 6.85,
+        "diamond": 8.99,
+        "redstone": 17.51,
+        "armor": 13.44,
+        "overall": null,
+        "overall_definition": "not extracted (Table 2 group AVG rows retrieved for Wood/Stone/Iron/Gold/Diamond/Redstone/Armor; an Overall row may exist in the paper but was not captured by the fetch)"
+      }
+    },
+    "tasks": {
+      "JARVIS-1|native": {
+        "wooden_00": {
+          "sr": 95.16,
+          "paper_task": "wooden_pickaxe (Table 5)",
+          "match": "exact",
+          "eval_times": 62
+        },
+        "wooden_01": {
+          "sr": 89.09,
+          "paper_task": "wooden_axe (Table 5)",
+          "match": "exact",
+          "eval_times": 55
+        },
+        "wooden_02": {
+          "sr": 90.28,
+          "paper_task": "wooden_shovel (Table 5)",
+          "match": "exact",
+          "eval_times": 72
+        },
+        "wooden_03": {
+          "sr": 93.18,
+          "paper_task": "wooden_hoe (Table 5)",
+          "match": "exact",
+          "eval_times": 44
+        },
+        "wooden_04": {
+          "sr": 92.42,
+          "paper_task": "wooden_sword (Table 5)",
+          "match": "exact",
+          "eval_times": 66
+        },
+        "wooden_05": {
+          "sr": 100.0,
+          "paper_task": "stick (Table 5)",
+          "match": "exact",
+          "eval_times": 86
+        },
+        "wooden_06": {
+          "sr": 97.06,
+          "paper_task": "crafting_table (Table 5)",
+          "match": "exact",
+          "eval_times": 68
+        },
+        "wooden_07": {
+          "sr": null,
+          "paper_task": "not in the 9/34 retrieved Wood rows; Wood group has 34 tasks total, likely present but not fetched",
+          "match": "approx"
+        },
+        "wooden_08": {
+          "sr": null,
+          "paper_task": "not retrieved; possibly among the other 25 Wood-group tasks",
+          "match": "approx"
+        },
+        "wooden_09": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "wooden_10": {
+          "sr": null,
+          "paper_task": "JARVIS-1 tasks are framed as craft/obtain goals, not a 'punch tree without any tool' scored task",
+          "match": "none"
+        },
+        "stone_00": {
+          "sr": 91.18,
+          "paper_task": "stone_pickaxe (Table 6)",
+          "match": "exact",
+          "eval_times": 68
+        },
+        "stone_01": {
+          "sr": 91.23,
+          "paper_task": "stone_axe (Table 6)",
+          "match": "exact",
+          "eval_times": 57
+        },
+        "stone_02": {
+          "sr": 85.14,
+          "paper_task": "stone_shovel (Table 6)",
+          "match": "exact",
+          "eval_times": 74
+        },
+        "stone_03": {
+          "sr": 94.59,
+          "paper_task": "stone_hoe (Table 6)",
+          "match": "exact",
+          "eval_times": 74
+        },
+        "stone_04": {
+          "sr": 88.31,
+          "paper_task": "stone_sword (Table 6)",
+          "match": "exact",
+          "eval_times": 77
+        },
+        "stone_05": {
+          "sr": 94.2,
+          "paper_task": "furnace (Table 6)",
+          "match": "exact",
+          "eval_times": 69
+        },
+        "stone_06": {
+          "sr": 91.18,
+          "paper_task": "stone_pickaxe (Table 6) -- reused; not framed as an 'upgrade' task in the paper",
+          "match": "approx",
+          "eval_times": 68
+        },
+        "stone_07": {
+          "sr": null,
+          "paper_task": "no distinct 'mine cobblestone' craft-style task in Table 6 (closest is 'stone', which is smelting cobble->stone, a different action)",
+          "match": "none"
+        },
+        "stone_08": {
+          "sr": null,
+          "paper_task": "not present in Table 6",
+          "match": "none"
+        },
+        "stone_09": {
+          "sr": null,
+          "paper_task": "not present in Table 6",
+          "match": "none"
+        },
+        "iron_00": {
+          "sr": 33.82,
+          "paper_task": "iron_pickaxe (Table 7)",
+          "match": "exact",
+          "eval_times": 68
+        },
+        "iron_01": {
+          "sr": 33.33,
+          "paper_task": "iron_axe (Table 7)",
+          "match": "exact",
+          "eval_times": 60
+        },
+        "iron_02": {
+          "sr": 33.8,
+          "paper_task": "iron_shovel (Table 7)",
+          "match": "exact",
+          "eval_times": 71
+        },
+        "iron_03": {
+          "sr": 32.14,
+          "paper_task": "iron_hoe (Table 7)",
+          "match": "exact",
+          "eval_times": 56
+        },
+        "iron_04": {
+          "sr": 32.88,
+          "paper_task": "iron_sword (Table 7)",
+          "match": "exact",
+          "eval_times": 73
+        },
+        "iron_05": {
+          "sr": 38.1,
+          "paper_task": "bucket (Table 7)",
+          "match": "exact",
+          "eval_times": 42
+        },
+        "iron_06": {
+          "sr": 30.77,
+          "paper_task": "hopper (Table 7)",
+          "match": "exact",
+          "eval_times": 65
+        },
+        "iron_07": {
+          "sr": 32.26,
+          "paper_task": "rail (Table 7)",
+          "match": "exact",
+          "eval_times": 62
+        },
+        "iron_08": {
+          "sr": 25.0,
+          "paper_task": "shears (Table 7)",
+          "match": "exact",
+          "eval_times": 64
+        },
+        "iron_09": {
+          "sr": 36.11,
+          "paper_task": "smithing_table (Table 7)",
+          "match": "exact",
+          "eval_times": 72
+        },
+        "iron_10": {
+          "sr": 35.82,
+          "paper_task": "iron_nugget (Table 7)",
+          "match": "exact",
+          "eval_times": 67
+        },
+        "iron_11": {
+          "sr": 32.08,
+          "paper_task": "iron_bars (Table 7)",
+          "match": "exact",
+          "eval_times": 53
+        },
+        "iron_12": {
+          "sr": 54.79,
+          "paper_task": "iron_ingot (Table 7)",
+          "match": "exact",
+          "eval_times": 73
+        },
+        "iron_13": {
+          "sr": null,
+          "paper_task": "not separately listed (iron_ingot task bundles mine+smelt into one goal)",
+          "match": "approx"
+        },
+        "iron_14": {
+          "sr": null,
+          "paper_task": "not present in Table 7",
+          "match": "none"
+        },
+        "iron_15": {
+          "sr": null,
+          "paper_task": "not present in Table 7",
+          "match": "none"
+        },
+        "gold_00": {
+          "sr": 5.26,
+          "paper_task": "golden_pickaxe (Table 8)",
+          "match": "exact",
+          "eval_times": 77
+        },
+        "gold_02": {
+          "sr": 4.76,
+          "paper_task": "golden_sword (Table 8)",
+          "match": "exact",
+          "eval_times": 85
+        },
+        "gold_06": {
+          "sr": 14.49,
+          "paper_task": "gold_ingot (Table 2 representative row)",
+          "match": "exact"
+        },
+        "gold_01": {
+          "sr": null,
+          "paper_task": "golden_axe not retrieved (Gold group has 9 tasks; only 3 fetched from Table 8)",
+          "match": "approx"
+        },
+        "gold_03": {
+          "sr": null,
+          "paper_task": "golden_hoe not retrieved",
+          "match": "approx"
+        },
+        "gold_04": {
+          "sr": null,
+          "paper_task": "golden_apple not retrieved; unclear if scored under Gold or Food group",
+          "match": "approx"
+        },
+        "gold_05": {
+          "sr": null,
+          "paper_task": "golden_carrot not retrieved; unclear if scored under Gold or Food group",
+          "match": "approx"
+        },
+        "diamond_00": {
+          "sr": 9.2,
+          "paper_task": "diamond (Table 2 representative row)",
+          "match": "exact"
+        },
+        "diamond_01": {
+          "sr": 6.22,
+          "paper_task": "diamond_pickaxe (Table 2 representative row; also cited in Sec 4.3 long-horizon comparison: 6.22% at ~20min, improving to 12.5% with extended time budget vs VPT's 2.5%)",
+          "match": "exact"
+        },
+        "diamond_02": {
+          "sr": null,
+          "paper_task": "not retrieved; plausibly one of the Diamond group's 7 tasks",
+          "match": "approx"
+        },
+        "diamond_03": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "diamond_04": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "diamond_05": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "diamond_06": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "redstone_00": {
+          "sr": null,
+          "paper_task": "not retrieved (Redstone group has 7 tasks; only 'dropper', which has no uid match, was seen)",
+          "match": "approx"
+        },
+        "redstone_01": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "redstone_02": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "redstone_03": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "redstone_04": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "redstone_05": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "armor_04": {
+          "sr": 30.3,
+          "paper_task": "iron_helmet (Table 2 representative row)",
+          "match": "exact"
+        },
+        "armor_00": {
+          "sr": null,
+          "paper_task": "not retrieved (Armor group has 17 tasks; leather tier plausibly present)",
+          "match": "approx"
+        },
+        "armor_01": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "armor_02": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "armor_03": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "armor_05": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "armor_06": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "armor_07": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "armor_08": {
+          "sr": null,
+          "paper_task": "not retrieved",
+          "match": "approx"
+        },
+        "armor_09": {
+          "sr": null,
+          "paper_task": "not retrieved; 'turtle_helmet' is a plausible real item but not confirmed present",
+          "match": "approx"
+        },
+        "armor_10": {
+          "sr": null,
+          "paper_task": "JARVIS-1 tasks are craft/obtain goals, not a 'wash in cauldron' action; more likely absent",
+          "match": "none"
+        },
+        "armor_11": {
+          "sr": null,
+          "paper_task": "JARVIS-1 tasks are craft/obtain goals, not a 'repair' action; more likely absent",
+          "match": "none"
+        },
+        "armor_12": {
+          "sr": null,
+          "paper_task": "resembles the Food group's 'kill animal' style tasks rather than Armor; not confirmed",
+          "match": "none"
+        }
+      }
+    }
+  },
+  "deps": {
+    "source": "https://arxiv.org/html/2302.01560v3 (cross-checked against https://ar5iv.labs.arxiv.org/html/2302.01560 -- identical content, including the same MT4 count discrepancy)",
+    "setting": {
+      "environment": "MineDojo, Minecraft 1.11.2 (main Table 2 results); robustness also checked on MineRL 1.16.5 and 'MC-TextWorld' 1.19.2 in a separate Table 3, not reproduced here",
+      "controller": "MC-Controller (imitation-learning controller, not STEVE-1 -- STEVE-1 appears only as a bibliography citation to later related work, contrary to the task brief's premise of a 'STEVE-1-variant')",
+      "runs_per_task": "every task executed 30 times, results averaged (Table 2 protocol)",
+      "horizon": "max steps per MT group: MT1 3000, MT2 3000, MT3 6000, MT4 3000, MT5 6000, MT6 6000, MT7 6000, MT8 12000 (Table 1)",
+      "init_inventory": "empty inventory for all 8 groups, except every group is given an axe as a starting tool ('Given Tool: Axe', Table 1)",
+      "notes": "Table numbering discrepancy: the task brief expected 'Table 3' for MT1-MT8 results, but in the fetched v3 HTML the main results table is 'Table 2' (caption: 'Success rates of DEPS and existing LLM planners on Minecraft Task101'); Table 3 in this version is the MineRL/MC-TextWorld cross-version robustness check. This may reflect table renumbering between preprint revisions. MT1-MT8 group definitions and task lists are in Table 1 (counts/max-steps) and Appendix B, Tables 9-16 (item lists) -- see 'mt_group_definitions'. A SEPARATE low-level controller-only benchmark (Table 18) gives real per-skill SR numbers but is NOT the same experiment as the full LLM-planner pipeline in Table 2 -- see 'tasks' below, clearly labeled.",
+      "mt_group_definitions": {
+        "MT1": {
+          "name": "Basic",
+          "n_tasks": 14,
+          "max_steps": 3000,
+          "example": "Make a wooden door",
+          "items": [
+            "CraftPlanks",
+            "CraftSticks",
+            "CraftWoodenSlab",
+            "CraftWoodenPressurePlate",
+            "CraftBowl",
+            "CraftWoodenButton",
+            "CraftChest",
+            "CraftOakStairs",
+            "CraftSign",
+            "CraftFence",
+            "CraftFenceGate",
+            "CraftBoat",
+            "CraftTrapdoor",
+            "CraftWoodenDoor"
+          ]
+        },
+        "MT2": {
+          "name": "Tool (Simple)",
+          "n_tasks": 12,
+          "max_steps": 3000,
+          "example": "Make a stone pickaxe",
+          "items": [
+            "CraftCraftingTable",
+            "CraftWoodenPickaxe",
+            "CraftWoodenAxe",
+            "CraftWoodenHoe",
+            "CraftWoodenSword",
+            "CraftWoodenShovel",
+            "CraftFurnace",
+            "CraftStonePickaxe",
+            "CraftStoneAxe",
+            "CraftStoneHoe",
+            "CraftStoneShovel",
+            "CraftStoneSword"
+          ]
+        },
+        "MT3": {
+          "name": "Hunt and Food",
+          "n_tasks": 7,
+          "max_steps": 6000,
+          "example": "Cook the beef",
+          "items": [
+            "CraftBed",
+            "CraftPainting",
+            "CraftCarpet",
+            "CraftItemFrame",
+            "CookPorkchop",
+            "CookBeef",
+            "CookMutton"
+          ]
+        },
+        "MT4": {
+          "name": "Dig-Down",
+          "n_tasks_table1": 6,
+          "n_tasks_appendix_list": 13,
+          "max_steps": 3000,
+          "example": "Mine coal",
+          "items": [
+            "CraftStoneStairs",
+            "CraftStoneSlab",
+            "CraftArmorStand",
+            "CraftCobblestoneWall",
+            "CraftQuartzBlock",
+            "CraftStoneBrick",
+            "SmeltStone",
+            "CraftTorch",
+            "ObtainCoal",
+            "CraftStoneBrickStairs",
+            "CraftStonePressurePlate",
+            "CraftStoneButton",
+            "CraftLever"
+          ],
+          "count_mismatch_note": "Table 1 states MT4 has 6 tasks; the Appendix B item list attributed to MT4 (Table 12) has 13 items. Reproduced identically across 2 independent fetches -- unresolved whether Table1's '6' is a typo, a grouping/extraction shift, or MT4 evaluates only a 6-task sample of a larger 13-item pool."
+        },
+        "MT5": {
+          "name": "Equipment",
+          "n_tasks": 9,
+          "max_steps": 6000,
+          "example": "Equip the leather helmet",
+          "items": [
+            "EquipLeatherBoots",
+            "EquipLeatherChestplate",
+            "EquipLeatherHelmet",
+            "EquipLeatherLeggings",
+            "EquipShield",
+            "EquipIronChestplate",
+            "EquipIronLeggings",
+            "EquipIronHelmet",
+            "EquipIronBoots"
+          ]
+        },
+        "MT6": {
+          "name": "Tool (Complex)",
+          "n_tasks": 7,
+          "max_steps": 6000,
+          "example": "Make shears and bucket",
+          "items": [
+            "CraftBucket",
+            "CraftShears",
+            "CraftIronPickaxe",
+            "CraftIronAxe",
+            "CraftIronHoe",
+            "CraftIronShovel",
+            "CraftIronSword"
+          ]
+        },
+        "MT7": {
+          "name": "IronStage",
+          "n_tasks": 13,
+          "max_steps": 6000,
+          "example": "Obtain an iron sword",
+          "items": [
+            "CraftIronBars",
+            "CraftIronNugget",
+            "CraftMinecart",
+            "CraftHopper",
+            "CraftHopperMinecart",
+            "CraftFurnaceMinecart",
+            "CraftCauldron",
+            "CraftChestMinecart",
+            "CraftIronDoor",
+            "CraftIronTrapdoor",
+            "CraftTripwireHook",
+            "CraftHeavyWeightedPressurePlate",
+            "CraftRail"
+          ]
+        },
+        "MT8": {
+          "name": "Challenge",
+          "n_tasks": 1,
+          "max_steps": 12000,
+          "example": "Obtain a diamond!",
+          "items": [
+            "ObtainDiamond"
+          ]
+        }
+      },
+      "full_pipeline_task_mapping_note": "The full DEPS pipeline (Table 2) publishes only MT1-MT8 GROUP averages, not per-task SR. Appendix F ('Success Rates of ALL Tasks in Minecraft') is referenced by the paper but its row-level content was not retrievable via the HTML fetch (only its caption came through). Group-to-uid correspondence for the full pipeline (exact task-name matches, sharing the group average, not a distinct number): wooden_00-04,06 <-> MT2 (CraftWoodenPickaxe/Axe/Hoe/Sword/Shovel, CraftCraftingTable); wooden_05 <-> MT1 (CraftSticks); wooden_07 <-> MT1 (CraftPlanks); stone_00-04 <-> MT2 (CraftStonePickaxe/Axe/Hoe/Sword/Shovel); stone_05 <-> MT2 (CraftFurnace); stone_06 (approx, MT2 CraftStonePickaxe reused, no 'upgrade' framing); iron_00-05,08 <-> MT6 (CraftIronPickaxe/Axe/Hoe/Sword/Shovel, CraftBucket, CraftShears); iron_06,07,10,11 <-> MT7 (CraftHopper, CraftRail, CraftIronNugget, CraftIronBars); iron_09 and iron_15: none (smithing table & villager trading absent from MC 1.11.2-era MT1-MT8 lists); diamond_00 <-> MT8 (ObtainDiamond, full-pipeline SR = 0.59%); diamond_01-06: none (crafting diamond tools not present in MT1-MT8); armor_00-08 (approx) <-> MT5 (Equip* tasks -- paper tests EQUIPPING pre-existing armor, not necessarily crafting it, so this is an approximate match); armor_09-11: none; gold_00-06 and redstone_00-05: NONE -- no gold or redstone items appear anywhere in MT1-MT8 (DEPS/MineDojo 1.11.2-era task set predates/excludes gold and redstone crafting tasks)."
+    },
+    "groups": {
+      "GPT|-": {
+        "MT1": 25.85,
+        "MT2": 47.88,
+        "MT3": 10.78,
+        "MT4": 7.14,
+        "MT5": 1.98,
+        "MT6": 0.0,
+        "MT7": 0.0,
+        "MT8": 0.0,
+        "AVG": 15.42
+      },
+      "PP|-": {
+        "MT1": 30.61,
+        "MT2": 40.09,
+        "MT3": 17.13,
+        "MT4": 16.0,
+        "MT5": 3.21,
+        "MT6": 0.47,
+        "MT7": 0.6,
+        "MT8": 0.0,
+        "AVG": 16.88
+      },
+      "CoT|-": {
+        "MT1": 40.24,
+        "MT2": 55.21,
+        "MT3": 6.82,
+        "MT4": 4.76,
+        "MT5": 1.73,
+        "MT6": 0.0,
+        "MT7": 0.0,
+        "MT8": 0.0,
+        "AVG": 18.89
+      },
+      "IM|-": {
+        "MT1": 46.89,
+        "MT2": 53.73,
+        "MT3": 3.64,
+        "MT4": 18.41,
+        "MT5": 4.57,
+        "MT6": 0.64,
+        "MT7": 1.02,
+        "MT8": 0.0,
+        "AVG": 21.64
+      },
+      "CaP|-": {
+        "MT1": 60.08,
+        "MT2": 60.11,
+        "MT3": 8.72,
+        "MT4": 20.33,
+        "MT5": 2.84,
+        "MT6": 0.63,
+        "MT7": 0.6,
+        "MT8": 0.0,
+        "AVG": 25.77
+      },
+      "DEP(no-self-verification)|-": {
+        "MT1": 75.7,
+        "MT2": 66.13,
+        "MT3": 45.69,
+        "MT4": 43.35,
+        "MT5": 15.93,
+        "MT6": 5.71,
+        "MT7": 4.6,
+        "MT8": 0.5,
+        "AVG": 39.36
+      },
+      "DEPS|-": {
+        "MT1": 79.77,
+        "MT2": 79.46,
+        "MT3": 62.4,
+        "MT4": 53.32,
+        "MT5": 29.24,
+        "MT6": 13.8,
+        "MT7": 12.56,
+        "MT8": 0.59,
+        "AVG": 48.56
+      }
+    },
+    "groups_native_key": "DEPS reports success by its own MT1-MT8 groups (mixed tiers), NOT by wooden/stone/iron/gold/redstone/diamond/armor -- see mt_group_definitions in setting for what each MTx contains and how it maps onto our groups (mapping is many-to-many, e.g. MT2 spans both our wooden and stone tool tasks).",
+    "tasks": {
+      "DEPS-controller-only(Table18)|MC-Controller-IL": {
+        "wooden_08": {
+          "sr": 39.0,
+          "paper_task": "Mine 1 oak wood (Table 18, low-level imitation-learning controller benchmark -- NOT the full DEPS LLM-planner pipeline)",
+          "match": "approx",
+          "note": null
+        },
+        "stone_07": {
+          "sr": 95.0,
+          "paper_task": "Mine 1 cobblestone with pickaxe (Table 18, low-level imitation-learning controller benchmark -- NOT the full DEPS LLM-planner pipeline)",
+          "match": "approx",
+          "note": null
+        },
+        "stone_08": {
+          "sr": 70.0,
+          "paper_task": "Mine 1 stone with pickaxe (Table 18, low-level imitation-learning controller benchmark -- NOT the full DEPS LLM-planner pipeline)",
+          "match": "approx",
+          "note": null
+        },
+        "iron_13": {
+          "sr": 40.0,
+          "paper_task": "Mine 1 iron ore with stone pickaxe (Table 18, low-level imitation-learning controller benchmark -- NOT the full DEPS LLM-planner pipeline)",
+          "match": "exact",
+          "note": null
+        },
+        "iron_14": {
+          "sr": 16.0,
+          "paper_task": "Mine 3 iron ore with stone pickaxe (Table 18, low-level imitation-learning controller benchmark -- NOT the full DEPS LLM-planner pipeline)",
+          "match": "exact",
+          "note": null
+        },
+        "diamond_00": {
+          "sr": 0.0,
+          "paper_task": "Mine 1 diamond with stone pickaxe (Table 18, low-level imitation-learning controller benchmark -- NOT the full DEPS LLM-planner pipeline)",
+          "match": "exact",
+          "note": null
+        },
+        "armor_12": {
+          "sr": 60.0,
+          "paper_task": "Kill 1 cow with axe (Table 18, low-level imitation-learning controller benchmark -- NOT the full DEPS LLM-planner pipeline)",
+          "match": "approx",
+          "note": null
+        },
+        "iron_12": {
+          "sr": 80.0,
+          "paper_task": "Smelt w/ furnace (Table 18, low-level imitation-learning controller benchmark -- NOT the full DEPS LLM-planner pipeline)",
+          "match": "approx",
+          "note": "generic smelting, not confirmed iron-specific"
+        }
+      }
+    }
+  },
+  "optimus3": {
+    "source": "https://arxiv.org/html/2506.10357v2 (v2, dated 2026-02-10; substantially revised from the June-2025 v1 -- compares against GPT-5-Instant/Thinking and Gemini-2.5, which postdate v1's submission)",
+    "setting": {
+      "title": "Optimus-3: Dual-Router Aligned Mixture-of-Experts Agent with Dual-Granularity Reasoning-Aware Policy Optimization",
+      "environment": "MineRL (20 Hz control), agent spawned with EMPTY inventory at randomized biome/position",
+      "runs_per_task": "at least 30 rollouts per task from different initial positions (Table III); group SR reported with standard deviation",
+      "benchmark": "the 67-task Long-Horizon benchmark is INHERITED UNCHANGED from Optimus-1 (arXiv:2408.03615) -- Optimus-3 does not redefine or re-list it: Wooden(10), Stone(9), Iron(16), Gold(6), Diamond(7), Redstone(6), Armor(13) = 67 (vs our 70 -- count mismatches in Wooden/Stone/Gold, same as noted for the Optimus-1 paper itself)",
+      "controller": "Optimus-3 is an end-to-end MoE model (Qwen2.5-VL backbone, 6.8B params, Task Router + Layer Router) -- no separate low-level policy like STEVE-1; baselines that use an MLLM-as-planner (GPT-3.5/GPT-4o/Qwen2.5-VL/Qwen2.5-VL-SFT/Gemini-1.5-pro) pair that planner with STEVE-1 as the policy",
+      "memory": "Optimus-3 itself does NOT use a memory-retrieval module (departs from Optimus-1/JARVIS-1's memory-augmented approach in favor of MoE routing); memory is only relevant to the JARVIS-1 and Optimus-1 baselines being compared against",
+      "notes": "Table III gives GROUP-LEVEL SR+-SD only for the 67-task Long-Horizon benchmark -- no per-task numbers and no appendix (this paper has no appendix; all content is in Tables I-V and Figs 1-12). Table IV gives genuine PER-TASK numbers (CR and SR) but for a separate, small, 5-task 'open-ended' natural-language-instruction benchmark with a live inventory -- do NOT conflate Table IV SR with Table III's tech-tree group SR; they are different experiments/protocols entirely. All values parsed directly from HTML <table> DOM (not an LLM summarization pass), cross-checked against the abstract's claimed deltas -- high confidence in exact figures."
+    },
+    "groups": {
+      "GPT-3.5(planner)+STEVE-1|-": {
+        "wooden": 40.0,
+        "stone": 20.0,
+        "iron": 0.0,
+        "gold": 0.0,
+        "diamond": 0.0,
+        "redstone": 0.0,
+        "armor": 0.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 15.0,
+          "stone": 13.0,
+          "iron": 0.0,
+          "gold": 0.0,
+          "diamond": 0.0,
+          "redstone": 0.0,
+          "armor": 0.0
+        }
+      },
+      "GPT-4o(planner)+STEVE-1|-": {
+        "wooden": 47.0,
+        "stone": 23.0,
+        "iron": 5.0,
+        "gold": 0.0,
+        "diamond": 0.0,
+        "redstone": 0.0,
+        "armor": 0.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 23.0,
+          "stone": 9.0,
+          "iron": 4.0,
+          "gold": 0.0,
+          "diamond": 0.0,
+          "redstone": 0.0,
+          "armor": 0.0
+        }
+      },
+      "Gemini-1.5-pro(planner)+STEVE-1|-": {
+        "wooden": 41.0,
+        "stone": 21.0,
+        "iron": 3.0,
+        "gold": 0.0,
+        "diamond": 0.0,
+        "redstone": 0.0,
+        "armor": 0.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 14.0,
+          "stone": 10.0,
+          "iron": 2.0,
+          "gold": 0.0,
+          "diamond": 0.0,
+          "redstone": 0.0,
+          "armor": 0.0
+        }
+      },
+      "Qwen2.5-VL(planner)+STEVE-1|-": {
+        "wooden": 28.0,
+        "stone": 6.0,
+        "iron": 0.0,
+        "gold": 0.0,
+        "diamond": 0.0,
+        "redstone": 0.0,
+        "armor": 0.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 15.0,
+          "stone": 3.0,
+          "iron": 0.0,
+          "gold": 0.0,
+          "diamond": 0.0,
+          "redstone": 0.0,
+          "armor": 0.0
+        }
+      },
+      "Qwen2.5-VL-SFT(planner)+STEVE-1|-": {
+        "wooden": 76.0,
+        "stone": 36.0,
+        "iron": 11.0,
+        "gold": 0.0,
+        "diamond": 0.0,
+        "redstone": 0.0,
+        "armor": 0.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 11.0,
+          "stone": 7.0,
+          "iron": 5.0,
+          "gold": 0.0,
+          "diamond": 0.0,
+          "redstone": 0.0,
+          "armor": 0.0
+        }
+      },
+      "VPT|-": {
+        "wooden": 18.0,
+        "stone": 7.0,
+        "iron": 0.0,
+        "gold": 0.0,
+        "diamond": 1.0,
+        "redstone": 0.0,
+        "armor": 0.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 15.0,
+          "stone": 5.0,
+          "iron": 0.0,
+          "gold": 0.0,
+          "diamond": 1.0,
+          "redstone": 0.0,
+          "armor": 0.0
+        }
+      },
+      "GROOT|-": {
+        "wooden": 34.0,
+        "stone": 17.0,
+        "iron": 8.0,
+        "gold": 1.0,
+        "diamond": 1.0,
+        "redstone": 3.0,
+        "armor": 4.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 17.0,
+          "stone": 10.0,
+          "iron": 5.0,
+          "gold": 1.0,
+          "diamond": 1.0,
+          "redstone": 2.0,
+          "armor": 2.0
+        }
+      },
+      "MineCLIP|-": {
+        "wooden": 23.0,
+        "stone": 12.0,
+        "iron": 6.0,
+        "gold": 0.0,
+        "diamond": 0.0,
+        "redstone": 0.0,
+        "armor": 2.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 16.0,
+          "stone": 8.0,
+          "iron": 5.0,
+          "gold": 0.0,
+          "diamond": 0.0,
+          "redstone": 0.0,
+          "armor": 2.0
+        }
+      },
+      "STEVE-1|-": {
+        "wooden": 45.0,
+        "stone": 22.0,
+        "iron": 8.0,
+        "gold": 0.0,
+        "diamond": 5.0,
+        "redstone": 0.0,
+        "armor": 7.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 22.0,
+          "stone": 19.0,
+          "iron": 6.0,
+          "gold": 0.0,
+          "diamond": 3.0,
+          "redstone": 0.0,
+          "armor": 5.0
+        }
+      },
+      "Voyager|-": {
+        "wooden": 87.0,
+        "stone": 32.0,
+        "iron": 8.0,
+        "gold": 2.0,
+        "diamond": 1.0,
+        "redstone": 0.0,
+        "armor": 14.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 25.0,
+          "stone": 15.0,
+          "iron": 6.0,
+          "gold": 2.0,
+          "diamond": 1.0,
+          "redstone": 0.0,
+          "armor": 9.0
+        }
+      },
+      "DEPS|-": {
+        "wooden": 77.0,
+        "stone": 48.0,
+        "iron": 16.0,
+        "gold": 0.0,
+        "diamond": 1.0,
+        "redstone": 0.0,
+        "armor": 10.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 13.0,
+          "stone": 9.0,
+          "iron": 8.0,
+          "gold": 0.0,
+          "diamond": 1.0,
+          "redstone": 0.0,
+          "armor": 18.0
+        }
+      },
+      "MP5|-": {
+        "wooden": 89.0,
+        "stone": 73.0,
+        "iron": 43.0,
+        "gold": 10.0,
+        "diamond": 9.0,
+        "redstone": 17.0,
+        "armor": 19.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 23.0,
+          "stone": 21.0,
+          "iron": 18.0,
+          "gold": 8.0,
+          "diamond": 8.0,
+          "redstone": 8.0,
+          "armor": 18.0
+        }
+      },
+      "JARVIS-1|-": {
+        "wooden": 93.0,
+        "stone": 89.0,
+        "iron": 36.0,
+        "gold": 7.0,
+        "diamond": 8.0,
+        "redstone": 16.0,
+        "armor": 15.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 14.0,
+          "stone": 7.0,
+          "iron": 6.0,
+          "gold": 3.0,
+          "diamond": 3.0,
+          "redstone": 7.0,
+          "armor": 19.0
+        }
+      },
+      "Optimus-1|-": {
+        "wooden": 98.0,
+        "stone": 92.0,
+        "iron": 46.0,
+        "gold": 8.0,
+        "diamond": 11.0,
+        "redstone": 25.0,
+        "armor": 19.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 2.0,
+          "stone": 4.0,
+          "iron": 9.0,
+          "gold": 5.0,
+          "diamond": 5.0,
+          "redstone": 3.0,
+          "armor": 22.0
+        }
+      },
+      "Optimus-2|-": {
+        "wooden": 99.0,
+        "stone": 93.0,
+        "iron": 53.0,
+        "gold": 9.0,
+        "diamond": 13.0,
+        "redstone": 28.0,
+        "armor": 21.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 2.0,
+          "stone": 4.0,
+          "iron": 3.0,
+          "gold": 1.0,
+          "diamond": 2.0,
+          "redstone": 3.0,
+          "armor": 19.0
+        }
+      },
+      "Optimus-3-Action(ablation)|-": {
+        "wooden": 93.0,
+        "stone": 87.0,
+        "iron": 49.0,
+        "gold": 3.0,
+        "diamond": 3.0,
+        "redstone": 9.0,
+        "armor": 15.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 3.0,
+          "stone": 5.0,
+          "iron": 4.0,
+          "gold": 4.0,
+          "diamond": 2.0,
+          "redstone": 5.0,
+          "armor": 22.0
+        }
+      },
+      "Optimus-3|-": {
+        "wooden": 99.0,
+        "stone": 95.0,
+        "iron": 55.0,
+        "gold": 10.0,
+        "diamond": 15.0,
+        "redstone": 29.0,
+        "armor": 23.0,
+        "overall": null,
+        "overall_definition": "not reported as a single aggregate column in Table III; only per-group SR +/- SD given",
+        "sd_percent": {
+          "wooden": 1.0,
+          "stone": 2.0,
+          "iron": 3.0,
+          "gold": 2.0,
+          "diamond": 2.0,
+          "redstone": 2.0,
+          "armor": 16.0
+        }
+      }
+    },
+    "tasks": {
+      "Optimus-3|open-ended-benchmark(TableIV)": {
+        "wooden_00": {
+          "sr": 75.0,
+          "paper_task": "Wooden Pickaxe (Table IV, CR=0.89)",
+          "match": "exact",
+          "note": "Table IV is a SEPARATE small (5-task) open-ended/live-inventory crafting benchmark, NOT the 67-task tech-tree group benchmark in Table III. CR (completion rate, partial credit) also reported: 0.89."
+        },
+        "stone_04": {
+          "sr": 70.0,
+          "paper_task": "Stone Sword (Table IV, CR=0.86)",
+          "match": "exact",
+          "note": "see wooden_00 note re: Table IV scope"
+        },
+        "iron_12": {
+          "sr": 65.0,
+          "paper_task": "Iron Ingot (Table IV, CR=0.79)",
+          "match": "exact",
+          "note": "see wooden_00 note re: Table IV scope"
+        },
+        "diamond_05": {
+          "sr": 35.0,
+          "paper_task": "Diamond Sword (Table IV, CR=0.69)",
+          "match": "exact",
+          "note": "see wooden_00 note re: Table IV scope"
+        },
+        "gold_00": {
+          "sr": null,
+          "paper_task": "Golden Shovel (Table IV, CR=0.75, SR=0.55) -- our task list has no 'golden shovel' uid (only golden pickaxe/axe/sword/hoe)",
+          "match": "none"
+        }
+      }
+    }
+  }
+}

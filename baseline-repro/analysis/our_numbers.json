@@ -1,0 +1,5402 @@
+{
+ "C3/optimus3": {
+  "orders": 1,
+  "tasks": {
+   "armor_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_07": {
+    "succ": 1,
+    "runs": 1
+   },
+   "armor_08": {
+    "succ": 1,
+    "runs": 1
+   },
+   "armor_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_10": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_11": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_12": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_01": {
+    "succ": 1,
+    "runs": 1
+   },
+   "diamond_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_03": {
+    "succ": 1,
+    "runs": 1
+   },
+   "iron_04": {
+    "succ": 1,
+    "runs": 1
+   },
+   "iron_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_07": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_08": {
+    "succ": 1,
+    "runs": 1
+   },
+   "iron_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_10": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_11": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_12": {
+    "succ": 1,
+    "runs": 1
+   },
+   "iron_13": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_14": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_15": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_00": {
+    "succ": 1,
+    "runs": 1
+   },
+   "stone_01": {
+    "succ": 1,
+    "runs": 1
+   },
+   "stone_02": {
+    "succ": 1,
+    "runs": 1
+   },
+   "stone_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_04": {
+    "succ": 1,
+    "runs": 1
+   },
+   "stone_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_07": {
+    "succ": 1,
+    "runs": 1
+   },
+   "stone_08": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_09": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_00": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_01": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_02": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_03": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_05": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_07": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_08": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_09": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_10": {
+    "succ": 1,
+    "runs": 1
+   }
+  },
+  "groups": {
+   "wooden": {
+    "sr": 63.6,
+    "k": 7,
+    "n": 11,
+    "ci95": [
+     35.4,
+     84.8
+    ]
+   },
+   "stone": {
+    "sr": 60.0,
+    "k": 6,
+    "n": 10,
+    "ci95": [
+     31.3,
+     83.2
+    ]
+   },
+   "iron": {
+    "sr": 25.0,
+    "k": 4,
+    "n": 16,
+    "ci95": [
+     10.2,
+     49.5
+    ]
+   },
+   "gold": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 7,
+    "ci95": [
+     0.0,
+     35.4
+    ]
+   },
+   "redstone": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 6,
+    "ci95": [
+     0.0,
+     39.0
+    ]
+   },
+   "diamond": {
+    "sr": 14.3,
+    "k": 1,
+    "n": 7,
+    "ci95": [
+     2.6,
+     51.3
+    ]
+   },
+   "armor": {
+    "sr": 15.4,
+    "k": 2,
+    "n": 13,
+    "ci95": [
+     4.3,
+     42.2
+    ]
+   },
+   "overall": {
+    "sr": 28.6,
+    "k": 20,
+    "n": 70,
+    "ci95": [
+     19.3,
+     40.1
+    ]
+   }
+  },
+  "infra_or_crash_episodes": 0
+ },
+ "M/deps": {
+  "orders": 1,
+  "tasks": {
+   "armor_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_05": {
+    "succ": 1,
+    "runs": 1
+   },
+   "armor_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_07": {
+    "succ": 1,
+    "runs": 1
+   },
+   "armor_08": {
+    "succ": 1,
+    "runs": 1
+   },
+   "armor_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_10": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_11": {
+    "succ": 1,
+    "runs": 1
+   },
+   "armor_12": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_00": {
+    "succ": 1,
+    "runs": 1
+   },
+   "iron_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_02": {
+    "succ": 1,
+    "runs": 1
+   },
+   "iron_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_07": {
+    "succ": 1,
+    "runs": 1
+   },
+   "iron_08": {
+    "succ": 1,
+    "runs": 1
+   },
+   "iron_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_10": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_11": {
+    "succ": 1,
+    "runs": 1
+   },
+   "iron_12": {
+    "succ": 1,
+    "runs": 1
+   },
+   "iron_13": {
+    "succ": 1,
+    "runs": 1
+   },
+   "iron_14": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_15": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_05": {
+    "succ": 1,
+    "runs": 1
+   },
+   "stone_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_07": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_08": {
+    "succ": 1,
+    "runs": 1
+   },
+   "stone_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_01": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_05": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_06": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_07": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_08": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_10": {
+    "succ": 1,
+    "runs": 1
+   }
+  },
+  "groups": {
+   "wooden": {
+    "sr": 45.5,
+    "k": 5,
+    "n": 11,
+    "ci95": [
+     21.3,
+     72.0
+    ]
+   },
+   "stone": {
+    "sr": 20.0,
+    "k": 2,
+    "n": 10,
+    "ci95": [
+     5.7,
+     51.0
+    ]
+   },
+   "iron": {
+    "sr": 43.8,
+    "k": 7,
+    "n": 16,
+    "ci95": [
+     23.1,
+     66.8
+    ]
+   },
+   "gold": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 7,
+    "ci95": [
+     0.0,
+     35.4
+    ]
+   },
+   "redstone": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 6,
+    "ci95": [
+     0.0,
+     39.0
+    ]
+   },
+   "diamond": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 7,
+    "ci95": [
+     0.0,
+     35.4
+    ]
+   },
+   "armor": {
+    "sr": 30.8,
+    "k": 4,
+    "n": 13,
+    "ci95": [
+     12.7,
+     57.6
+    ]
+   },
+   "overall": {
+    "sr": 25.7,
+    "k": 18,
+    "n": 70,
+    "ci95": [
+     16.9,
+     37.0
+    ]
+   }
+  },
+  "infra_or_crash_episodes": 0
+ },
+ "M/jarvis1": {
+  "orders": 1,
+  "tasks": {
+   "armor_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_07": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_08": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_10": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_11": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_12": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_07": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_08": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_10": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_11": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_12": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_13": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_14": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_15": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_05": {
+    "succ": 1,
+    "runs": 1
+   },
+   "stone_06": {
+    "succ": 1,
+    "runs": 1
+   },
+   "stone_07": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_08": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_00": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_01": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_03": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_04": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_06": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_07": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_08": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_10": {
+    "succ": 1,
+    "runs": 1
+   }
+  },
+  "groups": {
+   "wooden": {
+    "sr": 72.7,
+    "k": 8,
+    "n": 11,
+    "ci95": [
+     43.4,
+     90.3
+    ]
+   },
+   "stone": {
+    "sr": 20.0,
+    "k": 2,
+    "n": 10,
+    "ci95": [
+     5.7,
+     51.0
+    ]
+   },
+   "iron": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 16,
+    "ci95": [
+     0.0,
+     19.4
+    ]
+   },
+   "gold": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 7,
+    "ci95": [
+     0.0,
+     35.4
+    ]
+   },
+   "redstone": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 6,
+    "ci95": [
+     0.0,
+     39.0
+    ]
+   },
+   "diamond": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 7,
+    "ci95": [
+     0.0,
+     35.4
+    ]
+   },
+   "armor": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 13,
+    "ci95": [
+     0.0,
+     22.8
+    ]
+   },
+   "overall": {
+    "sr": 14.3,
+    "k": 10,
+    "n": 70,
+    "ci95": [
+     7.9,
+     24.3
+    ]
+   }
+  },
+  "infra_or_crash_episodes": 1
+ },
+ "M/mineevolve": {
+  "orders": 3,
+  "tasks": {
+   "armor_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_12": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_12": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_13": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_14": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_15": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_00": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_01": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_03": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_05": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_00": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_01": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_02": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_03": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_04": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_05": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_06": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_07": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_08": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_09": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_10": {
+    "succ": 3,
+    "runs": 3
+   }
+  },
+  "groups": {
+   "wooden": {
+    "sr": 60.6,
+    "k": 20,
+    "n": 33,
+    "ci95": [
+     43.7,
+     75.3
+    ]
+   },
+   "stone": {
+    "sr": 13.3,
+    "k": 4,
+    "n": 30,
+    "ci95": [
+     5.3,
+     29.7
+    ]
+   },
+   "iron": {
+    "sr": 2.1,
+    "k": 1,
+    "n": 48,
+    "ci95": [
+     0.4,
+     10.9
+    ]
+   },
+   "gold": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 21,
+    "ci95": [
+     0.0,
+     15.5
+    ]
+   },
+   "redstone": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 18,
+    "ci95": [
+     0.0,
+     17.6
+    ]
+   },
+   "diamond": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 21,
+    "ci95": [
+     0.0,
+     15.5
+    ]
+   },
+   "armor": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 39,
+    "ci95": [
+     0.0,
+     9.0
+    ]
+   },
+   "overall": {
+    "sr": 11.9,
+    "k": 25,
+    "n": 210,
+    "ci95": [
+     8.2,
+     17.0
+    ]
+   }
+  },
+  "infra_or_crash_episodes": 2
+ },
+ "M/optimus1-empty": {
+  "orders": 3,
+  "tasks": {
+   "armor_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_12": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_12": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_13": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_14": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_15": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_00": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_01": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_03": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_06": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_07": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_08": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_10": {
+    "succ": 1,
+    "runs": 3
+   }
+  },
+  "groups": {
+   "wooden": {
+    "sr": 3.0,
+    "k": 1,
+    "n": 33,
+    "ci95": [
+     0.5,
+     15.3
+    ]
+   },
+   "stone": {
+    "sr": 30.0,
+    "k": 9,
+    "n": 30,
+    "ci95": [
+     16.7,
+     47.9
+    ]
+   },
+   "iron": {
+    "sr": 2.1,
+    "k": 1,
+    "n": 48,
+    "ci95": [
+     0.4,
+     10.9
+    ]
+   },
+   "gold": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 21,
+    "ci95": [
+     0.0,
+     15.5
+    ]
+   },
+   "redstone": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 18,
+    "ci95": [
+     0.0,
+     17.6
+    ]
+   },
+   "diamond": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 21,
+    "ci95": [
+     0.0,
+     15.5
+    ]
+   },
+   "armor": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 39,
+    "ci95": [
+     0.0,
+     9.0
+    ]
+   },
+   "overall": {
+    "sr": 5.2,
+    "k": 11,
+    "n": 210,
+    "ci95": [
+     2.9,
+     9.1
+    ]
+   }
+  },
+  "infra_or_crash_episodes": 0
+ },
+ "M/optimus1-empty-goalfix": {
+  "orders": 3,
+  "tasks": {
+   "armor_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_12": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_00": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_03": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_07": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_12": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_13": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_14": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_15": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_01": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_02": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_03": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_04": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_07": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_08": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_09": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_00": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_01": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_02": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_03": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_04": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_10": {
+    "succ": 2,
+    "runs": 3
+   }
+  },
+  "groups": {
+   "wooden": {
+    "sr": 27.3,
+    "k": 9,
+    "n": 33,
+    "ci95": [
+     15.1,
+     44.2
+    ]
+   },
+   "stone": {
+    "sr": 26.7,
+    "k": 8,
+    "n": 30,
+    "ci95": [
+     14.2,
+     44.4
+    ]
+   },
+   "iron": {
+    "sr": 8.3,
+    "k": 4,
+    "n": 48,
+    "ci95": [
+     3.3,
+     19.6
+    ]
+   },
+   "gold": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 21,
+    "ci95": [
+     0.0,
+     15.5
+    ]
+   },
+   "redstone": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 18,
+    "ci95": [
+     0.0,
+     17.6
+    ]
+   },
+   "diamond": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 21,
+    "ci95": [
+     0.0,
+     15.5
+    ]
+   },
+   "armor": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 39,
+    "ci95": [
+     0.0,
+     9.0
+    ]
+   },
+   "overall": {
+    "sr": 10.0,
+    "k": 21,
+    "n": 210,
+    "ci95": [
+     6.6,
+     14.8
+    ]
+   }
+  },
+  "infra_or_crash_episodes": 0
+ },
+ "M/optimus1-prebuilt": {
+  "orders": 3,
+  "tasks": {
+   "armor_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_04": {
+    "succ": 1,
+    "runs": 3
+   },
+   "armor_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_07": {
+    "succ": 3,
+    "runs": 3
+   },
+   "armor_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_12": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_00": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_01": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_02": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_03": {
+    "succ": 3,
+    "runs": 3
+   },
+   "iron_04": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_05": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_06": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_07": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_08": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_09": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_10": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_11": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_12": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_13": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_14": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_15": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_00": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_01": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_02": {
+    "succ": 3,
+    "runs": 3
+   },
+   "stone_03": {
+    "succ": 3,
+    "runs": 3
+   },
+   "stone_04": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_07": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_08": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_09": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_00": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_01": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_02": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_03": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_04": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_05": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_06": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_07": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_10": {
+    "succ": 3,
+    "runs": 3
+   }
+  },
+  "groups": {
+   "wooden": {
+    "sr": 75.8,
+    "k": 25,
+    "n": 33,
+    "ci95": [
+     59.0,
+     87.2
+    ]
+   },
+   "stone": {
+    "sr": 46.7,
+    "k": 14,
+    "n": 30,
+    "ci95": [
+     30.2,
+     63.9
+    ]
+   },
+   "iron": {
+    "sr": 43.8,
+    "k": 21,
+    "n": 48,
+    "ci95": [
+     30.7,
+     57.7
+    ]
+   },
+   "gold": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 21,
+    "ci95": [
+     0.0,
+     15.5
+    ]
+   },
+   "redstone": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 18,
+    "ci95": [
+     0.0,
+     17.6
+    ]
+   },
+   "diamond": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 21,
+    "ci95": [
+     0.0,
+     15.5
+    ]
+   },
+   "armor": {
+    "sr": 10.3,
+    "k": 4,
+    "n": 39,
+    "ci95": [
+     4.1,
+     23.6
+    ]
+   },
+   "overall": {
+    "sr": 30.5,
+    "k": 64,
+    "n": 210,
+    "ci95": [
+     24.6,
+     37.0
+    ]
+   }
+  },
+  "infra_or_crash_episodes": 2
+ },
+ "M/optimus1-prebuilt-goalfix": {
+  "orders": 3,
+  "tasks": {
+   "armor_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_04": {
+    "succ": 1,
+    "runs": 3
+   },
+   "armor_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_06": {
+    "succ": 1,
+    "runs": 3
+   },
+   "armor_07": {
+    "succ": 2,
+    "runs": 3
+   },
+   "armor_08": {
+    "succ": 2,
+    "runs": 3
+   },
+   "armor_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_12": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_00": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_01": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_02": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_03": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_05": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_06": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_07": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_08": {
+    "succ": 3,
+    "runs": 3
+   },
+   "iron_09": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_11": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_12": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_13": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_14": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_15": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_00": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_01": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_02": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_03": {
+    "succ": 3,
+    "runs": 3
+   },
+   "stone_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_08": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_09": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_00": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_01": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_02": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_03": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_04": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_05": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_06": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_07": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_09": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_10": {
+    "succ": 3,
+    "runs": 3
+   }
+  },
+  "groups": {
+   "wooden": {
+    "sr": 69.7,
+    "k": 23,
+    "n": 33,
+    "ci95": [
+     52.7,
+     82.6
+    ]
+   },
+   "stone": {
+    "sr": 33.3,
+    "k": 10,
+    "n": 30,
+    "ci95": [
+     19.2,
+     51.2
+    ]
+   },
+   "iron": {
+    "sr": 41.7,
+    "k": 20,
+    "n": 48,
+    "ci95": [
+     28.8,
+     55.7
+    ]
+   },
+   "gold": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 21,
+    "ci95": [
+     0.0,
+     15.5
+    ]
+   },
+   "redstone": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 18,
+    "ci95": [
+     0.0,
+     17.6
+    ]
+   },
+   "diamond": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 21,
+    "ci95": [
+     0.0,
+     15.5
+    ]
+   },
+   "armor": {
+    "sr": 15.4,
+    "k": 6,
+    "n": 39,
+    "ci95": [
+     7.2,
+     29.7
+    ]
+   },
+   "overall": {
+    "sr": 28.1,
+    "k": 59,
+    "n": 210,
+    "ci95": [
+     22.5,
+     34.5
+    ]
+   }
+  },
+  "infra_or_crash_episodes": 3
+ },
+ "O/deps": {
+  "orders": 1,
+  "tasks": {
+   "armor_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_06": {
+    "succ": 1,
+    "runs": 1
+   },
+   "armor_07": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_08": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_10": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_11": {
+    "succ": 1,
+    "runs": 1
+   },
+   "armor_12": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_05": {
+    "succ": 1,
+    "runs": 1
+   },
+   "iron_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_07": {
+    "succ": 1,
+    "runs": 1
+   },
+   "iron_08": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_10": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_11": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_12": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_13": {
+    "succ": 1,
+    "runs": 1
+   },
+   "iron_14": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_15": {
+    "succ": 1,
+    "runs": 1
+   },
+   "redstone_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_05": {
+    "succ": 1,
+    "runs": 1
+   },
+   "stone_06": {
+    "succ": 1,
+    "runs": 1
+   },
+   "stone_07": {
+    "succ": 1,
+    "runs": 1
+   },
+   "stone_08": {
+    "succ": 1,
+    "runs": 1
+   },
+   "stone_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_03": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_06": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_07": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_08": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_10": {
+    "succ": 1,
+    "runs": 1
+   }
+  },
+  "groups": {
+   "wooden": {
+    "sr": 27.3,
+    "k": 3,
+    "n": 11,
+    "ci95": [
+     9.7,
+     56.6
+    ]
+   },
+   "stone": {
+    "sr": 40.0,
+    "k": 4,
+    "n": 10,
+    "ci95": [
+     16.8,
+     68.7
+    ]
+   },
+   "iron": {
+    "sr": 25.0,
+    "k": 4,
+    "n": 16,
+    "ci95": [
+     10.2,
+     49.5
+    ]
+   },
+   "gold": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 7,
+    "ci95": [
+     0.0,
+     35.4
+    ]
+   },
+   "redstone": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 6,
+    "ci95": [
+     0.0,
+     39.0
+    ]
+   },
+   "diamond": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 7,
+    "ci95": [
+     0.0,
+     35.4
+    ]
+   },
+   "armor": {
+    "sr": 15.4,
+    "k": 2,
+    "n": 13,
+    "ci95": [
+     4.3,
+     42.2
+    ]
+   },
+   "overall": {
+    "sr": 18.6,
+    "k": 13,
+    "n": 70,
+    "ci95": [
+     11.2,
+     29.2
+    ]
+   }
+  },
+  "infra_or_crash_episodes": 0
+ },
+ "O/jarvis1": {
+  "orders": 1,
+  "tasks": {
+   "armor_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_07": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_08": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_10": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_11": {
+    "succ": 0,
+    "runs": 1
+   },
+   "armor_12": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "diamond_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "gold_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_07": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_08": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_10": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_11": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_12": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_13": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_14": {
+    "succ": 0,
+    "runs": 1
+   },
+   "iron_15": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "redstone_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_01": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_04": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_05": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_06": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_07": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_08": {
+    "succ": 0,
+    "runs": 1
+   },
+   "stone_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_00": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_01": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_02": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_03": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_04": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_05": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_06": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_07": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_08": {
+    "succ": 1,
+    "runs": 1
+   },
+   "wooden_09": {
+    "succ": 0,
+    "runs": 1
+   },
+   "wooden_10": {
+    "succ": 1,
+    "runs": 1
+   }
+  },
+  "groups": {
+   "wooden": {
+    "sr": 63.6,
+    "k": 7,
+    "n": 11,
+    "ci95": [
+     35.4,
+     84.8
+    ]
+   },
+   "stone": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 10,
+    "ci95": [
+     -0.0,
+     27.8
+    ]
+   },
+   "iron": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 16,
+    "ci95": [
+     0.0,
+     19.4
+    ]
+   },
+   "gold": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 7,
+    "ci95": [
+     0.0,
+     35.4
+    ]
+   },
+   "redstone": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 6,
+    "ci95": [
+     0.0,
+     39.0
+    ]
+   },
+   "diamond": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 7,
+    "ci95": [
+     0.0,
+     35.4
+    ]
+   },
+   "armor": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 13,
+    "ci95": [
+     0.0,
+     22.8
+    ]
+   },
+   "overall": {
+    "sr": 10.0,
+    "k": 7,
+    "n": 70,
+    "ci95": [
+     4.9,
+     19.2
+    ]
+   }
+  },
+  "infra_or_crash_episodes": 1
+ },
+ "O/mineevolve": {
+  "orders": 3,
+  "tasks": {
+   "armor_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_07": {
+    "succ": 1,
+    "runs": 3
+   },
+   "armor_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_12": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_12": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_13": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_14": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_15": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_00": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_02": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_03": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_07": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_08": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_09": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_00": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_02": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_03": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_04": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_05": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_06": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_07": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_10": {
+    "succ": 1,
+    "runs": 3
+   }
+  },
+  "groups": {
+   "wooden": {
+    "sr": 33.3,
+    "k": 11,
+    "n": 33,
+    "ci95": [
+     19.8,
+     50.4
+    ]
+   },
+   "stone": {
+    "sr": 20.0,
+    "k": 6,
+    "n": 30,
+    "ci95": [
+     9.5,
+     37.3
+    ]
+   },
+   "iron": {
+    "sr": 6.2,
+    "k": 3,
+    "n": 48,
+    "ci95": [
+     2.1,
+     16.8
+    ]
+   },
+   "gold": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 21,
+    "ci95": [
+     0.0,
+     15.5
+    ]
+   },
+   "redstone": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 18,
+    "ci95": [
+     0.0,
+     17.6
+    ]
+   },
+   "diamond": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 21,
+    "ci95": [
+     0.0,
+     15.5
+    ]
+   },
+   "armor": {
+    "sr": 2.6,
+    "k": 1,
+    "n": 39,
+    "ci95": [
+     0.5,
+     13.2
+    ]
+   },
+   "overall": {
+    "sr": 10.0,
+    "k": 21,
+    "n": 210,
+    "ci95": [
+     6.6,
+     14.8
+    ]
+   }
+  },
+  "infra_or_crash_episodes": 0
+ },
+ "O/optimus1-empty": {
+  "orders": 3,
+  "tasks": {
+   "armor_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_12": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_02": {
+    "succ": 1,
+    "runs": 3
+   },
+   "gold_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_04": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_08": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_09": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_12": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_13": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_14": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_15": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_01": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_02": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_03": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_08": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_09": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_00": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_01": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_02": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_03": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_05": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_08": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_09": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_10": {
+    "succ": 1,
+    "runs": 3
+   }
+  },
+  "groups": {
+   "wooden": {
+    "sr": 24.2,
+    "k": 8,
+    "n": 33,
+    "ci95": [
+     12.8,
+     41.0
+    ]
+   },
+   "stone": {
+    "sr": 16.7,
+    "k": 5,
+    "n": 30,
+    "ci95": [
+     7.3,
+     33.6
+    ]
+   },
+   "iron": {
+    "sr": 8.3,
+    "k": 4,
+    "n": 48,
+    "ci95": [
+     3.3,
+     19.6
+    ]
+   },
+   "gold": {
+    "sr": 4.8,
+    "k": 1,
+    "n": 21,
+    "ci95": [
+     0.8,
+     22.7
+    ]
+   },
+   "redstone": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 18,
+    "ci95": [
+     0.0,
+     17.6
+    ]
+   },
+   "diamond": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 21,
+    "ci95": [
+     0.0,
+     15.5
+    ]
+   },
+   "armor": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 39,
+    "ci95": [
+     0.0,
+     9.0
+    ]
+   },
+   "overall": {
+    "sr": 8.6,
+    "k": 18,
+    "n": 210,
+    "ci95": [
+     5.5,
+     13.1
+    ]
+   }
+  },
+  "infra_or_crash_episodes": 0
+ },
+ "O/optimus1-empty-goalfix": {
+  "orders": 3,
+  "tasks": {
+   "armor_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_12": {
+    "succ": 1,
+    "runs": 3
+   },
+   "diamond_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_02": {
+    "succ": 2,
+    "runs": 3
+   },
+   "gold_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_04": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_12": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_13": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_14": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_15": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_01": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_03": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_04": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_05": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_06": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_07": {
+    "succ": 1,
+    "runs": 3
+   },
+   "stone_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_09": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_00": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_01": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_03": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_04": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_05": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_06": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_10": {
+    "succ": 2,
+    "runs": 3
+   }
+  },
+  "groups": {
+   "wooden": {
+    "sr": 30.3,
+    "k": 10,
+    "n": 33,
+    "ci95": [
+     17.4,
+     47.3
+    ]
+   },
+   "stone": {
+    "sr": 33.3,
+    "k": 10,
+    "n": 30,
+    "ci95": [
+     19.2,
+     51.2
+    ]
+   },
+   "iron": {
+    "sr": 6.2,
+    "k": 3,
+    "n": 48,
+    "ci95": [
+     2.1,
+     16.8
+    ]
+   },
+   "gold": {
+    "sr": 9.5,
+    "k": 2,
+    "n": 21,
+    "ci95": [
+     2.7,
+     28.9
+    ]
+   },
+   "redstone": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 18,
+    "ci95": [
+     0.0,
+     17.6
+    ]
+   },
+   "diamond": {
+    "sr": 0.0,
+    "k": 0,
+    "n": 21,
+    "ci95": [
+     0.0,
+     15.5
+    ]
+   },
+   "armor": {
+    "sr": 2.6,
+    "k": 1,
+    "n": 39,
+    "ci95": [
+     0.5,
+     13.2
+    ]
+   },
+   "overall": {
+    "sr": 12.4,
+    "k": 26,
+    "n": 210,
+    "ci95": [
+     8.6,
+     17.5
+    ]
+   }
+  },
+  "infra_or_crash_episodes": 0
+ },
+ "O/optimus1-prebuilt": {
+  "orders": 3,
+  "tasks": {
+   "armor_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_04": {
+    "succ": 3,
+    "runs": 3
+   },
+   "armor_05": {
+    "succ": 3,
+    "runs": 3
+   },
+   "armor_06": {
+    "succ": 1,
+    "runs": 3
+   },
+   "armor_07": {
+    "succ": 3,
+    "runs": 3
+   },
+   "armor_08": {
+    "succ": 2,
+    "runs": 3
+   },
+   "armor_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_12": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_01": {
+    "succ": 1,
+    "runs": 3
+   },
+   "diamond_02": {
+    "succ": 2,
+    "runs": 3
+   },
+   "diamond_03": {
+    "succ": 1,
+    "runs": 3
+   },
+   "diamond_04": {
+    "succ": 1,
+    "runs": 3
+   },
+   "diamond_05": {
+    "succ": 1,
+    "runs": 3
+   },
+   "diamond_06": {
+    "succ": 1,
+    "runs": 3
+   },
+   "gold_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_02": {
+    "succ": 1,
+    "runs": 3
+   },
+   "gold_03": {
+    "succ": 2,
+    "runs": 3
+   },
+   "gold_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_00": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_01": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_02": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_03": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_04": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_05": {
+    "succ": 3,
+    "runs": 3
+   },
+   "iron_06": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_07": {
+    "succ": 3,
+    "runs": 3
+   },
+   "iron_08": {
+    "succ": 3,
+    "runs": 3
+   },
+   "iron_09": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_10": {
+    "succ": 3,
+    "runs": 3
+   },
+   "iron_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_12": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_13": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_14": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_15": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_01": {
+    "succ": 2,
+    "runs": 3
+   },
+   "redstone_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_04": {
+    "succ": 1,
+    "runs": 3
+   },
+   "redstone_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_00": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_01": {
+    "succ": 3,
+    "runs": 3
+   },
+   "stone_02": {
+    "succ": 3,
+    "runs": 3
+   },
+   "stone_03": {
+    "succ": 3,
+    "runs": 3
+   },
+   "stone_04": {
+    "succ": 3,
+    "runs": 3
+   },
+   "stone_05": {
+    "succ": 3,
+    "runs": 3
+   },
+   "stone_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_07": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_08": {
+    "succ": 3,
+    "runs": 3
+   },
+   "stone_09": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_00": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_01": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_02": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_03": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_04": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_05": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_06": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_10": {
+    "succ": 3,
+    "runs": 3
+   }
+  },
+  "groups": {
+   "wooden": {
+    "sr": 66.7,
+    "k": 22,
+    "n": 33,
+    "ci95": [
+     49.6,
+     80.2
+    ]
+   },
+   "stone": {
+    "sr": 76.7,
+    "k": 23,
+    "n": 30,
+    "ci95": [
+     59.1,
+     88.2
+    ]
+   },
+   "iron": {
+    "sr": 56.2,
+    "k": 27,
+    "n": 48,
+    "ci95": [
+     42.3,
+     69.3
+    ]
+   },
+   "gold": {
+    "sr": 14.3,
+    "k": 3,
+    "n": 21,
+    "ci95": [
+     5.0,
+     34.6
+    ]
+   },
+   "redstone": {
+    "sr": 16.7,
+    "k": 3,
+    "n": 18,
+    "ci95": [
+     5.8,
+     39.2
+    ]
+   },
+   "diamond": {
+    "sr": 33.3,
+    "k": 7,
+    "n": 21,
+    "ci95": [
+     17.2,
+     54.6
+    ]
+   },
+   "armor": {
+    "sr": 30.8,
+    "k": 12,
+    "n": 39,
+    "ci95": [
+     18.6,
+     46.4
+    ]
+   },
+   "overall": {
+    "sr": 46.2,
+    "k": 97,
+    "n": 210,
+    "ci95": [
+     39.6,
+     52.9
+    ]
+   }
+  },
+  "infra_or_crash_episodes": 0
+ },
+ "O/optimus1-prebuilt-goalfix": {
+  "orders": 3,
+  "tasks": {
+   "armor_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_04": {
+    "succ": 1,
+    "runs": 3
+   },
+   "armor_05": {
+    "succ": 3,
+    "runs": 3
+   },
+   "armor_06": {
+    "succ": 2,
+    "runs": 3
+   },
+   "armor_07": {
+    "succ": 1,
+    "runs": 3
+   },
+   "armor_08": {
+    "succ": 2,
+    "runs": 3
+   },
+   "armor_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_10": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_11": {
+    "succ": 0,
+    "runs": 3
+   },
+   "armor_12": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_01": {
+    "succ": 2,
+    "runs": 3
+   },
+   "diamond_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_03": {
+    "succ": 2,
+    "runs": 3
+   },
+   "diamond_04": {
+    "succ": 1,
+    "runs": 3
+   },
+   "diamond_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "diamond_06": {
+    "succ": 2,
+    "runs": 3
+   },
+   "gold_00": {
+    "succ": 1,
+    "runs": 3
+   },
+   "gold_01": {
+    "succ": 3,
+    "runs": 3
+   },
+   "gold_02": {
+    "succ": 3,
+    "runs": 3
+   },
+   "gold_03": {
+    "succ": 1,
+    "runs": 3
+   },
+   "gold_04": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "gold_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_00": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_01": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_02": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_03": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_04": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_06": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_07": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_08": {
+    "succ": 3,
+    "runs": 3
+   },
+   "iron_09": {
+    "succ": 0,
+    "runs": 3
+   },
+   "iron_10": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_11": {
+    "succ": 2,
+    "runs": 3
+   },
+   "iron_12": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_13": {
+    "succ": 3,
+    "runs": 3
+   },
+   "iron_14": {
+    "succ": 1,
+    "runs": 3
+   },
+   "iron_15": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_00": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_01": {
+    "succ": 3,
+    "runs": 3
+   },
+   "redstone_02": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_03": {
+    "succ": 0,
+    "runs": 3
+   },
+   "redstone_04": {
+    "succ": 2,
+    "runs": 3
+   },
+   "redstone_05": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_00": {
+    "succ": 3,
+    "runs": 3
+   },
+   "stone_01": {
+    "succ": 3,
+    "runs": 3
+   },
+   "stone_02": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_03": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_04": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_05": {
+    "succ": 3,
+    "runs": 3
+   },
+   "stone_06": {
+    "succ": 0,
+    "runs": 3
+   },
+   "stone_07": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_08": {
+    "succ": 2,
+    "runs": 3
+   },
+   "stone_09": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_00": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_01": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_02": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_03": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_04": {
+    "succ": 2,
+    "runs": 3
+   },
+   "wooden_05": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_06": {
+    "succ": 3,
+    "runs": 3
+   },
+   "wooden_07": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_08": {
+    "succ": 0,
+    "runs": 3
+   },
+   "wooden_09": {
+    "succ": 1,
+    "runs": 3
+   },
+   "wooden_10": {
+    "succ": 3,
+    "runs": 3
+   }
+  },
+  "groups": {
+   "wooden": {
+    "sr": 63.6,
+    "k": 21,
+    "n": 33,
+    "ci95": [
+     46.6,
+     77.8
+    ]
+   },
+   "stone": {
+    "sr": 70.0,
+    "k": 21,
+    "n": 30,
+    "ci95": [
+     52.1,
+     83.3
+    ]
+   },
+   "iron": {
+    "sr": 43.8,
+    "k": 21,
+    "n": 48,
+    "ci95": [
+     30.7,
+     57.7
+    ]
+   },
+   "gold": {
+    "sr": 38.1,
+    "k": 8,
+    "n": 21,
+    "ci95": [
+     20.8,
+     59.1
+    ]
+   },
+   "redstone": {
+    "sr": 27.8,
+    "k": 5,
+    "n": 18,
+    "ci95": [
+     12.5,
+     50.9
+    ]
+   },
+   "diamond": {
+    "sr": 33.3,
+    "k": 7,
+    "n": 21,
+    "ci95": [
+     17.2,
+     54.6
+    ]
+   },
+   "armor": {
+    "sr": 23.1,
+    "k": 9,
+    "n": 39,
+    "ci95": [
+     12.6,
+     38.3
+    ]
+   },
+   "overall": {
+    "sr": 43.8,
+    "k": 92,
+    "n": 210,
+    "ci95": [
+     37.3,
+     50.6
+    ]
+   }
+  },
+  "infra_or_crash_episodes": 0
+ }
+}
