@@ -2,6 +2,7 @@
 
     conda run -n optimus3 python analysis/fig_repro_slides.py   (any env with matplotlib)
     -> analysis/out/fig_repro_optimus1.png   Optimus-1 reproduces in its own environment
+    -> analysis/out/fig_repro_optimus1_envM.png   the same Optimus-1 in MineEvolve's environment
     -> analysis/out/fig_repro_release.png    the others vs how complete their release is
 
 Only measured numbers (analysis/our_numbers.json, Wilson 95% CIs) and
@@ -36,8 +37,8 @@ def style():
                          "axes.labelcolor": INK, "xtick.color": INK, "ytick.color": MUTED})
 
 
-def fig_optimus1():
-    o = OURS["O/optimus1-prebuilt"]["groups"]
+def fig_optimus1(env: str = "O"):
+    o = OURS[f"{env}/optimus1-prebuilt"]["groups"]
     p = PAPERS["optimus1"]["groups"]["Optimus-1|-"]
     cats = GROUPS + ["overall"]
     pv = [p[g] for g in GROUPS] + [weighted(p)]
@@ -49,8 +50,9 @@ def fig_optimus1():
         ax.plot([x, x], [lo, hi], color=BLUE, lw=9, alpha=0.25, solid_capstyle="round", zorder=1)
         ax.scatter([x], [r["sr"]], s=90, color=BLUE, edgecolor="white", lw=1.5, zorder=3)
         ax.plot([x - 0.28, x + 0.28], [pv[i]] * 2, color=INK, lw=2.5, zorder=2)
-        ax.text(x, max(hi, pv[i]) + 4, "✓" if inside else ("↓" if r["sr"] < pv[i] else "↑"),
-                ha="center", fontsize=15, color=GREEN if inside else RED, fontweight="bold")
+        # 0 successes: the interval is wide enough to hold small paper values, which says "can't tell", not "matches"
+        mark, mcol = ("?", MUTED) if inside and r["sr"] == 0 else ("✓", GREEN) if inside else ("↓" if r["sr"] < pv[i] else "↑", RED)
+        ax.text(x, max(hi, pv[i]) + 4, mark, ha="center", fontsize=15, color=mcol, fontweight="bold")
         ax.text(x, -9, f"{r['sr']:.0f} / {pv[i]:.0f}", ha="center", fontsize=11, color=MUTED)
     ax.set_xticks([i + (0.6 if g == "overall" else 0) for i, g in enumerate(cats)])
     ax.set_xticklabels([f"{GL[g]}\n({NT[g]} tasks)" for g in GROUPS] + ["Overall\n(70 tasks)"])
@@ -61,15 +63,22 @@ def fig_optimus1():
         ax.spines[s].set_visible(False)
     ax.grid(axis="y", color=LINE, lw=0.8, ls=":")
     ax.text(-0.5, -12.5, "ours / paper", fontsize=10, color=MUTED)
-    h1 = ax.scatter([], [], s=90, color=BLUE, label="ours: Gemini-3-Flash, Env O, authors' full memory, 3 task orders (bar = 95% range)")
+    h1 = ax.scatter([], [], s=90, color=BLUE, label=f"ours: Gemini-3-Flash, Env {env}, authors' full memory, 3 task orders (bar = 95% range)")
     h2, = ax.plot([], [], color=INK, lw=2.5, label="Optimus-1 paper, Table 1 (GPT-4V)")
     ax.legend(handles=[h1, h2], loc="upper right", frameon=False, fontsize=11)
-    ax.set_title("Optimus-1 reproduces in its own environment: overall 46.2% vs 47.1% in the paper",
-                 loc="left", fontsize=15, color=INK, fontweight="bold")
-    fig.text(0.01, 0.005, "✓ paper value inside our 95% range.  Wood/Stone below the paper, Diamond above it "
-             "(Env O places diamond ore under the agent). Paper overall = its group values weighted by our task counts.",
-             fontsize=10, color=MUTED)
-    fig.savefig(OUT / "fig_repro_optimus1.png", bbox_inches="tight", facecolor="white")
+    ov, pov = o["overall"]["sr"], weighted(p)
+    if env == "O":
+        title = f"Optimus-1 reproduces in its own environment: overall {ov:.1f}% vs {pov:.1f}% in the paper"
+        note = "Wood/Stone below the paper, Diamond above it (Env O places diamond ore under the agent)."
+    else:
+        title = f"Same Optimus-1, MineEvolve's environment: overall {ov:.1f}% vs {pov:.1f}% in the paper"
+        note = ("Same code, memory, planner, tasks, seeds and orders as in Env O; the environment differs "
+                "(ore placement almost never gives diamond, no auto-pickaxe, no /kill, functional crafting; STEVE-1 guidance 4.0 vs 6.0).")
+    ax.set_title(title, loc="left", fontsize=15, color=INK, fontweight="bold")
+    fig.text(0.01, -0.03, "✓ paper value inside our 95% range; ? zero successes, range too wide to tell. "
+             "Paper overall = its group values weighted by our task counts.\n" + note, fontsize=10, color=MUTED)
+    fig.savefig(OUT / ("fig_repro_optimus1.png" if env == "O" else f"fig_repro_optimus1_env{env}.png"),
+                bbox_inches="tight", facecolor="white")
 
 
 def fig_release():
@@ -124,5 +133,5 @@ def fig_release():
 
 if __name__ == "__main__":
     style(); OUT.mkdir(exist_ok=True)
-    fig_optimus1(); fig_release()
+    fig_optimus1("O"); fig_optimus1("M"); fig_release()
     print(OUT / "fig_repro_optimus1.png", OUT / "fig_repro_release.png")
