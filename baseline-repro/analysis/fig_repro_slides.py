@@ -3,6 +3,7 @@
     conda run -n optimus3 python analysis/fig_repro_slides.py   (any env with matplotlib)
     -> analysis/out/fig_repro_optimus1.png   Optimus-1 reproduces in its own environment
     -> analysis/out/fig_repro_optimus1_envM.png   the same Optimus-1 in MineEvolve's environment
+    -> analysis/out/fig_repro_mineevolve_env{M,O}.png   MineEvolve, same format
     -> analysis/out/fig_repro_release.png    the others vs how complete their release is
 
 Only measured numbers (analysis/our_numbers.json, Wilson 95% CIs) and
@@ -37,11 +38,11 @@ def style():
                          "axes.labelcolor": INK, "xtick.color": INK, "ytick.color": MUTED})
 
 
-def fig_optimus1(env: str = "O"):
-    o = OURS[f"{env}/optimus1-prebuilt"]["groups"]
-    p = PAPERS["optimus1"]["groups"]["Optimus-1|-"]
+def fig_groups(env: str, chain: str, paper: dict, paper_label: str, ours_label: str, title: str, note: str, out: str):
+    """Per-group success, ours (dot + 95% range) vs the paper (black line), plus overall."""
+    o = OURS[f"{env}/{chain}"]["groups"]
     cats = GROUPS + ["overall"]
-    pv = [p[g] for g in GROUPS] + [weighted(p)]
+    pv = [paper[g] for g in GROUPS] + [weighted(paper)]
     fig, ax = plt.subplots(figsize=(13.33, 6.2), dpi=150)
     for i, g in enumerate(cats):
         r = o[g]; lo, hi = r["ci95"]
@@ -64,22 +65,41 @@ def fig_optimus1(env: str = "O"):
         ax.spines[s].set_visible(False)
     ax.grid(axis="y", color=LINE, lw=0.8, ls=":")
     ax.text(-0.5, -12.5, "ours / paper", fontsize=10, color=MUTED)
-    h1 = ax.scatter([], [], s=90, color=BLUE, label=f"ours: Gemini-3-Flash, Env {env}, authors' full memory, 3 task orders (bar = 95% range)")
-    h2, = ax.plot([], [], color=INK, lw=2.5, label="Optimus-1 paper, Table 1 (GPT-4V)")
+    h1 = ax.scatter([], [], s=90, color=BLUE, label=ours_label)
+    h2, = ax.plot([], [], color=INK, lw=2.5, label=paper_label)
     ax.legend(handles=[h1, h2], loc="upper right", frameon=False, fontsize=11)
-    ov, pov = o["overall"]["sr"], weighted(p)
-    if env == "O":
-        title = f"Optimus-1 reproduces in its own environment: overall {ov:.1f}% vs {pov:.1f}% in the paper"
-        note = "Wood/Stone below the paper, Diamond above it (Env O places diamond ore under the agent)."
-    else:
-        title = f"Same Optimus-1, MineEvolve's environment: overall {ov:.1f}% vs {pov:.1f}% in the paper"
-        note = ("Same code, memory, planner, tasks, seeds and orders as in Env O; the environment differs "
-                "(ore placement almost never gives diamond, no auto-pickaxe, no /kill, functional crafting; STEVE-1 guidance 4.0 vs 6.0).")
-    ax.set_title(title, loc="left", fontsize=15, color=INK, fontweight="bold")
+    ov, pov = o["overall"]["sr"], weighted(paper)
+    ax.set_title(title.format(ov=ov, pov=pov), loc="left", fontsize=15, color=INK, fontweight="bold")
     fig.text(0.01, -0.05, "✓ paper value inside our 95% range; ↓/↑ outside it (no mark: 0 successes). Bars are 95% ranges and lean toward 50% "
-             "near 0 or 100, so the dot is not centred. Paper overall = its group values weighted by our task counts.\n" + note, fontsize=10, color=MUTED)
-    fig.savefig(OUT / ("fig_repro_optimus1.png" if env == "O" else f"fig_repro_optimus1_env{env}.png"),
-                bbox_inches="tight", facecolor="white")
+             "near 0 or 100, so the dot is not centred. Paper overall = its group values weighted by our task counts.\n" + note,
+             fontsize=10, color=MUTED)
+    fig.savefig(OUT / out, bbox_inches="tight", facecolor="white")
+
+
+def fig_optimus1(env: str = "O"):
+    p = PAPERS["optimus1"]["groups"]["Optimus-1|-"]
+    lab = f"ours: Gemini-3-Flash, Env {env}, authors' full memory, 3 task orders (bar = 95% range)"
+    if env == "O":
+        fig_groups(env, "optimus1-prebuilt", p, "Optimus-1 paper, Table 1 (GPT-4V)", lab,
+                   "Optimus-1 reproduces in its own environment: overall {ov:.1f}% vs {pov:.1f}% in the paper",
+                   "Wood/Stone below the paper, Diamond above it (Env O places diamond ore under the agent).",
+                   "fig_repro_optimus1.png")
+    else:
+        fig_groups(env, "optimus1-prebuilt", p, "Optimus-1 paper, Table 1 (GPT-4V)", lab,
+                   "Same Optimus-1, MineEvolve's environment: overall {ov:.1f}% vs {pov:.1f}% in the paper",
+                   "Same code, memory, planner, tasks, seeds and orders as in Env O; the environment differs "
+                   "(ore placement almost never gives diamond, no auto-pickaxe, no /kill, functional crafting; STEVE-1 guidance 4.0 vs 6.0).",
+                   f"fig_repro_optimus1_env{env}.png")
+
+
+def fig_mineevolve(env: str):
+    p = PAPERS["mineevolve"]["groups"]["MineEvolve|Gemini-3-Flash"]
+    lab = f"ours: released MineEvolve, Gemini-3-Flash, Env {env}, 3 task orders (bar = 95% range)"
+    where = "its own environment (as released + a minimal crafting primitive)" if env == "M" else "Optimus-1's environment"
+    fig_groups(env, "mineevolve", p, "MineEvolve paper, Table 4 (Gemini-3-Flash)", lab,
+               "MineEvolve in " + where.split(" (")[0] + ": overall {ov:.1f}% vs {pov:.1f}% in the paper",
+               f"Env {env} = {where}. Same planner LLM as the paper's row; knowledge accumulates across the 70 tasks of each order.",
+               f"fig_repro_mineevolve_env{env}.png")
 
 
 def fig_release():
@@ -134,5 +154,5 @@ def fig_release():
 
 if __name__ == "__main__":
     style(); OUT.mkdir(exist_ok=True)
-    fig_optimus1("O"); fig_optimus1("M"); fig_release()
+    fig_optimus1("O"); fig_optimus1("M"); fig_mineevolve("M"); fig_mineevolve("O"); fig_release()
     print(OUT / "fig_repro_optimus1.png", OUT / "fig_repro_release.png")
