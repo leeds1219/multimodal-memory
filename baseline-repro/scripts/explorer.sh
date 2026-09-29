@@ -19,5 +19,6 @@ RUNS="$($PY -c 'import sys; sys.path.insert(0,"envs"); from common import RUNS_R
 ln -sfn "$RUNS/runs" analysis/explorer/runs        # keyframes and LLM images, loaded by URL
 if [[ "${1:-}" == "serve" ]]; then
   echo "open http://localhost:${PORT:-8765}/"
+  echo "episode replay: http://localhost:${PORT:-8765}/viewer.html"
   cd analysis/explorer && exec python3 -m http.server "${PORT:-8765}" --bind 127.0.0.1
 fi

@@ -1,10 +1,14 @@
 """Per-episode detail files for the explorer's episode viewer.
 
     python analysis/build_episodes.py                 # every episode -> analysis/explorer/episodes/
-    python analysis/build_episodes.py --bundle DIR    # film.js episodes only, frames embedded -> DIR
+    python analysis/build_episodes.py --bundle DIR    # example subset, frames embedded -> DIR
 
 Each episode becomes `<id>.js` calling `window.__ep(id, {...})` (a script, so the
-page also works from file://), plus `index.js` listing the ids. Contents:
+page also works from file://), plus `index.js`: one summary row per episode
+(task, result, steps, furthest tech-tree stage) for the viewer's lists.
+Bundle subset: the film.js episodes plus, per configuration, the first success
+and the first failure of each task group (order0 first), at most BUNDLE_PER_KIND
+of each. Contents:
   frames  every keyframe (step, src). Local mode: a relative URL under runs/
           (scripts/explorer.sh symlinks analysis/explorer/runs -> $RUNS_ROOT/runs);
           bundle mode: downscaled data URIs, at most MAX_FRAMES.
@@ -37,7 +41,12 @@ from common import RUNS_ROOT, TASKS  # noqa: E402
 
 SKIP = {"smoke", "mocktest", "mockfix"}
 ANSI = re.compile(r"\x1b\[[0-9;]*m")
-MAX_FRAMES = 90
+MAX_FRAMES = 48          # bundle only: frames kept per episode
+FRAME_W = 208            # bundle only: embedded frame width (px)
+BUNDLE_PER_KIND = 5
+STAGES = [("none", []), ("wood", ["log"]), ("wooden tools", ["planks", "crafting_table", "wooden_pickaxe"]),
+          ("stone", ["cobblestone", "stone_pickaxe", "furnace"]), ("iron", ["iron_ore", "iron_ingot", "iron_pickaxe"]),
+          ("gold / redstone / diamond", ["gold_ingot", "redstone", "diamond"])]
 CLIP_PROMPT, CLIP_RESP = 4000, 3000
 
 
@@ -233,7 +242,7 @@ def detail(env, chain, order, task, ep: Path, r: dict, bundle: bool) -> dict:
             t = int(p.stem)
         except ValueError:
             continue
-        frames.append([t, embed(p, 256) if bundle else f"{rel}/keyframes/{p.name}"])
+        frames.append([t, embed(p, FRAME_W, 50) if bundle else f"{rel}/keyframes/{p.name}"])
     inv, pos, hp = trajectory(ep)
     calls = llm_calls(ep, clock, rel)
     if bundle:
@@ -246,31 +255,58 @@ def detail(env, chain, order, task, ep: Path, r: dict, bundle: bool) -> dict:
             "frames": frames, "inv": inv, "pos": pos, "hp": hp, "events": events(method, ep, clock), "llm": calls}
 
 
+def summary(env, chain, order, task, r: dict, ms: dict) -> dict:
+    stage = max([i for i, (_, items) in enumerate(STAGES) if any(m in ms for m in items)] or [0])
+    return {"id": ep_id(env, chain, order, task), "env": env, "chain": chain, "order": order, "task": task,
+            "group": TASKS[task]["group"], "text": TASKS[task]["instruction"], "ok": bool(r.get("success")),
+            "st": r.get("success_step"), "steps": r.get("steps"), "hz": r.get("horizon_steps"), "end": r.get("end_reason"),
+            "src": r.get("plan_source"), "dead": bool(r.get("infra_env_died")), "stage": STAGES[stage][0],
+            "ms": ms}
+
+
+def bundle_ids(rows: list) -> set:
+    film = (REPRO / "analysis" / "explorer" / "film.js").read_text()
+    film = json.loads(film[film.index("=") + 1: film.rindex(";")])
+    ids = {ep_id(*k.split("/"), f["order"], f["task"]) for k, v in film.items() for f in v}
+    rows = sorted(rows, key=lambda x: (x["order"] != "order0", x["order"], x["task"]))
+    for cfg in {(x["env"], x["chain"]) for x in rows}:
+        for ok in (True, False):
+            n, seen = 0, set()
+            for x in rows:
+                if (x["env"], x["chain"]) != cfg or x["ok"] != ok or x["group"] in seen or x["dead"]:
+                    continue
+                seen.add(x["group"]); ids.add(x["id"]); n += 1
+                if n >= BUNDLE_PER_KIND:
+                    break
+    return ids
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--bundle", help="write only the film.js episodes, frames embedded, into this directory")
     a = ap.parse_args()
-    wanted = None
-    out = REPRO / "analysis" / "explorer" / "episodes"
-    if a.bundle:
-        out = Path(a.bundle)
-        film = (REPRO / "analysis" / "explorer" / "film.js").read_text()
-        film = json.loads(film[film.index("=") + 1: film.rindex(";")])
-        wanted = {ep_id(*k.split("/"), f["order"], f["task"]) for k, v in film.items() for f in v}
+    from build_explorer import milestones
+    out = Path(a.bundle) if a.bundle else REPRO / "analysis" / "explorer" / "episodes"
     out.mkdir(parents=True, exist_ok=True)
-    ids = []
+    eps = []
     for rf in sorted(glob.glob(str(RUNS_ROOT / "runs" / "*/*/*/*/*/result.json"))):
         p = Path(rf)
         env, chain, order, task, seed = p.parts[-6:-1]
         if order in SKIP or "." in seed or chain.startswith("steve1"):
             continue
-        i = ep_id(env, chain, order, task)
-        if wanted is not None and i not in wanted:
+        r = json.loads(p.read_text())
+        eps.append((env, chain, order, task, p.parent, r, summary(env, chain, order, task, r, milestones(p.parent))))
+    wanted = bundle_ids([e[6] for e in eps]) if a.bundle else None
+    rows = []
+    for env, chain, order, task, ep, r, row in eps:
+        if wanted is not None and row["id"] not in wanted:
             continue
-        d = detail(env, chain, order, task, p.parent, json.loads(p.read_text()), bool(a.bundle))
-        (out / f"{i}.js").write_text(f"window.__ep({json.dumps(i)},{json.dumps(d, separators=(',', ':'))});\n")
-        ids.append(i)
-    (out / "index.js").write_text("window.EP_INDEX = " + json.dumps(ids) + ";\n")
+        d = detail(env, chain, order, task, ep, r, bool(a.bundle))
+        (out / f"{row['id']}.js").write_text(f"window.__ep({json.dumps(row['id'])},{json.dumps(d, separators=(',', ':'))});\n")
+        rows.append(row)
+    ids = rows
+    (out / "index.js").write_text("window.EP_INDEX = " + json.dumps({"bundle": bool(a.bundle), "total": len(eps), "episodes": rows},
+                                                                      separators=(",", ":")) + ";\n")
     size = sum(f.stat().st_size for f in out.glob("*.js"))
     print(f"{len(ids)} episodes, {size / 1e6:.1f} MB -> {out}")
     return 0
