@@ -1,6 +1,6 @@
 """Build the per-episode dataset for the results explorer page.
 
-    python analysis/build_explorer.py   -> analysis/out/explorer_data.js
+    python analysis/build_explorer.py   -> analysis/explorer/data.js
 
 Per episode: result fields, tech-tree milestones reached (first step each
 item entered the inventory), the plan / executed subgoals as far as each
@@ -15,6 +15,7 @@ import glob
 import gzip
 import io
 import json
+import math
 import re
 import sys
 from pathlib import Path
@@ -135,6 +136,38 @@ def plan_info(method: str, ep: Path) -> dict:
     return info
 
 
+def wilson(k: int, n: int, z: float = 1.96) -> list:
+    if n == 0:
+        return [0.0, 0.0]
+    p = k / n
+    den = 1 + z * z / n
+    c = (p + z * z / (2 * n)) / den
+    h = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / den
+    return [round(100 * (c - h), 1), round(100 * (c + h), 1)]
+
+
+def our_numbers(eps: list) -> dict:
+    """Per env/chain: SR with Wilson 95 % CI per group and overall (episodes
+    pooled over task orders), per-task successes. Same numbers as
+    analysis/our_numbers.json, which this rewrites so compare_papers.py stays current."""
+    out = {}
+    for e in eps:
+        o = out.setdefault(f"{e['env']}/{e['chain']}", {"orders": set(), "tasks": {}, "cnt": {}, "infra_or_crash_episodes": 0})
+        o["orders"].add(e["order"])
+        t = o["tasks"].setdefault(e["task"], {"succ": 0, "runs": 0})
+        t["succ"] += e["ok"]; t["runs"] += 1
+        for g in (e["group"], "overall"):
+            c = o["cnt"].setdefault(g, [0, 0]); c[0] += e["ok"]; c[1] += 1
+        o["infra_or_crash_episodes"] += bool(e["dead"] or e["status"] == "crashed_final")
+    groups = [t["group"] for t in TASKS.values()]
+    for o in out.values():
+        o["orders"] = len(o["orders"])
+        cnt = o.pop("cnt")
+        o["groups"] = {g: {"sr": round(100 * k / n, 1) if n else 0.0, "k": k, "n": n, "ci95": wilson(k, n)}
+                       for g in list(dict.fromkeys(groups)) + ["overall"] for k, n in [cnt.get(g, [0, 0])]}
+    return out
+
+
 def main() -> int:
     eps = []
     for rf in sorted(glob.glob(str(RUNS_ROOT / "runs" / "*/*/*/*/*/result.json"))):
@@ -159,14 +192,17 @@ def main() -> int:
         if not rec["ok"]:
             rec["img"] = thumb(ep)
         eps.append(rec)
-    ours = json.loads((REPRO / "analysis" / "our_numbers.json").read_text())
+    ours = our_numbers(eps)
+    (REPRO / "analysis" / "our_numbers.json").write_text(json.dumps(ours, indent=1) + "\n")
     papers = json.loads((REPRO / "analysis" / "paper_numbers.json").read_text())
     paper_groups = {pk: {row: {k: v for k, v in g.items() if not isinstance(v, (dict, str))}
                          for row, g in (pv.get("groups") or {}).items()} for pk, pv in papers.items()}
     tasks = [{"uid": u, "group": t["group"], "text": t["instruction"]} for u, t in TASKS.items()]
-    data = {"episodes": eps, "ours": {k: v["groups"] for k, v in ours.items()}, "papers": paper_groups,
+    import datetime
+    data = {"generated": datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), "runs_root": str(RUNS_ROOT),
+            "episodes": eps, "ours": {k: v["groups"] for k, v in ours.items()}, "papers": paper_groups,
             "tasks": tasks, "milestones": [m[0] for m in MILESTONES]}
-    out = REPRO / "analysis" / "out" / "explorer_data.js"
+    out = REPRO / "analysis" / "explorer" / "data.js"
     out.write_text("window.DATA = " + json.dumps(data, separators=(",", ":")) + ";\n")
     print(f"{len(eps)} episodes, {out.stat().st_size / 1e6:.1f} MB -> {out}")
     return 0

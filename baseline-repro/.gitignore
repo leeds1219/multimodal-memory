@@ -1,3 +1,5 @@
 runs
 memory_snapshots/
 analysis/out/explorer_data.js
+analysis/explorer/data.js
+analysis/explorer/film.js
