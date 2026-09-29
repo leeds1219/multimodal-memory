@@ -50,9 +50,10 @@ def fig_optimus1(env: str = "O"):
         ax.plot([x, x], [lo, hi], color=BLUE, lw=9, alpha=0.25, solid_capstyle="round", zorder=1)
         ax.scatter([x], [r["sr"]], s=90, color=BLUE, edgecolor="white", lw=1.5, zorder=3)
         ax.plot([x - 0.28, x + 0.28], [pv[i]] * 2, color=INK, lw=2.5, zorder=2)
-        # 0 successes: the interval is wide enough to hold small paper values, which says "can't tell", not "matches"
-        mark, mcol = ("?", MUTED) if inside and r["sr"] == 0 else ("✓", GREEN) if inside else ("↓" if r["sr"] < pv[i] else "↑", RED)
-        ax.text(x, max(hi, pv[i]) + 4, mark, ha="center", fontsize=15, color=mcol, fontweight="bold")
+        # no mark when there were 0 successes: the range then reaches the paper value only because it is wide
+        mark, mcol = ("", MUTED) if inside and r["sr"] == 0 else ("✓", GREEN) if inside else ("↓" if r["sr"] < pv[i] else "↑", RED)
+        if mark:
+            ax.text(x, max(hi, pv[i]) + 4, mark, ha="center", fontsize=15, color=mcol, fontweight="bold")
         ax.text(x, -9, f"{r['sr']:.0f} / {pv[i]:.0f}", ha="center", fontsize=11, color=MUTED)
     ax.set_xticks([i + (0.6 if g == "overall" else 0) for i, g in enumerate(cats)])
     ax.set_xticklabels([f"{GL[g]}\n({NT[g]} tasks)" for g in GROUPS] + ["Overall\n(70 tasks)"])
@@ -75,8 +76,8 @@ def fig_optimus1(env: str = "O"):
         note = ("Same code, memory, planner, tasks, seeds and orders as in Env O; the environment differs "
                 "(ore placement almost never gives diamond, no auto-pickaxe, no /kill, functional crafting; STEVE-1 guidance 4.0 vs 6.0).")
     ax.set_title(title, loc="left", fontsize=15, color=INK, fontweight="bold")
-    fig.text(0.01, -0.03, "✓ paper value inside our 95% range; ? zero successes, range too wide to tell. "
-             "Paper overall = its group values weighted by our task counts.\n" + note, fontsize=10, color=MUTED)
+    fig.text(0.01, -0.05, "✓ paper value inside our 95% range; ↓/↑ outside it (no mark: 0 successes). Bars are 95% ranges and lean toward 50% "
+             "near 0 or 100, so the dot is not centred. Paper overall = its group values weighted by our task counts.\n" + note, fontsize=10, color=MUTED)
     fig.savefig(OUT / ("fig_repro_optimus1.png" if env == "O" else f"fig_repro_optimus1_env{env}.png"),
                 bbox_inches="tight", facecolor="white")
 
