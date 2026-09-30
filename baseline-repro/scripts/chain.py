@@ -82,6 +82,10 @@ class Chain:
         self.env_vars = {**os.environ, "LLM_CTX_FILE": str(self.ctx_file), "METHOD": a.method}
         if a.mock:
             self.env_vars["LLM_MOCK"] = "1"
+        # A variant token t with configs/llm_<t>.yaml selects that planner model (e.g. "g38").
+        for tok in (a.variant or "").split("-"):
+            if tok and (REPRO / "configs" / f"llm_{tok}.yaml").exists():
+                self.env_vars["LLM_CONFIG"] = str(REPRO / "configs" / f"llm_{tok}.yaml")
         if "cond6" in (a.variant or ""):  # sensitivity: Env M STEVE-1 at the official 6.0
             self.env_vars["MINEEVOLVE_STEVE_COND_SCALE"] = "6.0"
         # Which server provides STEVE-1: the method's own (Stage A) or, for the
@@ -101,6 +105,8 @@ class Chain:
             self.memory = self.wd / "src" / "optimus1" / "memories" / "v1"
             if "goalfix" in (a.variant or ""):
                 self.env_vars["OPTIMUS_GOALFIX"] = "1"
+            if "logfix" in (a.variant or ""):  # D33
+                self.env_vars["OPTIMUS_LOGFIX"] = "1"
         elif a.method == "mineevolve":
             self.memory = self.state / "kb"
             self.memory.mkdir(exist_ok=True)
@@ -282,8 +288,9 @@ class Chain:
             if not self.a.mock and ledger_total() >= CFG["global_cap_usd"]:
                 log("STOP: global LLM cap reached")
                 return 2
-            if not self.a.mock and (RUNS_ROOT / "STOP_BUDGET").exists():
-                log("STOP: STOP_BUDGET present (tripwire) -> " + (RUNS_ROOT / "STOP_BUDGET").read_text().strip())
+            stop_budget = Path(CFG["log_root"]) / "STOP_BUDGET"  # global, shared by every suite
+            if not self.a.mock and stop_budget.exists():
+                log("STOP: STOP_BUDGET present (tripwire) -> " + stop_budget.read_text().strip())
                 return 2
             for attempt in range(1, self.a.retries + 2):
                 self.restore_memory()

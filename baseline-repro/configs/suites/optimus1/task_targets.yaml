@@ -1,0 +1,270 @@
+rule: target item named in the instruction, in inventory at any step before the horizon
+targets:
+  o1_wooden_00:
+    any_of:
+    - wooden_shovel
+    count: 1
+  o1_wooden_01:
+    any_of:
+    - wooden_pickaxe
+    count: 1
+  o1_wooden_02:
+    any_of:
+    - wooden_axe
+    count: 1
+  o1_wooden_03:
+    any_of:
+    - wooden_hoe
+    count: 1
+  o1_wooden_04:
+    any_of:
+    - stick
+    count: 1
+  o1_wooden_05:
+    any_of:
+    - crafting_table
+    count: 1
+  o1_wooden_06:
+    any_of:
+    - wooden_sword
+    count: 1
+  o1_wooden_07:
+    any_of:
+    - chest
+    count: 1
+  o1_wooden_08:
+    any_of:
+    - bowl
+    count: 1
+  o1_wooden_09:
+    any_of:
+    - ladder
+    count: 1
+  o1_stone_00:
+    any_of:
+    - stone_shovel
+    count: 1
+  o1_stone_01:
+    any_of:
+    - stone_pickaxe
+    count: 1
+  o1_stone_02:
+    any_of:
+    - stone_axe
+    count: 1
+  o1_stone_03:
+    any_of:
+    - stone_hoe
+    count: 1
+  o1_stone_04:
+    any_of:
+    - charcoal
+    count: 1
+  o1_stone_05:
+    any_of:
+    - smoker
+    count: 1
+  o1_stone_06:
+    any_of:
+    - stone_sword
+    count: 1
+  o1_stone_07:
+    any_of:
+    - furnace
+    count: 1
+  o1_stone_08:
+    any_of:
+    - torch
+    count: 1
+  o1_iron_00:
+    any_of:
+    - iron_shovel
+    count: 1
+  o1_iron_01:
+    any_of:
+    - iron_pickaxe
+    count: 1
+  o1_iron_02:
+    any_of:
+    - iron_axe
+    count: 1
+  o1_iron_03:
+    any_of:
+    - iron_hoe
+    count: 1
+  o1_iron_04:
+    any_of:
+    - bucket
+    count: 1
+  o1_iron_05:
+    any_of:
+    - hopper
+    count: 1
+  o1_iron_06:
+    any_of:
+    - rail
+    count: 1
+  o1_iron_07:
+    any_of:
+    - iron_sword
+    count: 1
+  o1_iron_08:
+    any_of:
+    - shears
+    count: 1
+  o1_iron_09:
+    any_of:
+    - smithing_table
+    count: 1
+  o1_iron_10:
+    any_of:
+    - tripwire_hook
+    count: 1
+  o1_iron_11:
+    any_of:
+    - chain
+    count: 1
+  o1_iron_12:
+    any_of:
+    - iron_bars
+    count: 1
+  o1_iron_13:
+    any_of:
+    - iron_nugget
+    count: 1
+  o1_iron_14:
+    any_of:
+    - blast_furnace
+    count: 1
+  o1_iron_15:
+    any_of:
+    - stonecutter
+    count: 1
+  o1_gold_00:
+    any_of:
+    - golden_shovel
+    count: 1
+  o1_gold_01:
+    any_of:
+    - golden_pickaxe
+    count: 1
+  o1_gold_02:
+    any_of:
+    - golden_axe
+    count: 1
+  o1_gold_03:
+    any_of:
+    - golden_hoe
+    count: 1
+  o1_gold_04:
+    any_of:
+    - golden_sword
+    count: 1
+  o1_gold_05:
+    any_of:
+    - gold_ingot
+    count: 1
+  o1_redstone_00:
+    any_of:
+    - piston
+    count: 1
+  o1_redstone_01:
+    any_of:
+    - redstone_torch
+    count: 1
+  o1_redstone_02:
+    any_of:
+    - activator_rail
+    count: 1
+  o1_redstone_03:
+    any_of:
+    - compass
+    count: 1
+  o1_redstone_04:
+    any_of:
+    - dropper
+    count: 1
+  o1_redstone_05:
+    any_of:
+    - note_block
+    count: 1
+  o1_diamond_00:
+    any_of:
+    - diamond_shovel
+    count: 1
+  o1_diamond_01:
+    any_of:
+    - diamond_pickaxe
+    count: 1
+  o1_diamond_02:
+    any_of:
+    - diamond_axe
+    count: 1
+  o1_diamond_03:
+    any_of:
+    - diamond_hoe
+    count: 1
+  o1_diamond_04:
+    any_of:
+    - diamond_sword
+    count: 1
+  o1_diamond_05:
+    any_of:
+    - diamond
+    count: 1
+  o1_diamond_06:
+    any_of:
+    - jukebox
+    count: 1
+  o1_armor_00:
+    any_of:
+    - shield
+    count: 1
+  o1_armor_01:
+    any_of:
+    - iron_chestplate
+    count: 1
+  o1_armor_02:
+    any_of:
+    - iron_boots
+    count: 1
+  o1_armor_03:
+    any_of:
+    - iron_leggings
+    count: 1
+  o1_armor_04:
+    any_of:
+    - iron_helmet
+    count: 1
+  o1_armor_05:
+    any_of:
+    - diamond_helmet
+    count: 1
+  o1_armor_06:
+    any_of:
+    - diamond_chestplate
+    count: 1
+  o1_armor_07:
+    any_of:
+    - diamond_leggings
+    count: 1
+  o1_armor_08:
+    any_of:
+    - diamond_boots
+    count: 1
+  o1_armor_09:
+    any_of:
+    - golden_helmet
+    count: 1
+  o1_armor_10:
+    any_of:
+    - golden_leggings
+    count: 1
+  o1_armor_11:
+    any_of:
+    - golden_boots
+    count: 1
+  o1_armor_12:
+    any_of:
+    - golden_chestplate
+    count: 1

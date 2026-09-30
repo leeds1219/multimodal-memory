@@ -25,8 +25,12 @@ import numpy as np
 import yaml
 
 REPRO = Path(__file__).resolve().parents[1]
-CONFIGS = REPRO / "configs"
-RUNS_ROOT = Path("/home/rag/data/repro_runs")
+# REPRO_SUITE selects the task suite: unset = the 70 MCU tasks (configs/*.yaml);
+# "optimus1" = the Optimus-1 paper's own tasks (configs/suites/optimus1/). Each
+# suite writes to its own runs root so results never mix.
+SUITE = os.environ.get("REPRO_SUITE", "")
+CONFIGS = REPRO / "configs" / "suites" / SUITE if SUITE else REPRO / "configs"
+RUNS_ROOT = Path("/home/rag/data/repro_runs") / (f"suite_{SUITE}" if SUITE else "")
 MIN_FREE_GB = 5.0
 
 

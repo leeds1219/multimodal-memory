@@ -140,6 +140,22 @@ def main() -> int:
 
         om.get_info_from_plan = get_info_from_plan
 
+    if os.environ.get("OPTIMUS_LOGFIX") == "1":
+        # Variant "logfix" (DECISIONS D33): KnowledgeGraph._pretty_result indexes
+        # summary[item] for every node of the sub-graph, but raw materials (e.g.
+        # oak_log, reached through the hard-coded oak planks path) never enter
+        # summary -> KeyError. Released code then either crashes at step 0
+        # (retrieve_plan, UnboundLocalError on `example`) or during replanning.
+        # Fix: an uncounted node prints as "need ??", the code's own placeholder.
+        from optimus1.memories.graph import KnowledgeGraph
+        _orig_pretty = KnowledgeGraph._pretty_result
+
+        def _pretty_result(self, summary, base, sub_graph, in_degree=None):
+            from collections import defaultdict
+            return _orig_pretty(self, defaultdict(int, summary), base, sub_graph, in_degree)
+
+        KnowledgeGraph._pretty_result = _pretty_result
+
     native = {}
     orig_do = om.agent_do
 

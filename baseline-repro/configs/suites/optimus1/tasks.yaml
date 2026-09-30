@@ -1,0 +1,338 @@
+source: /home/rag/data/official/NeurIPS24-Optimus-1/src/optimus1/conf/benchmark
+note: 'type: craft entries only (the 67 tasks the Optimus-1 paper reports)'
+tasks:
+- uid: o1_wooden_00
+  group: wooden
+  local_id: 0
+  type: craft
+  instruction: Craft a wooden shovel
+- uid: o1_wooden_01
+  group: wooden
+  local_id: 1
+  type: craft
+  instruction: Craft a wooden pickaxe
+- uid: o1_wooden_02
+  group: wooden
+  local_id: 2
+  type: craft
+  instruction: Craft a wooden axe
+- uid: o1_wooden_03
+  group: wooden
+  local_id: 3
+  type: craft
+  instruction: Craft a wooden hoe
+- uid: o1_wooden_04
+  group: wooden
+  local_id: 4
+  type: craft
+  instruction: Craft a stick
+- uid: o1_wooden_05
+  group: wooden
+  local_id: 5
+  type: craft
+  instruction: Craft a crafting table
+- uid: o1_wooden_06
+  group: wooden
+  local_id: 6
+  type: craft
+  instruction: Craft a wooden sword
+- uid: o1_wooden_07
+  group: wooden
+  local_id: 7
+  type: craft
+  instruction: Craft a chest
+- uid: o1_wooden_08
+  group: wooden
+  local_id: 8
+  type: craft
+  instruction: Craft a bowl
+- uid: o1_wooden_09
+  group: wooden
+  local_id: 9
+  type: craft
+  instruction: Craft a ladder
+- uid: o1_stone_00
+  group: stone
+  local_id: 0
+  type: craft
+  instruction: Craft a stone shovel
+- uid: o1_stone_01
+  group: stone
+  local_id: 1
+  type: craft
+  instruction: Craft a stone pickaxe
+- uid: o1_stone_02
+  group: stone
+  local_id: 2
+  type: craft
+  instruction: Craft a stone axe
+- uid: o1_stone_03
+  group: stone
+  local_id: 3
+  type: craft
+  instruction: Craft a stone hoe
+- uid: o1_stone_04
+  group: stone
+  local_id: 4
+  type: craft
+  instruction: Smelt a charcoal
+- uid: o1_stone_05
+  group: stone
+  local_id: 5
+  type: craft
+  instruction: Craft a smoker
+- uid: o1_stone_06
+  group: stone
+  local_id: 6
+  type: craft
+  instruction: Craft a stone sword
+- uid: o1_stone_07
+  group: stone
+  local_id: 7
+  type: craft
+  instruction: Craft a furnace
+- uid: o1_stone_08
+  group: stone
+  local_id: 8
+  type: craft
+  instruction: Craft a torch
+- uid: o1_iron_00
+  group: iron
+  local_id: 0
+  type: craft
+  instruction: Craft a iron shovel
+- uid: o1_iron_01
+  group: iron
+  local_id: 1
+  type: craft
+  instruction: Craft a iron pickaxe
+- uid: o1_iron_02
+  group: iron
+  local_id: 2
+  type: craft
+  instruction: Craft a iron axe
+- uid: o1_iron_03
+  group: iron
+  local_id: 3
+  type: craft
+  instruction: Craft a iron hoe
+- uid: o1_iron_04
+  group: iron
+  local_id: 4
+  type: craft
+  instruction: Craft a bucket
+- uid: o1_iron_05
+  group: iron
+  local_id: 5
+  type: craft
+  instruction: Craft a hopper
+- uid: o1_iron_06
+  group: iron
+  local_id: 6
+  type: craft
+  instruction: Craft a rail
+- uid: o1_iron_07
+  group: iron
+  local_id: 7
+  type: craft
+  instruction: Craft a iron sword
+- uid: o1_iron_08
+  group: iron
+  local_id: 8
+  type: craft
+  instruction: Craft a shears
+- uid: o1_iron_09
+  group: iron
+  local_id: 9
+  type: craft
+  instruction: Craft a smithing table
+- uid: o1_iron_10
+  group: iron
+  local_id: 10
+  type: craft
+  instruction: Craft a tripwire hook
+- uid: o1_iron_11
+  group: iron
+  local_id: 11
+  type: craft
+  instruction: Craft a chain
+- uid: o1_iron_12
+  group: iron
+  local_id: 12
+  type: craft
+  instruction: Craft an iron bars
+- uid: o1_iron_13
+  group: iron
+  local_id: 13
+  type: craft
+  instruction: Craft an iron nugget
+- uid: o1_iron_14
+  group: iron
+  local_id: 14
+  type: craft
+  instruction: Craft a blast furnace
+- uid: o1_iron_15
+  group: iron
+  local_id: 15
+  type: craft
+  instruction: Craft a stonecutter
+- uid: o1_gold_00
+  group: gold
+  local_id: 0
+  type: craft
+  instruction: Craft a golden shovel
+- uid: o1_gold_01
+  group: gold
+  local_id: 1
+  type: craft
+  instruction: Craft a golden pickaxe
+- uid: o1_gold_02
+  group: gold
+  local_id: 2
+  type: craft
+  instruction: Craft a golden axe
+- uid: o1_gold_03
+  group: gold
+  local_id: 3
+  type: craft
+  instruction: Craft a golden hoe
+- uid: o1_gold_04
+  group: gold
+  local_id: 4
+  type: craft
+  instruction: Craft a golden sword
+- uid: o1_gold_05
+  group: gold
+  local_id: 5
+  type: craft
+  instruction: Smelt and craft a gold ingot
+- uid: o1_redstone_00
+  group: redstone
+  local_id: 0
+  type: craft
+  instruction: Craft a piston
+- uid: o1_redstone_01
+  group: redstone
+  local_id: 1
+  type: craft
+  instruction: Craft a redstone torch
+- uid: o1_redstone_02
+  group: redstone
+  local_id: 2
+  type: craft
+  instruction: Craft an activator rail
+- uid: o1_redstone_03
+  group: redstone
+  local_id: 3
+  type: craft
+  instruction: Craft a compass
+- uid: o1_redstone_04
+  group: redstone
+  local_id: 4
+  type: craft
+  instruction: Craft a dropper
+- uid: o1_redstone_05
+  group: redstone
+  local_id: 5
+  type: craft
+  instruction: Craft a note block
+- uid: o1_diamond_00
+  group: diamond
+  local_id: 0
+  type: craft
+  instruction: Craft a diamond shovel
+- uid: o1_diamond_01
+  group: diamond
+  local_id: 1
+  type: craft
+  instruction: Craft a diamond pickaxe
+- uid: o1_diamond_02
+  group: diamond
+  local_id: 2
+  type: craft
+  instruction: Craft a diamond axe
+- uid: o1_diamond_03
+  group: diamond
+  local_id: 3
+  type: craft
+  instruction: Craft a diamond hoe
+- uid: o1_diamond_04
+  group: diamond
+  local_id: 4
+  type: craft
+  instruction: Craft a diamond sword
+- uid: o1_diamond_05
+  group: diamond
+  local_id: 5
+  type: craft
+  instruction: Dig down and mine a diamond
+- uid: o1_diamond_06
+  group: diamond
+  local_id: 6
+  type: craft
+  instruction: Craft a jukebox
+- uid: o1_armor_00
+  group: armor
+  local_id: 0
+  type: craft
+  instruction: Craft shield
+- uid: o1_armor_01
+  group: armor
+  local_id: 1
+  type: craft
+  instruction: Craft iron chestplate
+- uid: o1_armor_02
+  group: armor
+  local_id: 2
+  type: craft
+  instruction: Craft iron boots
+- uid: o1_armor_03
+  group: armor
+  local_id: 3
+  type: craft
+  instruction: Craft iron leggings
+- uid: o1_armor_04
+  group: armor
+  local_id: 4
+  type: craft
+  instruction: Craft iron helmet
+- uid: o1_armor_05
+  group: armor
+  local_id: 5
+  type: craft
+  instruction: Craft diamond helmet
+- uid: o1_armor_06
+  group: armor
+  local_id: 6
+  type: craft
+  instruction: Craft diamond chestplate
+- uid: o1_armor_07
+  group: armor
+  local_id: 7
+  type: craft
+  instruction: Craft diamond leggings
+- uid: o1_armor_08
+  group: armor
+  local_id: 8
+  type: craft
+  instruction: Craft diamond boots
+- uid: o1_armor_09
+  group: armor
+  local_id: 9
+  type: craft
+  instruction: Craft golden helmet
+- uid: o1_armor_10
+  group: armor
+  local_id: 10
+  type: craft
+  instruction: Craft golden leggings
+- uid: o1_armor_11
+  group: armor
+  local_id: 11
+  type: craft
+  instruction: Craft golden boots
+- uid: o1_armor_12
+  group: armor
+  local_id: 12
+  type: craft
+  instruction: Craft golden chestplate
