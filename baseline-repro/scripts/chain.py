@@ -325,7 +325,8 @@ def main() -> int:
     ap.add_argument("--gpu", type=int, required=True)
     ap.add_argument("--port", type=int, required=True)
     ap.add_argument("--retries", type=int, default=2)
-    ap.add_argument("--stall-min", type=float, default=20.0)
+    ap.add_argument("--stall-min", type=float, default=60.0,
+                    help="kill an episode whose env took no step for this many wall minutes (infra hang); above the worst-case LLM wait (300 s x 7 attempts)")
     ap.add_argument("--mock", action="store_true")
     ap.add_argument("--seed-offset", type=int, default=0, help="extra-seed runs: seed = seeds.yaml + offset")
     a = ap.parse_args()
