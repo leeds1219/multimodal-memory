@@ -49,8 +49,17 @@ def env_m_group(group: str) -> dict:
     return _bench(ME_BENCH, group)["env"]
 
 
+SUITE_PINS_HORIZON = bool(__import__("os").environ.get("REPRO_SUITE"))  # the default MCU suite keeps each env's own horizons
+
+
 def env_o_group(group: str) -> dict:
-    return _bench(O_BENCH, O_GROUP[group])["env"]
+    env = dict(_bench(O_BENCH, O_GROUP[group])["env"])
+    # A task suite may pin the horizon to its paper's value (suites/optimus1: Table 5).
+    from common import load_yaml
+    hz = (load_yaml("tasks.yaml").get("horizon_minutes") or {}).get(group)
+    if hz is not None and SUITE_PINS_HORIZON:
+        env["max_minutes"] = int(hz)
+    return env
 
 
 # =============================================================================

@@ -1,5 +1,13 @@
 source: /home/rag/data/official/NeurIPS24-Optimus-1/src/optimus1/conf/benchmark
 note: 'type: craft entries only (the 67 tasks the Optimus-1 paper reports)'
+horizon_minutes:
+  wooden: 3
+  stone: 6
+  iron: 10
+  gold: 30
+  redstone: 30
+  diamond: 30
+  armor: 30
 tasks:
 - uid: o1_wooden_00
   group: wooden

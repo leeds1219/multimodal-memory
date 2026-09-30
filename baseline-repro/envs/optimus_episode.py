@@ -177,6 +177,8 @@ def main() -> int:
         "evaluate=[0]", "env.times=1", f"server.port={args.port}",
         "record.video.save=false", "record.action.save=false",
     ]
+    if args.env == "O":
+        overrides.append(f"env.max_minutes={int(genv['max_minutes'])}")  # suite may pin the paper's horizon
     log_file = open(ep / "client.log", "a")
     sys.stdout = sys.stderr = log_file
     from hydra import compose, initialize_config_dir
