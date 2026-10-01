@@ -104,8 +104,8 @@ def paper_task_sr() -> dict:
 
 def fig_groups(rows):
     fig, ax = plt.subplots(figsize=(13.33, 6.2), dpi=150)
-    cats = G + ["o5", "all"]
-    pv = [PG[g] for g in G] + [sum(PG[g] for g in G[2:]) / 5, sum(PG[g] * NT[g] for g in G) / 67]
+    cats = G + ["o5"]
+    pv = [PG[g] for g in G] + [sum(PG[g] for g in G[2:]) / 5]
     ours = {}
     for i, g in enumerate(cats):
         x = i + (0.6 if i == len(G) else 1.0 if i > len(G) else 0)
@@ -128,20 +128,20 @@ def fig_groups(rows):
         lab = f"{ours.get((LF, g), float('nan')):.0f} / {pv[i]:.0f}"
         ax.text(x, -9, lab, ha="center", fontsize=11, color=MUTED)
     ax.set_xticks([i + (0.6 if i == len(G) else 1.0 if i > len(G) else 0) for i in range(len(cats))])
-    ax.set_xticklabels([f"{GL[g]}\n({NT[g]} tasks)" for g in G] + ["Overall\n5 hard groups\n(paper's def.)", "Overall\nall 67 tasks\n(weighted)"], fontsize=11)
+    ax.set_xticklabels([f"{GL[g]}\n({NT[g]} tasks)" for g in G] + ["Overall\n(mean of 5\nhard groups)"], fontsize=11)
     ax.axvline(len(G) - 0.2, color=LINE, lw=1)
     ax.set_ylim(-14, 108); ax.set_yticks([0, 25, 50, 75, 100]); ax.set_ylabel("success rate (%)")
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
     ax.grid(axis="y", color=LINE, lw=0.8, ls=":")
-    ax.text(-0.5, -12.5, "ours / paper", fontsize=10, color=MUTED)
-    h = [ax.scatter([], [], s=90, color=BLUE, label="ours, logfix (released code + one-line graph fix)"),
-         ax.scatter([], [], s=90, color=ORANGE, label="ours, released code (Wood/Stone only)"),
+    ax.text(-0.5, -12.5, "+ crash fix / paper", fontsize=10, color=MUTED)
+    h = [ax.scatter([], [], s=90, color=BLUE, label="as released + crash fix (one-line knowledge-graph fix)"),
+         ax.scatter([], [], s=90, color=ORANGE, label="as released (run on Wood/Stone only)"),
          ax.plot([], [], color=INK, lw=2.5, label="Optimus-1 paper (GPT-4V)")[0]]
     ax.legend(handles=h, loc="upper right", frameon=False, fontsize=11)
     ax.set_title("Optimus-1 on its own 67 tasks (paper time limits, gemini-3.8-flash, 3 worlds per task)",
                  loc="left", fontsize=15, fontweight="bold", color=INK)
-    fig.text(0.01, -0.05, "Bars: 95% range. Iron and harder groups are above the paper; Wood and Stone remain below it.\n"
+    fig.text(0.01, -0.05, "Both versions are our runs of the authors' code. Bars: 95% range. Overall = the paper's definition (mean of Iron, Gold, Redstone, Diamond, Armor).\n"
              "Env O as released (ore placed under the agent, GUI macros, always day); time limits from paper Table 5; the paper ran >=30 worlds per task.",
              fontsize=10, color=MUTED)
     fig.savefig(OUT / "o1suite_groups.png", bbox_inches="tight", facecolor="white")
@@ -164,8 +164,8 @@ def fig_woodstone(rows):
         ax.text(6.7, y, f"{sr:.0f}%" if sr is not None else "–", ha="left", va="center", fontsize=11, color=MUTED)
     ax.set_xlim(-0.1, 7.4); ax.set_ylim(-0.7, len(tasks) - 0.3)
     ax.set_xticks([0.45, 1.45, 2.45, 3.85, 4.85, 5.85]); ax.set_xticklabels(["world 1", "world 2", "world 3"] * 2, fontsize=10)
-    ax.text(1.45, len(tasks) - 0.1, "released code", ha="center", fontsize=12, fontweight="bold", color=INK)
-    ax.text(4.85, len(tasks) - 0.1, "logfix", ha="center", fontsize=12, fontweight="bold", color=INK)
+    ax.text(1.45, len(tasks) - 0.1, "as released", ha="center", fontsize=12, fontweight="bold", color=INK)
+    ax.text(4.85, len(tasks) - 0.1, "as released + crash fix", ha="center", fontsize=12, fontweight="bold", color=INK)
     ax.text(6.7, len(tasks) - 0.1, "paper", ha="left", fontsize=12, fontweight="bold", color=INK)
     ax.set_yticks([])
     for s in ("top", "right", "left", "bottom"):
@@ -198,7 +198,7 @@ def fig_notree(rows):
                 a.imshow(Image.open(picks[j]))
             a.set_title(names[j], fontsize=9, color=MUTED)
             if j == 0:
-                tag = "released" if r["chain"] == RL else "logfix"
+                tag = "as released" if r["chain"] == RL else "+ crash fix"
                 a.set_ylabel(f"{r['text']}\n{tag}, {r['world']}", fontsize=9, rotation=0, ha="right", va="center", color=INK)
     fig.suptitle("Episodes that never collected wood: where the agent started and where it went", fontsize=13,
                  fontweight="bold", color=INK, x=0.02, ha="left")
