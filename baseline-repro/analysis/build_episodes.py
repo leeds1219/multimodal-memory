@@ -37,7 +37,7 @@ from pathlib import Path
 REPRO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPRO / "envs"))
 sys.path.insert(0, str(REPRO / "analysis"))
-from common import RUNS_ROOT, TASKS  # noqa: E402
+from common import RUNS_ROOT, SUITE, TASKS  # noqa: E402
 
 SKIP = {"smoke", "mocktest", "mockfix"}
 ANSI = re.compile(r"\x1b\[[0-9;]*m")
@@ -265,9 +265,14 @@ def summary(env, chain, order, task, r: dict, ms: dict) -> dict:
 
 
 def bundle_ids(rows: list) -> set:
-    film = (REPRO / "analysis" / "explorer" / "film.js").read_text()
-    film = json.loads(film[film.index("=") + 1: film.rindex(";")])
-    ids = {ep_id(*k.split("/"), f["order"], f["task"]) for k, v in film.items() for f in v}
+    ids = set()
+    film_f = REPRO / "analysis" / "explorer" / "film.js"
+    if not SUITE and film_f.exists():
+        film = film_f.read_text()
+        film = json.loads(film[film.index("=") + 1: film.rindex(";")])
+        ids = {ep_id(*k.split("/"), f["order"], f["task"]) for k, v in film.items() for f in v}
+    if SUITE:  # a suite's own copy: every failure of the easy groups, plus the per-group picks below
+        ids |= {x["id"] for x in rows if not x["ok"] and x["group"] in ("wooden", "stone")}
     rows = sorted(rows, key=lambda x: (x["order"] != "order0", x["order"], x["task"]))
     for cfg in {(x["env"], x["chain"]) for x in rows}:
         for ok in (True, False):
@@ -286,7 +291,7 @@ def main() -> int:
     ap.add_argument("--bundle", help="write only the film.js episodes, frames embedded, into this directory")
     a = ap.parse_args()
     from build_explorer import milestones
-    out = Path(a.bundle) if a.bundle else REPRO / "analysis" / "explorer" / "episodes"
+    out = Path(a.bundle) if a.bundle else REPRO / "analysis" / "explorer" / (f"suite_{SUITE}/episodes" if SUITE else "episodes")
     out.mkdir(parents=True, exist_ok=True)
     eps = []
     for rf in sorted(glob.glob(str(RUNS_ROOT / "runs" / "*/*/*/*/*/result.json"))):
