@@ -47,3 +47,46 @@ def make_workdir(wd: Path, memory: str) -> Path:
 
 if __name__ == "__main__":
     print(make_workdir(Path(sys.argv[1]), sys.argv[2]))
+
+
+def fix_memory_typos(mem: Path) -> int:
+    """Variant "memfix" (DECISIONS D35): data typos in the authors' released memory.
+
+    The stored plans for "Craft a chest" end with
+        {"task": "use crafting table", "goal": ["craft chest", 1]}
+    whose goal is not an item, so the plan "finishes" without a chest and the
+    planner, shown the plan as its example, copies it. Rewritten to
+        {"task": "craft chest", "goal": ["chest", 1]}.
+    Returns the number of steps changed. Only plan JSON is touched.
+    """
+    import json
+    n = 0
+    for f in Path(mem).rglob("*.json"):
+        try:
+            txt = f.read_text()
+        except OSError:
+            continue
+        if '"craft chest"' not in txt:
+            continue
+        try:
+            d = json.loads(txt)
+        except ValueError:
+            continue
+
+        def walk(o):
+            nonlocal n
+            if isinstance(o, dict):
+                g = o.get("goal")
+                if isinstance(g, list) and g and g[0] == "craft chest":
+                    o["goal"] = ["chest"] + list(g[1:])
+                    o["task"] = "craft chest"
+                    n += 1
+                for v in o.values():
+                    walk(v)
+            elif isinstance(o, list):
+                for v in o:
+                    walk(v)
+        walk(d)
+        f.unlink()  # break any hard link before rewriting
+        f.write_text(json.dumps(d, ensure_ascii=False, indent=2))
+    return n

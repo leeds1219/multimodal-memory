@@ -107,6 +107,11 @@ class Chain:
                 self.env_vars["OPTIMUS_GOALFIX"] = "1"
             if "logfix" in (a.variant or ""):  # D33
                 self.env_vars["OPTIMUS_LOGFIX"] = "1"
+            if "memfix" in (a.variant or "") and not (self.state / "memfix_done").exists():  # D35
+                from optimus_workdir import fix_memory_typos
+                n = fix_memory_typos(self.memory)
+                (self.state / "memfix_done").write_text(str(n))
+                log(f"memfix: rewrote {n} 'craft chest' steps in this chain's memory")
         elif a.method == "mineevolve":
             self.memory = self.state / "kb"
             self.memory.mkdir(exist_ok=True)
