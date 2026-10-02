@@ -179,6 +179,8 @@ def main() -> int:
                 self.turn_left(); self.turn_left()  # 90 deg away from the failed spot
                 for _ in range(10):
                     self._call_func("forward")
+                # authors' later mitigation for confined spaces (Optimus-3 craft_agent: attack_num 40)
+                self.pre_open_tabel(attack_num=40)
                 self._place_down()
                 for _ in range(5):
                     self._call_func("use")
@@ -478,7 +480,8 @@ def main() -> int:
                 env.can_change_hotbar = hot
 
         def _reflect_replan(task, predicament, obs, current_plan, plan_manager, memory_bank, cfg, pbar, all_task, logger, env):
-            if os.environ.get("OPTIMUS_ESCAPEFIX") == "1" and predicament in ("drop_down", "in_water"):
+            if (os.environ.get("OPTIMUS_ESCAPEFIX") == "1" and predicament in ("drop_down", "in_water")
+                    and "dig" not in str(task)):  # under ground on purpose while digging down
                 _escape(env, predicament, logger)
                 return False  # keep executing the current sub-goal from the new position
             info = f"predicament: {predicament}. " + PREDICAMENT.get(predicament or "", "the agent is in trouble")
