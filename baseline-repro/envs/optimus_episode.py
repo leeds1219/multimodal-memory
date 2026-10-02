@@ -188,6 +188,68 @@ def main() -> int:
 
         _CH.open_crating_table_wo_recipe = open_crating_table_wo_recipe
 
+    if os.environ.get("OPTIMUS_TAGFIX") == "1":
+        # Variant "tagfix" (DECISIONS D40): crafting_shaped fills every cell of a tag
+        # ingredient (minecraft:logs, :planks) from the FIRST matching inventory stack
+        # and fails "missing material" if that one stack is short, even when stacks of
+        # other wood types cover it (smoker with 2 birch + 2 oak logs; Minecraft accepts
+        # mixed types). Fix: only when such a mix is needed, fill the cells stack by
+        # stack; every other craft runs the released code unchanged.
+        import json as _json
+        from optimus1.helper import jarvis_craft_helper as _jch
+        _CH2 = _jch.CraftHelper
+        _orig_shaped = _CH2.crafting_shaped
+
+        def _members(self, key):
+            if key.get("item"):
+                return {key["item"][10:]}
+            tags = _json.load(open(os.path.join(self.root_path, "tag_items.json")))
+            return {x[10:] for x in tags[key["tag"]]}
+
+        def _stacks(labels, members):
+            return sorted(((s, v["quantity"]) for s, v in labels.items()
+                           if s.startswith("inventory_") and v.get("type") in members),
+                          key=lambda t: -t[1])
+
+        def _cells(pattern, sym, width):
+            return [i * width + j for i in range(len(pattern)) for j in range(len(pattern[i])) if pattern[i][j] == sym]
+
+        def crafting_shaped(self, target, iter_num, recipe_info):
+            pattern, keys = recipe_info.get("pattern"), recipe_info.get("key")
+            labels = self.get_labels()
+            mix = False
+            for sym, key in keys.items():
+                if key.get("tag"):
+                    need = len(_cells(pattern, sym, 1)) * iter_num
+                    first = self.find_in_inventory(labels, key["tag"][10:], "tag")
+                    have = labels[first]["quantity"] if first else 0
+                    mix |= have < need <= sum(q for _, q in _stacks(labels, _members(self, key)))
+            if not mix:
+                return _orig_shaped(self, target, iter_num, recipe_info)
+            width = 3 if "table" in self.current_gui_type else 2
+            for sym, key in _jch.random_dic(keys).items():
+                labels = self.get_labels()
+                cells = _cells(pattern, sym, width)
+                stacks = [s for s in _stacks(labels, _members(self, key)) if s[1] >= iter_num]
+                name = (key.get("item") or key.get("tag"))[10:]
+                self._assert(sum(q for _, q in stacks) >= len(cells) * iter_num,
+                             _jch.MISSING_MATERIAL_FORMAT.format(name, len(cells) * iter_num))
+                holding, held = None, 0
+                for cell in cells:
+                    if held < iter_num:
+                        if holding:
+                            self.pull_item_return(self.crafting_slotpos, holding)
+                        holding, qty = stacks.pop(0)
+                        self.pull_item(self.crafting_slotpos, holding, f"resource_{cell}", iter_num)
+                        held = qty - iter_num
+                    else:
+                        self.pull_item_continue(self.crafting_slotpos, f"resource_{cell}", name, iter_num)
+                        held -= iter_num
+                if held > 0:
+                    self.pull_item_return(self.crafting_slotpos, holding)
+
+        _CH2.crafting_shaped = crafting_shaped
+
     native = {}
     orig_do = om.agent_do
 
@@ -213,6 +275,8 @@ def main() -> int:
         overrides.append(f"env.max_minutes={int(genv['max_minutes'])}")  # suite may pin the paper's horizon
         if os.environ.get("OPTIMUS_BIOME"):  # variant "forest" (DECISIONS D38): released stone/iron yaml use plains
             overrides.append(f"env.prefer_biome={os.environ['OPTIMUS_BIOME']}")
+        if os.environ.get("OPTIMUS_INIT_INV"):  # test-only: hydra list, e.g. [{type:oak_log,quantity:2,slot:0}]
+            overrides.append(f"env.initial_inventory={os.environ['OPTIMUS_INIT_INV']}")
     log_file = open(ep / "client.log", "a")
     sys.stdout = sys.stderr = log_file
     from hydra import compose, initialize_config_dir
