@@ -292,39 +292,99 @@ def main() -> int:
                     break
             return out
 
+        OCEAN = {0, 10, 24, 44, 45, 46, 47, 48, 49, 50}  # 1.16 ocean biome ids
+
+        def _loc(out):
+            obs, _, _, info = out
+            return (obs.get("location_stats") if isinstance(obs, dict) else None) or info.get("location_stats", {})
+
+        def _xz(out):
+            loc = _loc(out)
+            return float(loc.get("xpos", 0)), float(loc.get("zpos", 0))
+
+        def _go_to_land(env, logger):
+            # Swim toward the spawn point (always land) until out of the ocean biome or back at spawn.
+            import math
+            sp, steps, out = mon.first_pos, 0, _act(env)
+            while steps < 1200 and not out[2]:
+                loc = _loc(out)
+                x, z = _xz(out)
+                if sp and math.hypot(sp[0] - x, sp[2] - z) < 4:
+                    break
+                if steps > 40 and int(np.asarray(loc.get("biome_id", 0))) not in OCEAN:
+                    break
+                cam = [-float(np.asarray(loc.get("pitch", 0))), 0.0]
+                if sp and "yaw" in loc:  # Minecraft yaw: 0 = +z, 90 = -x
+                    target = math.degrees(math.atan2(-(sp[0] - x), sp[2] - z))
+                    cam[1] = max(-90.0, min(90.0, (target - float(np.asarray(loc["yaw"])) + 180) % 360 - 180))
+                _act(env, 1, camera=cam)
+                out = _act(env, 20, forward=1, jump=1, sprint=1)
+                steps += 21
+            logger.warning(f"escapefix: go_to_land ({steps} steps)")
+
+        def _probe_exit(env):
+            # Look level, walk+jump 8 steps: escaped if moved >= 1.5 blocks under open sky.
+            out = _act(env)
+            x0, z0 = _xz(out)
+            _act(env, 1, camera=[-float(np.asarray(_loc(out).get("pitch", 0))), 0])
+            out = _act(env, 8, forward=1, jump=1)
+            x1, z1 = _xz(out)
+            sky = bool(np.asarray(_loc(out).get("can_see_sky", False)))
+            return ((x1 - x0) ** 2 + (z1 - z0) ** 2) ** 0.5 >= 1.5 and sky, out
+
+        def _build_tower(env, logger):
+            out = _act(env)
+            inv = out[3].get("plain_inventory", {})
+            slot = next((s for s in range(9) if inv.get(s, {}).get("type") in PLACEABLE), None)
+            if slot is None:  # no block to stand on yet: dig two from the wall in front (not the floor)
+                _act(env, 1, camera=[-float(np.asarray(_loc(out).get("pitch", 0))), 0])
+                for _ in range(2):
+                    _act(env, 40, attack=1)
+                    _act(env, 10, forward=1)
+                out = _act(env, 5)
+                inv = out[3].get("plain_inventory", {})
+                slot = next((s for s in range(9) if inv.get(s, {}).get("type") in PLACEABLE), None)
+            built = dug = 0
+            ok = False
+            for i in range(20):
+                ok, out = _probe_exit(env)
+                if ok or out[2]:
+                    break
+                if slot is None:
+                    break
+                inv = out[3].get("plain_inventory", {})
+                if inv.get(slot, {}).get("type") not in PLACEABLE:
+                    slot = next((s for s in range(9) if inv.get(s, {}).get("type") in PLACEABLE), None)
+                    if slot is None:
+                        break
+                _act(env, 1, **{f"hotbar.{slot + 1}": 1})
+                _act(env, 2, camera=[88, 0])
+                y0 = float(np.asarray(_loc(out).get("ypos", 0)))
+                _act(env, 1, jump=1)
+                _act(env, 2)
+                _act(env, 1, use=1)
+                out = _act(env, 3)
+                if float(np.asarray(_loc(out).get("ypos", 0))) > y0 + 0.5:
+                    built += 1
+                else:  # ceiling: dig the block above, then try again
+                    _act(env, 4, camera=[-88, 0])
+                    _act(env, 30, attack=1)
+                    dug += 1
+            if not ok:  # leave the spot anyway
+                _act(env, 6, camera=[0, 30])
+                out = _act(env, 40, forward=1, jump=1)
+            logger.warning(f"escapefix: build_tower ({built} placed, {dug} dug, exited={ok}, slot {slot})")
+
         def _escape(env, predicament, logger):
-            hot, use_ok = env.can_change_hotbar, True
+            hot = env.can_change_hotbar
             env.can_change_hotbar = True
             try:
-                _, _, done, info = _act(env)
-                if predicament == "in_water":  # go_to_land
-                    _act(env, 2, camera=[-30, 0])
-                    _act(env, 200, forward=1, jump=1, sprint=1)
-                    logger.warning("escapefix: go_to_land (200 steps)")
-                    return
-                inv = info.get("plain_inventory", {})
-                slot = next((s for s in range(9) if inv.get(s, {}).get("type") in PLACEABLE), None)
-                built = 0
-                if slot is not None:  # build_tower: pillar up while blocks last and height grows
-                    _act(env, 1, **{f"hotbar.{slot + 1}": 1})
-                    _act(env, 2, camera=[88, 0])
-                    stalls = 0
-                    for _ in range(15):
-                        y0 = info["location_stats"]["ypos"]
-                        _act(env, 1, jump=1)
-                        _act(env, 2)
-                        _, _, done, info = _act(env, 1, use=1)
-                        _, _, done, info = _act(env, 3)
-                        if done or inv.get(slot, {}).get("type") != info["plain_inventory"].get(slot, {}).get("type"):
-                            break
-                        stalls = stalls + 1 if info["location_stats"]["ypos"] <= y0 + 0.5 else 0
-                        built += stalls == 0
-                        if stalls >= 2:
-                            break
-                    _act(env, 2, camera=[-88, 0])
-                _act(env, 6, camera=[0, 30])  # turn ~180 deg, then leave the spot
-                _act(env, 60, forward=1, jump=1)
-                logger.warning(f"escapefix: build_tower ({built} blocks, hotbar slot {slot}) + walk away")
+                # The reflector's label is not reliable (an ocean spawn was called drop_down):
+                # also swim when the agent is in an ocean biome at sea level.
+                loc = _loc(_act(env))
+                at_sea = (int(np.asarray(loc.get("biome_id", -1))) in OCEAN
+                          and float(np.asarray(loc.get("ypos", 0))) >= float(np.asarray(loc.get("sea_level", 62))) - 2)
+                (_go_to_land if predicament == "in_water" or at_sea else _build_tower)(env, logger)
             finally:
                 env.can_change_hotbar = hot
 

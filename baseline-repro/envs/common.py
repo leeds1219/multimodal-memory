@@ -154,6 +154,7 @@ class EpisodeMonitor:
         self.end_reason: Optional[str] = None
         self.last_inventory: Dict[str, int] = {}
         self.last_pos: Optional[list] = None
+        self.first_pos: Optional[list] = None  # spawn point (escapefix go_to_land)
         self.last_obs: Any = None
         self.deaths = 0
         self._traj = gzip.open(self.dir / "trajectory.jsonl.gz", "wt")
@@ -184,6 +185,8 @@ class EpisodeMonitor:
         loc = obs.get("location_stats") if isinstance(obs, Mapping) else None
         if isinstance(loc, Mapping):
             pos = [round(float(np.asarray(loc.get(k, 0))), 1) for k in ("xpos", "ypos", "zpos")]
+            if self.first_pos is None:
+                self.first_pos = pos
             if pos != self.last_pos:
                 rec["pos"] = pos
                 self.last_pos = pos
