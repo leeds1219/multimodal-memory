@@ -366,3 +366,30 @@ LLM spend (ledger, all runs incl. smoke/debug): $698.21 / cap $3000   per env: {
 
 ### 09-26 06:05 — API-free diagnostic D1 prepared, launched, and stopped (GPUs taken by another user)
 Prepared an API-free diagnostic (`configs/run_plan_diagD1.yaml`, LLM layer in mock mode): STEVE-1 only (no planner), Wood+Stone × 3 seeds, in Env M (cond 4.0), Env M (cond 6.0) and Env O — to compare with the MineEvolve paper's STEVE-1-only row and separate env/controller effects from method effects. GPUs 0/1/6 were idle at 05:47, but another user's job (~22 GB on each of GPUs 0,1,2,3,6,7) started before our launch at 05:57, so the run was stopped at once and its partial results deleted. To rerun when GPUs are free: re-check `nvidia-smi` (memory.used 0 on the chosen GPUs), set `gpus:` in the plan, then `python scripts/supervise.py --plan configs/run_plan_diagD1.yaml`.
+
+## 2026-10-02 — Optimus-1 only; env restored; Wood fixed; Stone diagnosis
+
+**Scope.** Decided to keep only Optimus-1 (its own 67-task suite, D34) as the baseline; MineEvolve, DEPS,
+JARVIS-1, Optimus-3, Env M and VoLoAgent removed from the tree (still in git history).
+
+**Isoworld results (10-01, 6 seeds, logfix+memfix+isoworld).** Wood 58/60 = 96.7% (paper 98.6%),
+Stone 42/54 = 77.8% (paper 92.4%); 114/114 episodes ran in the requested world (`world_seed_ok`).
+Released code on the same tasks: Wood 27/30 = 90.0% (all 3 failures = chest typo, fixed by memfix).
+
+**Remaining Wood failures.** wooden_00 seed1: table placed over water, GUI never opened, released code
+clicks on regardless until timeout → `craftfix` (D37); rerun of that world succeeded (fix path not hit).
+wooden_03 seed4: plain timeout (chopping took ~3500/3600 steps).
+
+**Stone failures.** 8 of 12 never got a log; the released stone.yaml uses `prefer_biome: plains`
+(all other groups forest). Running plains vs forest (D38), 6 seeds each, GPUs 2-3 (LAUNCHES.md).
+`stone_01` is a memory hit (stored plan used without a planner call), so `plan_source=example_fallback`
+is a mislabel there, not a planner failure.
+
+**Env (D39).** Container reset wiped /opt/conda/envs/mcagent and system Java. The original env was copied
+from the old container to /home/rag/data/conda_envs/mcagent_orig (symlinked). `setup_env.sh` rebuilt to
+pin envs/mcagent.lock.txt (= original freeze): a test build installed all 142 pinned packages identical
+to the original. The authors' MCP-Reborn jar was deleted by minerl's setup.py during a rebuild and
+restored from their tarball (same world verified on a same-seed rerun).
+
+**Known infra crash.** `minerl spaces.sample: numpy.float64 cannot be interpreted as an integer` at
+~step 6 (66 crashed attempts across all suite_optimus1 variants); the chain retries the same seed.

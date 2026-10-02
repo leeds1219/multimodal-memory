@@ -1,39 +1,42 @@
 # multimodal-memory
 
-Workspace grouping two codebases:
+Reproduction of **Optimus-1** (NeurIPS 2024, [iLearn-Lab/NeurIPS24-Optimus-1](https://github.com/iLearn-Lab/NeurIPS24-Optimus-1))
+with a Gemini planner, as the baseline for our multimodal-memory work. Other baselines
+(MineEvolve, DEPS, JARVIS-1, Optimus-3) and VoLoAgent were dropped on 2026-10-02; they
+are still in git history before that date.
 
-| Folder | Upstream | Vendored commit |
-|--------|----------|-----------------|
-| `MC-MineEvolve/` | https://github.com/xzw-ustc/MC-MineEvolve | `a0a5f9b36626fd544dfd3c05e5ec27a1c1b48081` |
-| `VoLoAgent/` | https://github.com/NVlabs/VoLoAgent (Apache-2.0) | `b4e623079ca8498a16bcd5016920d71f76c44d30` |
+Everything lives in `baseline-repro/`:
 
-Each folder is a plain copy (upstream `.git` removed); see each folder's own README for setup.
+| Path | What |
+|------|------|
+| `scripts/setup_env.sh` | builds the whole setup: env `mcagent` pinned to the original env's freeze (`envs/mcagent.lock.txt`), authors' repos at pinned commits + our patches, prebuilt simulator jar (sha256-checked), checkpoints |
+| `scripts/chain.py` | runs one chain of episodes (one seed offset, a task list) on one GPU |
+| `envs/optimus_episode.py` | one Optimus-1 episode; labelled fix variants are switched on here |
+| `configs/suites/optimus1/` | the 67 craft tasks of the paper (Table 5), seeds, horizons |
+| `baselines/optimus1/` | our patches to the authors' code and MineCLIP, memory repair |
+| `DECISIONS.md` | every non-obvious choice and every fix variant, with evidence (D1–D39) |
+| `PROGRESS.md`, `RESUME.md` | what was run and how to resume / check runs |
 
-## Local environments (macOS, via [uv](https://docs.astral.sh/uv/))
+## Setup (Linux, NVIDIA GPU)
 
 ```bash
-# MC-MineEvolve (Python 3.10; MineStudio/MineRL skipped — Linux+NVIDIA only)
-cd MC-MineEvolve && uv venv .venv --python 3.10 \
-  && uv pip install -r <(grep -vi '^MineStudio' requirements.txt) && uv pip install --no-deps -e .
-
-# VoLoAgent (Python 3.11)
-cd VoLoAgent && uv venv .venv --python 3.11 && uv pip install -e ".[dev]"
+cd baseline-repro
+bash scripts/setup_env.sh          # idempotent; env goes to /home/rag/data/conda_envs/mcagent
 ```
 
-## Linux + GPU servers (conda)
+The planner key goes in `/home/rag/data/env.yaml` (`GOOGLE_API_KEY=...`); never commit it.
 
-One conda env per sub-project; never install into `base`. Env names are fixed so
-everyone's shell looks the same:
+## Run
 
-| Sub-project | Env | Setup |
-|-------------|-----|-------|
-| `MC-MineEvolve/` | `mineevolve` (py3.10) | `bash MC-MineEvolve/scripts/setup_env.sh` — installs Java 8, Xvfb, MineRL 1.0.2, MineStudio, torch; no root needed |
-| `VoLoAgent/` | `volo` (py3.11) | `conda create -n volo python=3.11 && conda activate volo && pip install -e "VoLoAgent[dev]"` |
+```bash
+cd baseline-repro
+REPRO_SUITE=optimus1 /opt/conda/envs/mcagent/bin/python scripts/chain.py --env O --method optimus1 \
+  --variant prebuilt-logfix-memfix-craftfix-isoworld-g38 --order seed0 --seed-offset 0 \
+  --tasks o1_stone_00,o1_stone_01 --gpu 2 --port 10200
+```
 
-Smoke-test MC-MineEvolve without any LLM key: `conda activate mineevolve && cd MC-MineEvolve && xvfb-run -a python scripts/smoke_test.py`.
+Variant tokens (combine with `-`): `prebuilt` (authors' full memory), `logfix` (D33),
+`memfix` (D35), `isoworld` (D36), `craftfix` (D37), `forest` (D38, diagnostic), `g38`
+(gemini-3.8-flash planner). Results: `/home/rag/data/repro_runs/suite_optimus1/runs/O/<variant>/<order>/<task>/<seed>/result.json`.
 
-On shared boxes, point pip / HF / torch / conda caches at the big data volume instead
-of `$HOME` (e.g. `PIP_CACHE_DIR`, `HF_HOME`, `TORCH_HOME`, `CONDA_ENVS_DIRS`, `CONDA_PKGS_DIRS`).
-
-See `CLAUDE.md` for the repo rules (branching, envs, what not to commit) and
-`CONTRIBUTING.md` for the PR workflow.
+See `CLAUDE.md` for the repo rules and `CONTRIBUTING.md` for the PR workflow.

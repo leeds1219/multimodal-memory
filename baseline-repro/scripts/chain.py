@@ -328,8 +328,8 @@ class Chain:
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--env", required=True, choices=["M", "O"])
-    ap.add_argument("--method", required=True, choices=["mineevolve", "optimus1", "deps", "jarvis1", "steve1"])
+    ap.add_argument("--env", required=True, choices=["O"])
+    ap.add_argument("--method", required=True, choices=["optimus1"])
     ap.add_argument("--variant", default="", help="optimus1: empty | prebuilt")
     ap.add_argument("--order", default="order0")
     ap.add_argument("--tasks", default="", help="comma list; default = the whole order")

@@ -14,3 +14,38 @@ __pycache__/
 
 # secrets
 .env
+
+# ---- experiment artefacts: never commit (they live on the data volume) ----
+# logs and run outputs
+*.log
+logs/
+runs/
+runs_smoke/
+repro_runs/
+memory_snapshots/
+*.jsonl
+*.jsonl.gz
+# large analysis outputs (keep small tables/figures out too; regenerate them from analysis/*.py)
+analysis/out/
+analysis/explorer/
+# media, weights, archives, simulator builds
+*.mp4
+*.avi
+*.gif
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+*.npy
+*.npz
+*.pkl
+*.jar
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+# secrets / keys
+env.yaml
+*.key
+*credentials*

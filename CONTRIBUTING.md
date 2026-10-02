@@ -7,8 +7,7 @@ git clone https://github.com/leeds1219/multimodal-memory.git
 cd multimodal-memory
 ```
 
-Then build the virtual env for the project you're working on (see `README.md`).
-Each sub-project has its own `.venv/`; they are git-ignored.
+Then build the env with `bash baseline-repro/scripts/setup_env.sh` (see `README.md`).
 
 ## Workflow
 
@@ -39,7 +38,6 @@ Branch prefixes: `feature/`, `fix/`, `docs/`, `refactor/`, `experiment/`.
 - **Never commit secrets.** API keys go in `.env` (git-ignored) or `export VAR=...` in your shell.
 - **Never commit large binaries** — model weights, videos, logs. They are git-ignored; keep it that way.
 - Keep PRs focused. One PR = one logical change; big refactors get their own PR.
-- If a PR touches `MC-MineEvolve/` and `VoLoAgent/` at the same time, say so in the description.
 
 ## Resolving conflicts
 
@@ -56,5 +54,3 @@ git push
 ## Code style
 
 - Python ≥ 3.10, follow the style already in the file you're editing.
-- `VoLoAgent/` uses `ruff` (`ruff check . && ruff format .` from its venv).
-- Run `pytest` in `VoLoAgent/` before opening a PR if you touched it.
