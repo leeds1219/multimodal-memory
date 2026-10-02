@@ -126,6 +126,11 @@ def main() -> int:
     if args.env == "O":
         om.env_make = env_make
 
+    mcdir = None
+    if args.env == "O" and os.environ.get("OPTIMUS_ISOWORLD") == "1":  # D36
+        from isoworld import make_private_mcdir
+        mcdir = make_private_mcdir(ep)
+
     if os.environ.get("OPTIMUS_GOALFIX") == "1":
         # Variant "goalfix" (DECISIONS D29): Gemini answers <goal inference> with a
         # list ("stone pickaxe, cobblestone, sticks, ..."), the prompt's own example
@@ -156,6 +161,33 @@ def main() -> int:
 
         KnowledgeGraph._pretty_result = _pretty_result
 
+    if os.environ.get("OPTIMUS_CRAFTFIX") == "1":
+        # Variant "craftfix" (DECISIONS D37): open_crating_table_wo_recipe places the
+        # table at the agent's feet and presses "use", but never checks that the
+        # table GUI opened. Over water the placement silently fails and the helper
+        # clicks slots of a GUI that is not there ("fail for unkown reason") until
+        # the horizon. Fix: if the GUI is closed, step aside and retry the released
+        # placement up to 3 times; if it is still closed, fail the craft honestly.
+        from optimus1.helper.jarvis_craft_helper import CraftHelper as _CH
+        _orig_open = _CH.open_crating_table_wo_recipe
+
+        def open_crating_table_wo_recipe(self):
+            _orig_open(self)
+            for _ in range(3):
+                if self.info["isGuiOpen"]:
+                    return
+                self.turn_left(); self.turn_left()  # 90 deg away from the failed spot
+                for _ in range(10):
+                    self._call_func("forward")
+                self._place_down()
+                for _ in range(5):
+                    self._call_func("use")
+                    if self.info["isGuiOpen"]:
+                        break
+            self._assert(self.info["isGuiOpen"], "crafting table could not be opened")
+
+        _CH.open_crating_table_wo_recipe = open_crating_table_wo_recipe
+
     native = {}
     orig_do = om.agent_do
 
@@ -179,6 +211,8 @@ def main() -> int:
     ]
     if args.env == "O":
         overrides.append(f"env.max_minutes={int(genv['max_minutes'])}")  # suite may pin the paper's horizon
+        if os.environ.get("OPTIMUS_BIOME"):  # variant "forest" (DECISIONS D38): released stone/iron yaml use plains
+            overrides.append(f"env.prefer_biome={os.environ['OPTIMUS_BIOME']}")
     log_file = open(ep / "client.log", "a")
     sys.stdout = sys.stderr = log_file
     from hydra import compose, initialize_config_dir
@@ -237,6 +271,12 @@ def main() -> int:
         "final_inventory": mon.last_inventory, "plan_source": plan_source, **llm, "error": err,
         "disk_free_gb": round(disk_free_gb(), 1),
     }
+    if mcdir is not None:  # D36: the seed the world was actually generated with
+        from isoworld import cleanup, world_seeds
+        ws = world_seeds(mcdir)
+        result["world_seeds"] = ws
+        result["world_seed_ok"] = bool(ws) and all(v == seed for v in ws.values())
+        cleanup(mcdir)
     write_result(ep, result)
     print(json.dumps({k: result[k] for k in ("task", "status", "success", "steps", "llm_calls", "cost_usd")}))
     return 0 if status != "crashed" else 3

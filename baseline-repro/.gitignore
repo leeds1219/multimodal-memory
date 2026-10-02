@@ -5,3 +5,8 @@ analysis/explorer/data.js
 analysis/explorer/film.js
 analysis/explorer/episodes/
 analysis/explorer/runs
+
+# never commit: run logs and large analysis outputs
+logs/
+analysis/out/
+analysis/explorer/

@@ -105,8 +105,14 @@ class Chain:
             self.memory = self.wd / "src" / "optimus1" / "memories" / "v1"
             if "goalfix" in (a.variant or ""):
                 self.env_vars["OPTIMUS_GOALFIX"] = "1"
+            if "isoworld" in (a.variant or ""):  # D36
+                self.env_vars["OPTIMUS_ISOWORLD"] = "1"
             if "logfix" in (a.variant or ""):  # D33
                 self.env_vars["OPTIMUS_LOGFIX"] = "1"
+            if "craftfix" in (a.variant or ""):  # D37
+                self.env_vars["OPTIMUS_CRAFTFIX"] = "1"
+            if "forest" in (a.variant or ""):  # D38
+                self.env_vars["OPTIMUS_BIOME"] = "forest"
             if "memfix" in (a.variant or "") and not (self.state / "memfix_done").exists():  # D35
                 from optimus_workdir import fix_memory_typos
                 n = fix_memory_typos(self.memory)
