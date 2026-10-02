@@ -250,6 +250,134 @@ def main() -> int:
 
         _CH2.crafting_shaped = crafting_shaped
 
+    if os.environ.get("OPTIMUS_REPLANFIX") == "1":
+        # Variant "replanfix" (DECISIONS D41): the reflector's REPLAN verdict is parsed
+        # (main.py: situation, replan_type) but never acted on - `match situation` only
+        # has `case "done" | "continue": pass`. The authors (issue #11) say only a subset
+        # of replanning is implemented and to add cases "after line 223" by querying the
+        # planner. Done here exactly so: one `case "replan"` is compiled into agent_do,
+        # which sends the predicament (the reflection prompt's own definitions) to the
+        # released replan prompt, inserts the new sub-goals before the current one and
+        # leaves the current sub-goal. A sub-goal whose goal is not an inventory item
+        # (e.g. "climb out of the cave") would be marked done at once by the released
+        # checker (KeyError -> finished), so it gets a fixed step budget instead.
+        import inspect as _inspect
+        import re as _re2
+        import textwrap as _tw
+        from optimus1.env.mods.task_checker import TaskCheckerMod
+
+        ESCAPE_STEPS = int(os.environ.get("OPTIMUS_ESCAPE_STEPS", "600"))
+        PREDICAMENT = {  # gpt4_planning.reflection_systerm
+            "drop_down": '"drop_down" means that the agent has fallen into a cave or is trapped in a mountain or river',
+            "in_water": '"in_water" means that the agent is in the ocean and needs to return to land immediately',
+        }
+        _n_escape = [0]
+
+        # Variant "escapefix" (DECISIONS D42), on top of replanfix: re-querying the planner
+        # gives "find trees"-like sub-goals that STEVE-1 cannot use to leave a pit / a dug-in
+        # hillside (test on 4 failed worlds: 0/4). The release still calls
+        # replan_helper.build_tower() for drop_down and go_to_land() for in_water
+        # (helper.py), but never shipped that class; this is our reconstruction of it.
+        PLACEABLE = ("dirt", "cobblestone", "stone", "andesite", "diorite", "granite", "netherrack",
+                     "oak_planks", "birch_planks", "spruce_planks", "jungle_planks", "acacia_planks", "dark_oak_planks")
+
+        def _act(env, n=1, **keys):
+            out = None
+            for _ in range(n):
+                a = env.noop_action()
+                for k, v in keys.items():
+                    a[k] = np.array(v)
+                out = env.step(a)
+                if out[2]:  # horizon reached: stop, agent_do's own loop ends the episode
+                    break
+            return out
+
+        def _escape(env, predicament, logger):
+            hot, use_ok = env.can_change_hotbar, True
+            env.can_change_hotbar = True
+            try:
+                _, _, done, info = _act(env)
+                if predicament == "in_water":  # go_to_land
+                    _act(env, 2, camera=[-30, 0])
+                    _act(env, 200, forward=1, jump=1, sprint=1)
+                    logger.warning("escapefix: go_to_land (200 steps)")
+                    return
+                inv = info.get("plain_inventory", {})
+                slot = next((s for s in range(9) if inv.get(s, {}).get("type") in PLACEABLE), None)
+                built = 0
+                if slot is not None:  # build_tower: pillar up while blocks last and height grows
+                    _act(env, 1, **{f"hotbar.{slot + 1}": 1})
+                    _act(env, 2, camera=[88, 0])
+                    stalls = 0
+                    for _ in range(15):
+                        y0 = info["location_stats"]["ypos"]
+                        _act(env, 1, jump=1)
+                        _act(env, 2)
+                        _, _, done, info = _act(env, 1, use=1)
+                        _, _, done, info = _act(env, 3)
+                        if done or inv.get(slot, {}).get("type") != info["plain_inventory"].get(slot, {}).get("type"):
+                            break
+                        stalls = stalls + 1 if info["location_stats"]["ypos"] <= y0 + 0.5 else 0
+                        built += stalls == 0
+                        if stalls >= 2:
+                            break
+                    _act(env, 2, camera=[-88, 0])
+                _act(env, 6, camera=[0, 30])  # turn ~180 deg, then leave the spot
+                _act(env, 60, forward=1, jump=1)
+                logger.warning(f"escapefix: build_tower ({built} blocks, hotbar slot {slot}) + walk away")
+            finally:
+                env.can_change_hotbar = hot
+
+        def _reflect_replan(task, predicament, obs, current_plan, plan_manager, memory_bank, cfg, pbar, all_task, logger, env):
+            if os.environ.get("OPTIMUS_ESCAPEFIX") == "1" and predicament in ("drop_down", "in_water"):
+                _escape(env, predicament, logger)
+                return False  # keep executing the current sub-goal from the new position
+            info = f"predicament: {predicament}. " + PREDICAMENT.get(predicament or "", "the agent is in trouble")
+            try:
+                examples = memory_bank.retrieve_replan(task, info)
+                new = om.render_gpt4_plan(om.ServerAPI.get_plan(cfg["server"], obs, task, info, examples, ""), is_replan=True)
+            except Exception as e:  # keep the current sub-goal, as the released code does on parse errors
+                logger.warning(f"replanfix: replan failed ({e!r})")
+                return False
+            if not new:
+                return False
+            for p in new:
+                names = env.task_checker_mod._expand_item(str((p.get("goal") or [""])[0]))
+                if not all(n in obs["inventory"] for n in names):
+                    _n_escape[0] += 1
+                    p["goal"] = [f"__escape__{_n_escape[0]}", ESCAPE_STEPS]
+            if new[-1]["task"] != task:
+                new.append(current_plan)
+            plan_manager.insert_plan(new, is_replan=True)
+            om.set_pbar_total(pbar, all_task, len(plan_manager.all))
+            logger.warning(f"[yellow]Reflection replan ({predicament})...\n{new}[/yellow]")
+            memory_bank.save_replan(task, info, new)
+            return True
+
+        om._reflect_replan = _reflect_replan
+        src = _tw.dedent(_inspect.getsource(om.agent_do))
+        m = list(_re2.finditer(r'\n( +)case "done" \| "continue":\n(?:.*\n)*?\1    pass\n', src))
+        assert len(m) == 1, "replanfix: anchor not found exactly once in agent_do"
+        ind = m[0].group(1)
+        case = (f'{ind}case "replan" if _reflect_replan(task, replan_type, obs, current_plan, plan_manager, '
+                f'memory_bank, cfg, pbar, all_task, logger, env):\n{ind}    break\n')
+        src = "\n" * (om.agent_do.__code__.co_firstlineno - 1) + src[:m[0].end()] + case + src[m[0].end():]
+        exec(compile(src, _inspect.getsourcefile(om.agent_do), "exec"), om.__dict__)
+
+        _orig_tc_step, _orig_tc_reset = TaskCheckerMod.step, TaskCheckerMod.reset
+
+        def tc_step(self, inventory, goal):
+            if goal is not None and str(goal[0]).startswith("__escape__"):
+                self._cache["escape_n"] = self._cache.get("escape_n", 0) + 1
+                return self._cache["escape_n"] >= int(goal[1])
+            return _orig_tc_step(self, inventory, goal)
+
+        def tc_reset(self, inventory=None):
+            self._cache["escape_n"] = 0
+            return _orig_tc_reset(self, inventory)
+
+        TaskCheckerMod.step, TaskCheckerMod.reset = tc_step, tc_reset
+
     native = {}
     orig_do = om.agent_do
 

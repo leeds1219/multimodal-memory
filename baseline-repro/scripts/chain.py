@@ -113,6 +113,10 @@ class Chain:
                 self.env_vars["OPTIMUS_CRAFTFIX"] = "1"
             if "tagfix" in (a.variant or ""):  # D40
                 self.env_vars["OPTIMUS_TAGFIX"] = "1"
+            if "replanfix" in (a.variant or ""):  # D41
+                self.env_vars["OPTIMUS_REPLANFIX"] = "1"
+            if "escapefix" in (a.variant or ""):  # D42
+                self.env_vars["OPTIMUS_ESCAPEFIX"] = "1"
             if "forest" in (a.variant or ""):  # D38
                 self.env_vars["OPTIMUS_BIOME"] = "forest"
             if "memfix" in (a.variant or "") and not (self.state / "memfix_done").exists():  # D35
