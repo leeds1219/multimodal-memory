@@ -414,3 +414,16 @@ restored from their tarball (same world verified on a same-seed rerun).
 **Final evaluation** (10-02 09:45, GPUs 2-3, 18 chains): variant
 `prebuilt-logfix-memfix-craftfix-tagfix-replanfix-escapefix-isoworld-g38`, all 67 tasks × 6 seeds, orders
 `final<k>_<a|b|c>`, released biomes and paper horizons. Expected ~6 h, ~$30.
+
+### 10-02 (cont.) — Stone in plains reaches the paper; final evaluation relaunched
+
+| Stone, released biome (plains), 6 seeds | success |
+|---|---|
+| logfix+memfix+isoworld (+craftfix) | 42/54 = 77.8% |
+| + tagfix, promptfix, replanfix, escapefix v2 → v5 (D41-D44) | 43 → 46 → 47 → 46 → **50/54 = 92.6%** |
+| paper Table 9 | 92.4% |
+
+Remaining v5 failures: ocean spawn (stone_04 seed0, never reaches trees), slow cobblestone mining (7/8 at timeout),
+furnace/charcoal timeouts after escapes. The final run includes Stone again = an independent second sample.
+Final evaluation relaunched 10-02 (variant `prebuilt-logfix-memfix-craftfix-tagfix-promptfix-replanfix-escapefix5-isoworld-g38`,
+67 tasks × 6 seeds, orders `final<k>_<a|b|c>`, --retries 4). The aborted earlier final (escapefix v1) is superseded.
