@@ -266,6 +266,28 @@ def main() -> int:
 
         _TC._expand_item = _expand_item
 
+    if os.environ.get("OPTIMUS_PROMPTFIX") == "1":
+        # Variant "promptfix" (DECISIONS D43): the sub-goal text is STEVE-1's prompt. The
+        # authors' memory always says "dig down and mine/break down <ore>" (thousands of
+        # plans); Gemini sometimes writes "mine cobblestone" / "find and mine coal", which
+        # STEVE-1 cannot do on the surface (all suite_optimus1 runs: cobblestone/stone with
+        # "dig down" 377/390, without 19/122; "mine cobblestone" 0/10). Mining sub-goals for
+        # underground blocks get the memory's wording; nothing else in the plan changes.
+        UNDERGROUND = ("cobblestone", "stone", "coal", "iron", "gold", "diamond", "redstone", "lapis")
+        _orig_render = om.render_gpt4_plan
+
+        def render_gpt4_plan(plan, is_replan=False):
+            plans = _orig_render(plan, is_replan)
+            for p in plans or []:
+                t, g = str(p.get("task", "")), p.get("goal") or [""]
+                item = str(g[0]).lower()
+                if (t.split(" ")[0] not in ("craft", "smelt", "equip") and "smelt" not in t
+                        and "dig" not in t and any(u in item for u in UNDERGROUND)):
+                    p["task"] = "dig down and mine " + item.replace("_", " ").replace("coals", "coal")
+            return plans
+
+        om.render_gpt4_plan = render_gpt4_plan
+
     if os.environ.get("OPTIMUS_REPLANFIX") == "1":
         # Variant "replanfix" (DECISIONS D41): the reflector's REPLAN verdict is parsed
         # (main.py: situation, replan_type) but never acted on - `match situation` only
