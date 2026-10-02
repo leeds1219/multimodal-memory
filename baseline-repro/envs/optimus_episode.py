@@ -250,6 +250,22 @@ def main() -> int:
 
         _CH2.crafting_shaped = crafting_shaped
 
+        # The released task checker expands "logs" to the six *_log items only, but the
+        # minecraft:logs tag the recipes use also holds stripped logs and *_wood: an agent
+        # holding 3 stripped_oak_log could never finish "chop trees" (stone_00 seed0, twice).
+        from optimus1.env.mods.task_checker import TaskCheckerMod as _TC
+        _orig_expand = _TC._expand_item
+
+        def _expand_item(self, item):
+            out = _orig_expand(self, item)
+            if "log" in item:
+                woods = ["acacia", "birch", "dark_oak", "jungle", "oak", "spruce"]
+                out = out + [f"stripped_{w}_log" for w in woods] + [f"{w}_wood" for w in woods] \
+                    + [f"stripped_{w}_wood" for w in woods]
+            return out
+
+        _TC._expand_item = _expand_item
+
     if os.environ.get("OPTIMUS_REPLANFIX") == "1":
         # Variant "replanfix" (DECISIONS D41): the reflector's REPLAN verdict is parsed
         # (main.py: situation, replan_type) but never acted on - `match situation` only
@@ -344,7 +360,7 @@ def main() -> int:
                 out = _act(env, 5)
                 inv = out[3].get("plain_inventory", {})
                 slot = next((s for s in range(9) if inv.get(s, {}).get("type") in PLACEABLE), None)
-            built = dug = 0
+            built = dug = stall = 0
             ok = False
             for i in range(20):
                 ok, out = _probe_exit(env)
@@ -359,6 +375,7 @@ def main() -> int:
                         break
                 _act(env, 1, **{f"hotbar.{slot + 1}": 1})
                 _act(env, 2, camera=[88, 0])
+                out = _act(env, 8)  # land first: the exit probe ends with jumps, so ypos would read high
                 y0 = float(np.asarray(_loc(out).get("ypos", 0)))
                 _act(env, 1, jump=1)
                 _act(env, 2)
@@ -366,7 +383,11 @@ def main() -> int:
                 out = _act(env, 3)
                 if float(np.asarray(_loc(out).get("ypos", 0))) > y0 + 0.5:
                     built += 1
-                else:  # ceiling: dig the block above, then try again
+                    stall = 0
+                else:  # ceiling: dig the block above, then try again (at most 3 times in a row)
+                    stall += 1
+                    if stall > 3:
+                        break
                     _act(env, 4, camera=[-88, 0])
                     _act(env, 30, attack=1)
                     dug += 1
