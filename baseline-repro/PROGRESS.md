@@ -393,3 +393,24 @@ restored from their tarball (same world verified on a same-seed rerun).
 
 **Known infra crash.** `minerl spaces.sample: numpy.float64 cannot be interpreted as an integer` at
 ~step 6 (66 crashed attempts across all suite_optimus1 variants); the chain retries the same seed.
+
+### 10-02 (cont.) — Stone: cause found (REPLAN never acted on); final evaluation launched
+
+| Stone, 6 seeds (54 ep.) | success |
+|---|---|
+| logfix+memfix+isoworld, released biome (plains) — 10-01 | 42/54 = 77.8% |
+| + craftfix, plains | 42/54 = 77.8% |
+| + craftfix, forest (D38 diagnostic) | 49/54 = 90.7% |
+| paper Table 9 | 92.4% |
+
+* Plains failures: 11 of 12 had ≥1 reflector REPLAN that the released code ignores; without a REPLAN 39/40 succeed (D41).
+  Forest only looks better because the agent rarely falls into a pit / digs into a hillside when trees are close.
+* Biome: not stated in the paper ("random start point"); the authors' memory labels Stone episodes ~half forest / half
+  plains (Wood ~95% forest, calibrated on our own runs), so the released `plains` is kept for the final run.
+* replanfix (planner re-query, as the authors suggest in issue #11): 0/7 on previously failed worlds.
+  escapefix (scripted build_tower / go_to_land, D42): 2/7, logs obtained after escaping in 3 of 4 stone_01 worlds.
+* tagfix (D40): smoker with mixed log types; A/B in a fixed world: released fails the craft, tagfix crafts at once.
+
+**Final evaluation** (10-02 09:45, GPUs 2-3, 18 chains): variant
+`prebuilt-logfix-memfix-craftfix-tagfix-replanfix-escapefix-isoworld-g38`, all 67 tasks × 6 seeds, orders
+`final<k>_<a|b|c>`, released biomes and paper horizons. Expected ~6 h, ~$30.
