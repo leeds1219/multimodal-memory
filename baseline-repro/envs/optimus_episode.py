@@ -250,6 +250,45 @@ def main() -> int:
 
         _CH2.crafting_shaped = crafting_shaped
 
+        # crafting(<tag>, n) in the release only succeeds if ONE member recipe can make all n
+        # (e.g. 19 planks from oak logs alone) and otherwise fails "missing material" although
+        # several log types together suffice (stone_01 seed3: 4 birch + 2 oak logs, "craft
+        # planks 19" failed, then a chop/craft loop until timeout). On that failure, craft the
+        # members one after another from what the inventory holds.
+        _orig_crafting = _CH2.crafting
+
+        def crafting(self, target, target_num=1):
+            done, info = _orig_crafting(self, target, target_num)
+            key = "minecraft:" + str(target)
+            if done or "missing material" not in str(info) or key not in getattr(self, "tag_info", {}):
+                return done, info
+            remaining = int(target_num)
+            for member in self.tag_info[key]:
+                sub = member[10:]
+                path = os.path.join(self.recipe_path, sub + ".json")
+                if remaining <= 0 or not os.path.exists(path):
+                    continue
+                recipe = _json.load(open(path))
+                ingr = recipe.get("ingredients") or []
+                if len(ingr) != 1:
+                    continue
+                k = ingr[0]
+                name, kind = ((k["item"][10:], "item") if k.get("item") else (k["tag"][10:], "tag"))
+                labels = self.get_labels()
+                have = sum(v["quantity"] for s_, v in labels.items() if s_.startswith("inventory_")
+                           and (v.get("type") == name if kind == "item"
+                                else v.get("type") in {x[10:] for x in self.tag_info.get("minecraft:" + name, [])}))
+                per = int(recipe.get("result", {}).get("count", 1))
+                n = min(-(-remaining // per), have)
+                if n <= 0:
+                    continue
+                d, i = _orig_crafting(self, sub, n * per)
+                if d:
+                    remaining -= n * per
+            return (True, None) if remaining <= 0 else (False, info)
+
+        _CH2.crafting = crafting
+
         # The released task checker expands "logs" to the six *_log items only, but the
         # minecraft:logs tag the recipes use also holds stripped logs and *_wood: an agent
         # holding 3 stripped_oak_log could never finish "chop trees" (stone_00 seed0, twice).
@@ -360,15 +399,19 @@ def main() -> int:
                 steps += 21
             logger.warning(f"escapefix: go_to_land ({steps} steps)")
 
-        def _probe_exit(env):
-            # Look level, walk+jump 8 steps: escaped if moved >= 1.5 blocks under open sky.
+        def _probe_exit(env, y_start):
+            # Look level, walk+jump 8 steps. Escaped if the agent can roam (>= 3 blocks) or has
+            # climbed out (>= 1.5 blocks moved while >= 1.5 above where the escape started).
+            # can_see_sky is not used: it read False in every escapefix3 episode.
             out = _act(env)
             x0, z0 = _xz(out)
             _act(env, 1, camera=[-float(np.asarray(_loc(out).get("pitch", 0))), 0])
-            out = _act(env, 8, forward=1, jump=1)
+            _act(env, 8, forward=1, jump=1)
+            out = _act(env, 6)
             x1, z1 = _xz(out)
-            sky = bool(np.asarray(_loc(out).get("can_see_sky", False)))
-            return ((x1 - x0) ** 2 + (z1 - z0) ** 2) ** 0.5 >= 1.5 and sky, out
+            moved = ((x1 - x0) ** 2 + (z1 - z0) ** 2) ** 0.5
+            y1 = float(np.asarray(_loc(out).get("ypos", 0)))
+            return moved >= 3 or (moved >= 1.5 and y1 >= y_start + 1.5), out
 
         def _build_tower(env, logger):
             out = _act(env)
@@ -384,8 +427,9 @@ def main() -> int:
                 slot = next((s for s in range(9) if inv.get(s, {}).get("type") in PLACEABLE), None)
             built = dug = stall = 0
             ok = False
+            y_start = float(np.asarray(_loc(out).get("ypos", 0)))
             for i in range(20):
-                ok, out = _probe_exit(env)
+                ok, out = _probe_exit(env, y_start)
                 if ok or out[2]:
                     break
                 if slot is None:
@@ -406,6 +450,8 @@ def main() -> int:
                 if float(np.asarray(_loc(out).get("ypos", 0))) > y0 + 0.5:
                     built += 1
                     stall = 0
+                    if built >= 12:  # never a taller pillar: fall damage
+                        break
                 else:  # ceiling: dig the block above, then try again (at most 3 times in a row)
                     stall += 1
                     if stall > 3:
