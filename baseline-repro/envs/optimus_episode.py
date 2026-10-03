@@ -307,7 +307,7 @@ def main() -> int:
 
         _TC._expand_item = _expand_item
 
-    if os.environ.get("OPTIMUS_PROMPTFIX") == "1":
+    if os.environ.get("OPTIMUS_PROMPTFIX") in ("1", "2"):
         # Variant "promptfix" (DECISIONS D43): the sub-goal text is STEVE-1's prompt. The
         # authors' memory always says "dig down and mine/break down <ore>" (thousands of
         # plans); Gemini sometimes writes "mine cobblestone" / "find and mine coal", which
@@ -315,6 +315,12 @@ def main() -> int:
         # "dig down" 377/390, without 19/122; "mine cobblestone" 0/10). Mining sub-goals for
         # underground blocks get the memory's wording; nothing else in the plan changes.
         UNDERGROUND = ("cobblestone", "stone", "coal", "iron", "gold", "diamond", "redstone", "lapis")
+        # promptfix2 (D45): v1's substring test also rewrote crafted items and non-items
+        # ("dig down and mine iron pickaxe", goal iron_pickaxe; gold_block, stone_block,
+        # find_gold_ore). v2 rewrites only goals that are mined blocks.
+        MINED = {"cobblestone", "stone", "coal", "coals", "diamond", "diamonds", "redstone", "lapis_lazuli"} \
+            | {f"{o}_ore" for o in ("coal", "iron", "gold", "diamond", "redstone", "lapis", "emerald", "copper")}
+        _v2 = os.environ["OPTIMUS_PROMPTFIX"] == "2"
         _orig_render = om.render_gpt4_plan
 
         def render_gpt4_plan(plan, is_replan=False):
@@ -323,7 +329,8 @@ def main() -> int:
                 t, g = str(p.get("task", "")), p.get("goal") or [""]
                 item = str(g[0]).lower()
                 if (t.split(" ")[0] not in ("craft", "smelt", "equip") and "smelt" not in t
-                        and "dig" not in t and any(u in item for u in UNDERGROUND)):
+                        and "dig" not in t and any(u in item for u in UNDERGROUND)
+                        and (not _v2 or item.removeprefix("deepslate_") in MINED)):
                     p["task"] = "dig down and mine " + item.replace("_", " ").replace("coals", "coal")
             return plans
 

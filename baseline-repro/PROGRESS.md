@@ -427,3 +427,52 @@ Remaining v5 failures: ocean spawn (stone_04 seed0, never reaches trees), slow c
 furnace/charcoal timeouts after escapes. The final run includes Stone again = an independent second sample.
 Final evaluation relaunched 10-02 (variant `prebuilt-logfix-memfix-craftfix-tagfix-promptfix-replanfix-escapefix5-isoworld-g38`,
 67 tasks × 6 seeds, orders `final<k>_<a|b|c>`, --retries 4). The aborted earlier final (escapefix v1) is superseded.
+
+## 2026-10-03 — final evaluation (67 tasks × 6 seeds) and failure analysis
+
+Variant `prebuilt-logfix-memfix-craftfix-tagfix-promptfix-replanfix-escapefix5-isoworld-g38`, released biomes and
+horizons, Gemini 3.8 Flash, 402 episodes, $25.5. One crashed_final (socket timeout) and one anomaly (Gemini proxy 500)
+were moved aside and rerun singly (LAUNCHES.md); 0 infra failures remain.
+
+| Group | ours | paper (Table 1) | near-released run (`logfix` only, 10-01) |
+|---|---|---|---|
+| Wood | 56/60 = 93.3% | 98.6 | 26/31 = 83.9 |
+| Stone | 48/54 = 88.9% (two runs: 98/108 = 90.7%) | 92.35 | 19/28 = 67.9 |
+| Iron | 69/96 = 71.9% | 46.69 | 31/48 = 64.6 |
+| Gold | 18/36 = 50.0% | 8.51 | 5/18 = 27.8 |
+| Diamond | 20/42 = 47.6% | 11.61 | 7/21 = 33.3 |
+| Redstone | 32/36 = 88.9% | 25.02 | 14/18 = 77.8 |
+| Armor | 41/78 = 52.6% | 19.47 | 20/39 = 51.3 |
+| Overall (mean of I/G/D/R/A) | 62.2 | 22.26 | 51.0 |
+
+* Wood/Stone are within ~1.5 SE of the paper (Wood 10-01 + 10-03 = 114/120 = 95.0%). The 4 Wood worlds that failed
+  all succeeded on 10-01: 2 crafting tables placed in/next to water (GUI never opened; one agent drowned), 1 stuck in
+  water, 1 slow chopping — run-to-run variance, no new code path involved before the failure.
+* The other groups are 2–6× the paper, and were already far above with near-released code, so this is not from our fixes.
+  Likely: the released Env O helpers (ore spawning 10% per STEVE-1 step, diamond at any y ≤ 14; auto best pickaxe below
+  y 70; see the 09-23 env table) and a stronger planner than GPT-4V. Whether the paper's runs used those helpers is not
+  stated. **Wood/Stone reproduce; the harder groups do not match the paper (they are higher).**
+
+### Failure analysis (`analysis/final_failures.py` → analysis/out/final_failures.{csv,txt}, not committed)
+
+118 failures, 116 at the horizon. One primary cause each (first rule that matches):
+
+| cause | all | Wood+Stone | Iron | G/D/R/A |
+|---|---|---|---|---|
+| ore not found within the horizon | 40 | 0 | 2 | 38 |
+| terrain trap (pit / ravine / water), escape failed | 30 | 3 | 18 | 9 |
+| ore not found, time lost in a trap earlier | 14 | 1 | 1 | 12 |
+| slow gathering (wood / cobblestone) | 12 | 2 | 2 | 8 |
+| ours: replan sub-goal with a dirt goal ("pillar up using dirt", "select block") | 7 | 0 | 1 | 6 |
+| craft / smelt failed | 7 | 2 | 3 | 2 |
+| ours: promptfix v1 rewrote a non-mined goal (D45) | 5 | 0 | 0 | 5 |
+| crafting-table GUI never opened | 3 | 2 | 0 | 1 |
+
+* A reflector REPLAN appears in 101/118 failures vs 24/284 successes: getting stuck is the main failure signal.
+* Iron's 18 traps: the agent falls into a stone ravine/cave while looking for trees (plains spawn) with an empty
+  inventory; build_tower has no block and cannot dig stone by hand (exited=False every time, up to 13 escapes per
+  episode); the reflector still says drop_down each time.
+* Our fixes' own issues: promptfix v1 over-match (fixed as promptfix2, D45, check running); replanfix accepts replan
+  sub-goals whose goal is dirt, which pillaring consumes (8/8 such episodes failed) — not fixed yet.
+* Planner goal `stone` for a mining step (mining stone yields cobblestone): 1/4 succeeded; matches the earlier
+  "smelt stone" 0/90 finding.
