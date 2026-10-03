@@ -307,6 +307,27 @@ def main() -> int:
 
         _TC._expand_item = _expand_item
 
+    if os.environ.get("OPTIMUS_ORESPAWN") == "diamond":
+        # Variant "diamondore" (DECISIONS D46, diagnostic): the released env (env/wrapper.py
+        # random_ore) /setblocks coal/iron/gold/redstone/diamond ore 3-5 blocks below the agent
+        # (10% per STEVE-1 step, one per y level), but the paper (App. D) only mentions raised
+        # diamond generation. Keep the released diamond branch unchanged, drop the others.
+        import random as _random
+        import optimus1.env.wrapper as _wrapper
+
+        def random_ore(env, ORE_MAP, ypos: float, thresold: float = 0.9):
+            if _random.random() <= thresold:
+                return
+            dy = _random.randint(-5, -3)
+            new_pos = int(ypos + dy)
+            if ypos <= 14 and ypos not in ORE_MAP and new_pos not in ORE_MAP and new_pos >= 1:
+                ORE_MAP[new_pos] = "diamond_ore"
+                ORE_MAP[ypos] = 1
+                env.execute_cmd("/setblock ~ ~{} ~ minecraft:diamond_ore".format(dy))
+                print(f"diamond ore at {new_pos}")
+
+        _wrapper.random_ore = random_ore
+
     if os.environ.get("OPTIMUS_PROMPTFIX") in ("1", "2"):
         # Variant "promptfix" (DECISIONS D43): the sub-goal text is STEVE-1's prompt. The
         # authors' memory always says "dig down and mine/break down <ore>" (thousands of
