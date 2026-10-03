@@ -1,0 +1,270 @@
+<title>Optimus-1 Failure Casebook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: casebook — summary strip on top, failure list on the left, one case file on the right (stacks on phones). */
+:root{
+  --ground:#eef0f2; --panel:#ffffff; --ink:#1c2128; --muted:#5d6672; --line:#d6dbe1;
+  --accent:#2f5fb3; --accent-soft:#e3ebf8; --done:#2e7d4f; --fail:#b23a2e; --warn:#a86b00;
+  --band-gold:#f4e3a6; --band-dia:#c9ecef;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --ground:#14171c; --panel:#1c2027; --ink:#e6e9ee; --muted:#9aa3ae; --line:#2e343d;
+  --accent:#7ea6ec; --accent-soft:#233149; --done:#5fc28a; --fail:#ef7d70; --warn:#e2ac4a;
+  --band-gold:#4a3f1b; --band-dia:#173f44; color-scheme: dark;}}
+:root[data-theme="dark"]{
+  --ground:#14171c; --panel:#1c2027; --ink:#e6e9ee; --muted:#9aa3ae; --line:#2e343d;
+  --accent:#7ea6ec; --accent-soft:#233149; --done:#5fc28a; --fail:#ef7d70; --warn:#e2ac4a;
+  --band-gold:#4a3f1b; --band-dia:#173f44; color-scheme: dark;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font:15px/1.5 var(--body);padding-inline:16px;padding-block:20px 40px}
+.wrap{max-width:1380px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1{font:700 28px/1.15 var(--display);margin:0;text-wrap:balance}
+h2{font:600 18px/1.2 var(--display);margin:0 0 8px;text-wrap:balance}
+.sub{color:var(--muted);font-size:13px;margin-top:4px;font-family:var(--mono);overflow-wrap:anywhere}
+.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.summary{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px}
+@media (max-width:900px){.summary{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:4px 8px;border-bottom:1px solid var(--line)}
+th{font-weight:700;color:var(--muted);font-size:11px;letter-spacing:.05em;text-transform:uppercase}
+td.num,th.num{text-align:right}
+.bar{display:flex;flex-direction:column;gap:5px}
+.bar-row{display:grid;grid-template-columns:minmax(0,1fr) 140px 34px;gap:8px;align-items:center;font-size:13px;cursor:pointer;border-radius:4px;padding:1px 4px}
+.bar-row:hover,.bar-row.on{background:var(--accent-soft)}
+.bar-track{height:10px;background:var(--line);border-radius:5px;overflow:hidden}
+.bar-fill{height:100%;background:var(--accent)}
+.main{display:grid;grid-template-columns:340px minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.main{grid-template-columns:1fr}}
+.list{position:sticky;top:env(safe-area-inset-top,0px);max-height:calc(100vh - 20px);display:flex;flex-direction:column;gap:8px}
+@media (max-width:900px){.list{position:static;max-height:none}}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:3px 10px;font:13px var(--body);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+.chip:focus-visible,button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible,.item:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=search],select,textarea{font:14px var(--body);color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 8px;width:100%}
+.items{overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+@media (max-width:900px){.items{max-height:340px}}
+.item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;padding:8px 10px;border-bottom:1px solid var(--line);cursor:pointer}
+.item:hover{background:var(--accent-soft)}
+.item.sel{background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.item .t{font-weight:700;font-size:13px;overflow-wrap:anywhere}
+.item .c{grid-column:1/-1;color:var(--muted);font-size:12px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--warn);display:inline-block;margin-left:6px;vertical-align:middle}
+.case{display:flex;flex-direction:column;gap:14px;min-width:0}
+.head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline}
+.pill{border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700;background:var(--accent-soft);color:var(--accent)}
+.pill.fail{background:transparent;border:1px solid var(--fail);color:var(--fail)}
+.meta{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:13px;color:var(--muted)}
+.compare{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+@media (max-width:1100px){.compare{grid-template-columns:1fr}}
+.analysis ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+.analysis li:last-child{font-weight:700}
+.handnote{margin-top:10px;padding:8px 10px;border-left:3px solid var(--accent);background:var(--accent-soft);font-size:14px;white-space:pre-wrap}
+.notes{display:flex;flex-direction:column;gap:8px}
+.notes .row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.notes textarea{min-height:120px;resize:vertical}
+.notes .foot{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+button{font:700 14px var(--body);border:1px solid var(--accent);background:var(--accent);color:var(--panel);border-radius:6px;padding:6px 14px;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}
+.status{font-size:13px;color:var(--muted)}
+.film{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.film figure{margin:0;display:flex;flex-direction:column;gap:2px}
+.film img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;border:1px solid var(--line);display:block}
+.film figcaption{font:12px var(--mono);color:var(--muted)}
+.chart{overflow-x:auto}
+.chart svg{display:block;width:100%;min-width:520px;height:auto}
+.timeline{display:flex;height:18px;border-radius:4px;overflow:hidden;border:1px solid var(--line)}
+.timeline span{display:block;height:100%;border-right:1px solid var(--panel)}
+.sg{max-height:240px;overflow-y:auto}
+.sg td:first-child{width:28px;color:var(--muted)}
+.ok{color:var(--done);font-weight:700}.no{color:var(--fail);font-weight:700}
+.events{max-height:300px;overflow:auto;font:12px/1.55 var(--mono);white-space:pre-wrap;margin:0;background:var(--ground);border-radius:6px;padding:8px 10px;border:1px solid var(--line)}
+.inv{display:flex;flex-wrap:wrap;gap:4px}
+.inv span{font:12px var(--mono);border:1px solid var(--line);border-radius:4px;padding:1px 6px}
+.empty{color:var(--muted);padding:20px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Optimus-1 Failure Casebook</h1>
+    <div class="sub" id="runline"></div>
+  </header>
+
+  <section class="summary">
+    <div class="card">
+      <h2>그룹별 성공률 (ours vs 논문 Table 1)</h2>
+      <div style="overflow-x:auto"><table id="groups"></table></div>
+    </div>
+    <div class="card">
+      <h2>실패 원인 (규칙 기반 1차 분류)</h2>
+      <div class="bar" id="causes"></div>
+      <div class="status" style="margin-top:8px">원인을 누르면 목록이 그 원인으로 필터됩니다.</div>
+    </div>
+  </section>
+
+  <section class="main">
+    <aside class="list" aria-label="실패한 에피소드 목록">
+      <div class="filters" id="gfilters"></div>
+      <input type="search" id="q" placeholder="task, 지시문, sub-goal 검색">
+      <div class="status" id="count"></div>
+      <div class="items" id="items" role="listbox"></div>
+    </aside>
+    <article class="case" id="case"><div class="empty">왼쪽에서 에피소드를 고르세요.</div></article>
+  </section>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const CAUSE_KO = {
+  "ore not found within the horizon": "광석을 시간 안에 못 찾음",
+  "ore not found within the horizon (time lost in a trap earlier)": "광석 못 찾음 (앞서 지형에 갇혀 시간 손실)",
+  "terrain trap (pit/ravine/water), escape failed": "지형에 갇힘 (구덩이·협곡·물), 탈출 실패",
+  "slow gathering (wood/cobblestone)": "채집이 느림 (나무·조약돌)",
+  "craft/smelt failed (materials or GUI)": "제작/제련 실패",
+  "crafting-table GUI never opened (water/cramped)": "제작대 GUI가 안 열림",
+  "ours: replan sub-goal with a dirt goal (pillar/select)": "우리 버그: replan의 dirt 목표 sub-goal",
+  "ours: promptfix v1 rewrote a non-mined goal": "우리 버그: promptfix v1 과잉 치환",
+  "infra": "인프라", "success": "성공",
+};
+const ko = c => CAUSE_KO[c] || c;
+const GROUP_KO = {wooden:"Wood",stone:"Stone",iron:"Iron",gold:"Gold",diamond:"Diamond",redstone:"Redstone",armor:"Armor"};
+const AGREE = [["","— 선택 —"],["agree","동의"],["partly","부분 동의"],["disagree","동의 안 함"],["unsure","모르겠음"]];
+const eps = DATA.episodes;
+const state = {group:null, cause:null, q:"", sel:null, notes:{}};
+let db = null;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function summary(){
+  $("runline").textContent = `${DATA.variant} · orders ${DATA.prefix}* · 실패 ${eps.filter(e=>!e.success).length}개`;
+  let h = `<tr><th>group</th><th class="num">ours</th><th class="num">%</th><th class="num">paper</th><th class="num">failures</th></tr>`;
+  for (const g of DATA.groups){
+    h += `<tr><td>${GROUP_KO[g.group]}</td><td class="num">${g.succ}/${g.n}</td><td class="num">${(100*g.succ/g.n).toFixed(1)}</td><td class="num">${g.paper.toFixed(1)}</td><td class="num">${g.n-g.succ}</td></tr>`;
+  }
+  $("groups").innerHTML = h;
+  const cnt = {}; eps.filter(e=>!e.success).forEach(e => cnt[e.cause]=(cnt[e.cause]||0)+1);
+  const max = Math.max(...Object.values(cnt), 1);
+  $("causes").innerHTML = Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([c,n]) =>
+    `<div class="bar-row${state.cause===c?" on":""}" data-c="${esc(c)}" role="button" tabindex="0"><span>${esc(ko(c))}</span><span class="bar-track"><span class="bar-fill" style="display:block;width:${100*n/max}%"></span></span><span class="num">${n}</span></div>`).join("");
+  $("causes").querySelectorAll(".bar-row").forEach(r => {
+    const go = () => { state.cause = state.cause===r.dataset.c ? null : r.dataset.c; summary(); list(); };
+    r.onclick = go; r.onkeydown = ev => { if (ev.key==="Enter"||ev.key===" "){ev.preventDefault();go();} };
+  });
+  const gs = ["all", ...DATA.groups.map(g=>g.group)];
+  $("gfilters").innerHTML = gs.map(g => `<button class="chip" aria-pressed="${(state.group||"all")===g}" data-g="${g}">${g==="all"?"전체":GROUP_KO[g]}</button>`).join("");
+  $("gfilters").querySelectorAll(".chip").forEach(b => b.onclick = () => { state.group = b.dataset.g==="all"?null:b.dataset.g; summary(); list(); });
+}
+
+function visible(){
+  const q = state.q.toLowerCase();
+  return eps.filter(e => (!state.group || e.group===state.group) && (!state.cause || e.cause===state.cause) &&
+    (!q || (e.task+" "+e.instruction+" "+e.last_subgoal+" "+e.id).toLowerCase().includes(q)));
+}
+
+function list(){
+  const v = visible();
+  $("count").textContent = `${v.length}개 표시` + (state.cause ? ` · 원인: ${ko(state.cause)}` : "");
+  $("items").innerHTML = v.map(e => `<div class="item${state.sel===e.id?" sel":""}" data-id="${esc(e.id)}" role="option" tabindex="0" aria-selected="${state.sel===e.id}">
+      <span class="t">${esc(e.instruction)}</span><span class="mono" style="font-size:12px;color:var(--muted)">${esc(e.order)}${state.notes[e.id]?'<span class="dot" title="노트 있음"></span>':""}</span>
+      <span class="c">${esc(ko(e.cause))} · ${esc(e.last_subgoal||"—")}</span></div>`).join("") || `<div class="empty">조건에 맞는 에피소드가 없습니다.</div>`;
+  $("items").querySelectorAll(".item").forEach(it => {
+    const go = () => select(it.dataset.id);
+    it.onclick = go; it.onkeydown = ev => { if (ev.key==="Enter"){go();} };
+  });
+}
+
+function depthChart(e){
+  if (!e.y.length) return `<div class="status">위치 기록 없음</div>`;
+  const W=760,H=220,L=40,R=12,T=10,B=28;
+  const tmax = Math.max(e.horizon, e.y[e.y.length-1][0], 1);
+  const ys = e.y.map(p=>p[1]); const ymax = Math.max(80, ...ys)+2, ymin = 0;
+  const X = t => L + (W-L-R)*t/tmax, Y = y => T + (H-T-B)*(ymax-y)/(ymax-ymin);
+  const band = (a,b,cls) => `<rect x="${L}" y="${Y(b)}" width="${W-L-R}" height="${Y(a)-Y(b)}" fill="var(${cls})" opacity=".8"/>`;
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="시간에 따른 높이(y)">`;
+  s += band(15,26,"--band-gold") + band(1,14,"--band-dia");
+  s += `<text x="${W-R-4}" y="${Y(20.5)+4}" text-anchor="end" font-size="11" fill="var(--muted)">금 층 15–26</text>`;
+  s += `<text x="${W-R-4}" y="${Y(7.5)+4}" text-anchor="end" font-size="11" fill="var(--muted)">다이아 층 ≤14</text>`;
+  for (const yv of [0,20,40,60,80]) if (yv<=ymax) s += `<line x1="${L}" x2="${W-R}" y1="${Y(yv)}" y2="${Y(yv)}" stroke="var(--line)"/><text x="${L-6}" y="${Y(yv)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${yv}</text>`;
+  const ticks = 6; for (let i=0;i<=ticks;i++){ const t=Math.round(tmax*i/ticks); s += `<text x="${X(t)}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--muted)">${t.toLocaleString()}</text>`; }
+  s += `<polyline fill="none" stroke="var(--accent)" stroke-width="1.6" points="${e.y.map(p=>X(p[0]).toFixed(1)+","+Y(p[1]).toFixed(1)).join(" ")}"/>`;
+  for (const d of e.deaths) s += `<line x1="${X(d)}" x2="${X(d)}" y1="${T}" y2="${H-B}" stroke="var(--fail)" stroke-dasharray="3 3"/>`;
+  const last = e.y[e.y.length-1]; s += `<circle cx="${X(last[0])}" cy="${Y(last[1])}" r="3.5" fill="var(--accent)"/>`;
+  s += `<text x="${L}" y="${H-B+18}" font-size="11" fill="var(--muted)" text-anchor="start" dx="-${L-4}">step</text>`;
+  return s + `</svg>`;
+}
+
+function timeline(e){
+  if (!e.subgoals.length) return `<div class="status">monitor 기록 없음</div>`;
+  const tot = e.subgoals.reduce((a,g)=>a+g.steps,0) || 1;
+  const bar = e.subgoals.map(g => `<span title="${esc(g.name)} · ${g.steps.toLocaleString()} step" style="width:${100*g.steps/tot}%;background:var(${g.done?"--done":"--fail"});opacity:${g.done?.55:.9}"></span>`).join("");
+  const rows = e.subgoals.map((g,i) => `<tr><td class="num">${i}</td><td>${esc(g.name)}</td><td class="num">${g.steps.toLocaleString()}</td><td class="${g.done?"ok":"no"}">${g.done?"완료":"미완료"}</td></tr>`).join("");
+  return `<div class="timeline">${bar}</div><div class="sg" style="margin-top:8px"><table><tr><th>#</th><th>sub-goal</th><th class="num">step</th><th>결과</th></tr>${rows}</table></div>`;
+}
+
+function notesBox(e){
+  const n = state.notes[e.id] || {};
+  const causes = [...new Set(eps.map(x=>x.cause))].filter(c=>c!=="success");
+  return `<div class="card notes"><h2>내 분석</h2>
+    <div class="row">
+      <label><span class="label">Claude 판단에</span><select id="n-agree">${AGREE.map(([v,t])=>`<option value="${v}"${n.agree===v?" selected":""}>${t}</option>`).join("")}</select></label>
+      <label><span class="label">내가 보는 원인</span><select id="n-cause"><option value="">— 선택 —</option>${causes.map(c=>`<option value="${esc(c)}"${n.cause===c?" selected":""}>${esc(ko(c))}</option>`).join("")}<option value="other"${n.cause==="other"?" selected":""}>기타 (아래에 적기)</option></select></label>
+    </div>
+    <textarea id="n-text" placeholder="어디서, 왜 실패했다고 보는지 적어 주세요. Claude가 나중에 읽고 비교합니다.">${esc(n.text||"")}</textarea>
+    <div class="foot"><button id="n-save">저장</button><span class="status" id="n-status">${db ? (n.updated ? "저장된 노트 · "+new Date(n.updated).toLocaleString() : "아직 노트 없음") : "노트 저장은 claude.ai에서 열었을 때만 됩니다."}</span></div>
+  </div>`;
+}
+
+function select(id){
+  state.sel = id; list();
+  const e = eps.find(x=>x.id===id); if (!e) return;
+  const inv = Object.entries(e.inventory).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<span>${esc(k)} ${v}</span>`).join("") || `<span>비어 있음</span>`;
+  $("case").innerHTML = `
+    <div class="card">
+      <div class="head"><h2 style="margin:0">${esc(e.instruction)}</h2><span class="pill">${GROUP_KO[e.group]||e.group}</span><span class="pill fail">${esc(ko(e.cause))}</span></div>
+      <div class="meta mono" style="margin-top:6px"><span>${esc(e.task)}</span><span>order ${esc(e.order)}</span><span>seed ${e.seed}</span><span>${(e.steps||0).toLocaleString()} / ${e.horizon.toLocaleString()} step</span><span>LLM ${e.llm_calls} calls · $${(e.cost||0).toFixed(3)}</span></div>
+    </div>
+    <div class="compare">
+      <div class="card analysis"><h2>Claude 분석</h2><ul>${e.analysis.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>
+        ${e.note?`<div class="handnote"><span class="label">Claude 메모 (직접 확인)</span><br>${esc(e.note)}</div>`:""}</div>
+      ${notesBox(e)}
+    </div>
+    <div class="card"><h2>키프레임</h2><div class="film">${e.frames.map(f=>`<figure><img src="${f.src}" alt="step ${f.step} 화면" loading="lazy"><figcaption>step ${f.step.toLocaleString()}</figcaption></figure>`).join("")}</div></div>
+    <div class="card"><h2>높이(y) 변화</h2><div class="status" style="margin-bottom:6px">빨간 점선 = 사망(리스폰). 노란 띠 = 금 생성 층, 청록 띠 = 다이아 생성 층.</div><div class="chart">${depthChart(e)}</div></div>
+    <div class="card"><h2>sub-goal 별 step</h2>${timeline(e)}</div>
+    <div class="card"><h2>최종 인벤토리</h2><div class="inv">${inv}</div></div>
+    <div class="card"><h2>이벤트 로그</h2><div class="status" style="margin-bottom:6px">▶ sub-goal 시작 · ◆ reflector 판정 · ⇡ 탈출 스크립트 · ✖ GUI 실패 / /kill</div><pre class="events">${e.events.map(esc).join("\n")}</pre></div>`;
+  const save = $("n-save");
+  if (!db) { save.disabled = true; return; }
+  save.onclick = async () => {
+    const body = {agree:$("n-agree").value, cause:$("n-cause").value, text:$("n-text").value, updated:Date.now(), task:e.task, order:e.order};
+    save.disabled = true; $("n-status").textContent = "저장 중…";
+    try { await db.collection("notes").doc(e.id).set(body); $("n-status").textContent = "저장됨 · "+new Date(body.updated).toLocaleString(); }
+    catch (err) { $("n-status").textContent = err && err.code==="invalid_argument" ? "이 화면에서는 저장 권한이 없습니다." : "저장 실패 ("+(err&&err.code||"unknown")+"). 잠시 후 다시 눌러 주세요."; }
+    finally { save.disabled = false; }
+  };
+}
+
+$("q").addEventListener("input", ev => { state.q = ev.target.value; list(); });
+summary(); list();
+if (eps.length) select(eps[0].id);
+
+(async () => {
+  try { db = await window.claude?.use?.("db") ?? null; } catch { db = null; }
+  if (!db) return;
+  db.collection("notes").onSnapshot(snap => {
+    const m = {}; snap.docs.forEach(d => { if (d.exists) m[d.id] = d.data(); });
+    const first = !Object.keys(state.notes).length;
+    state.notes = m; list();
+    if (state.sel && (first || !document.activeElement || !document.activeElement.id.startsWith("n-"))) select(state.sel);
+  }, () => {});
+  if (state.sel) select(state.sel);
+})();
+</script>

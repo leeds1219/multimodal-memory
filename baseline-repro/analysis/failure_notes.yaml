@@ -1,0 +1,22 @@
+# Claude's hand-written notes per failed episode (shown beside the generated analysis in failure_report.py).
+# id = <order>__<task>__<seed>
+final3_b__o1_wooden_06__660619206: >-
+  키프레임 확인: 모래 바닥 물속에서 제작대를 놓으려다 GUI가 안 열림, 한 번 익사(MineRLAgent0 drowned) 후 리스폰.
+  재료(판자 2, 막대 6)는 다 있었음. 같은 월드는 10-01 run에서 1091 step에 성공 → 실행마다 갈리는 변동.
+final5_b__o1_wooden_02__1354067424: >-
+  키프레임 확인: 물 위에 떠서 제작대를 계속 놓으려 함 → GUI 실패 반복, craftfix 재시도도 물속이라 실패.
+  재료(판자 5, 막대 4)는 충분. 같은 월드는 10-01에 853 step 성공.
+final1_b__o1_wooden_01__870772898: >-
+  첫 sub-goal(나무 찾기/베기) 중 물에 빠짐(reflector in_water 2회), go_to_land 실행 후에도 나무를 못 구함. 인벤토리 비어 있음.
+final2_b__o1_wooden_03__1567076839: >-
+  replan 없이 그냥 느림: 3600 step 동안 원목 2개. 같은 월드 10-01에는 1035 step 성공.
+final1_c__o1_iron_07__1254707478: >-
+  키프레임 확인: 시작 직후(y68→55) 돌 협곡에 떨어짐. 인벤토리가 비어서 쌓을 블록이 없고 맨손으로는 돌을 못 캠 →
+  build_tower 9회 모두 0개 설치, 탈출 실패. reflector는 매번 drop_down 판정. 12000 step 내내 첫 sub-goal.
+final4_a__o1_gold_02__749902767: >-
+  promptfix v1 버그: "mine iron ore and craft iron pickaxe"(goal iron_pickaxe)가 "dig down and mine iron pickaxe"로 바뀌어
+  STEVE-1이 곡괭이를 '캐러' 계속 파 내려감. promptfix2(D45)에서 수정, 재실험 중.
+final4_a__o1_gold_03__164627561: >-
+  promptfix v1 버그 ("dig down and mine iron pickaxe"). gold_02와 같은 패턴.
+final4_b__o1_armor_10__435116415: >-
+  promptfix v1 버그 ("dig down and mine iron pickaxe"). 이후 금 단계도 미도달.
