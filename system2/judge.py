@@ -12,6 +12,8 @@ The agent then played from a saved moment and tried the change. You get the hypo
 experiment.
 Decide only whether the prediction was observed in the log. Whether the task succeeded does not matter: the
 prediction can be observed in an attempt that still fails, and an attempt can succeed without it.
+Use only what the game recorded in the log (heights, position changes, inventory changes, health, deaths, command
+results). The predicted result counts only if it came after the agent made the change.
 - "Supported": what the prediction says happened.
 - "Refuted": the change was tried and what the prediction says did not happen, or the opposite happened.
 - "Not tried": the agent never made the change, so the log cannot show it either way.

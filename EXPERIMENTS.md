@@ -59,10 +59,12 @@ In the nolava world, lava near the agent becomes stone, so that deaths in lava d
 The learning loop runs on each failed episode:
 1. System 2 finds the failure point, the turn whose decision caused the failure (`system2/failure_point.py`).
 2. It proposes a hypothesis: a change, the result it predicts, how to try it, and a statement about the world
-   (`system2/hypothesis.py`).
-3. The game restarts from the last save before that turn, and the agent tries the change (`world/replay.py`).
-4. System 2 judges whether the prediction was observed, regardless of task success (`system2/judge.py`).
-   A Supported statement goes to World Knowledge.
+   (`system2/hypothesis.py`). It sees the agent's own turns around the failure point (8 before, 3 after).
+3. The game restarts from the last save before that turn (saves are 600 steps apart), and the agent tries the
+   change. It is told the change, the expected result and how to try it (`world/replay.py`).
+4. System 2 judges whether the prediction was observed after the change, regardless of task success
+   (`system2/judge.py`): Supported, Refuted, or Not tried (the change was never made). It reads only what the game
+   recorded, not the agent's thoughts. A Supported statement goes to World Knowledge.
 5. If the hypothesis was refuted, the loop proposes another at the same failure point. If it was supported, the
    loop looks for the next failure point. The loop stops on task success or after 5 experiments.
 
