@@ -1,0 +1,270 @@
+{
+ "activator_rail": {
+  "release": "craft 1 activator_rail summary:\n1. logs: need 10\n2. planks: need 29\n3. stick: need 9\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 9\n11. iron_pickaxe: need 1\n12. redstone_ore: need 1\n13. redstone: need 1\n14. redstone_torch: need 1\n15. activator_rail: need 1\n",
+  "fixed": "craft 1 activator_rail summary:\n1. logs: need 10\n2. planks: need 29\n3. stick: need 9\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 9\n10. iron_ingot: need 9\n11. iron_pickaxe: need 1\n12. redstone_ore: need 1\n13. redstone: need 1\n14. redstone_torch: need 1\n15. activator_rail: need 1\n"
+ },
+ "blast_furnace": {
+  "release": "craft 1 blast_furnace summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 20\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. stone: need 3\n10. iron_ore: need 1\n11. smooth_stone: need 3\n12. iron_ingot: need 5\n13. blast_furnace: need 1\n",
+  "fixed": "craft 1 blast_furnace summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 20\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. stone: need 3\n10. iron_ore: need 5\n11. smooth_stone: need 3\n12. iron_ingot: need 5\n13. blast_furnace: need 1\n"
+ },
+ "bowl": {
+  "release": "craft 1 bowl summary:\n1. logs: need 2\n2. planks: need 7\n3. crafting_table: need 1\n4. bowl: need 1\n",
+  "fixed": "craft 1 bowl summary:\n1. logs: need 2\n2. planks: need 7\n3. crafting_table: need 1\n4. bowl: need 1\n"
+ },
+ "bucket": {
+  "release": "craft 1 bucket summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. bucket: need 1\n",
+  "fixed": "craft 1 bucket summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. bucket: need 1\n"
+ },
+ "chain": {
+  "release": "craft 1 chain summary:\n1. iron_ore: need 1\n2. logs: need 6\n3. iron_ingot: need 1\n4. planks: need 19\n5. crafting_table: need 1\n6. stick: need 4\n7. wooden_pickaxe: need 1\n8. cobblestone: need 11\n9. furnace: need 1\n10. stone_pickaxe: need 1\n11. iron_items: need 2\n12. iron_nugget: need 2\n13. chain: need 1\n",
+  "fixed": "craft 1 chain summary:\n1. iron_ore: need 1\n2. logs: need 6\n3. iron_ingot: need 1\n4. planks: need 19\n5. crafting_table: need 1\n6. stick: need 4\n7. wooden_pickaxe: need 1\n8. cobblestone: need 11\n9. furnace: need 1\n10. stone_pickaxe: need 1\n11. iron_items: need 2\n12. iron_nugget: need 2\n13. chain: need 1\n"
+ },
+ "charcoal": {
+  "release": "craft 1 charcoal summary:\n1. logs: need 4\n2. logs_that_burn: need 1\n3. planks: need 13\n4. crafting_table: need 1\n5. stick: need 2\n6. wooden_pickaxe: need 1\n7. cobblestone: need 8\n8. furnace: need 1\n9. charcoal: need 1\n",
+  "fixed": "craft 1 charcoal summary:\n1. logs: need 4\n2. logs_that_burn: need 1\n3. planks: need 13\n4. crafting_table: need 1\n5. stick: need 2\n6. wooden_pickaxe: need 1\n7. cobblestone: need 8\n8. furnace: need 1\n9. charcoal: need 1\n"
+ },
+ "chest": {
+  "release": "craft 1 chest summary:\n1. logs: need 3\n2. planks: need 12\n3. crafting_table: need 1\n4. chest: need 1\n",
+  "fixed": "craft 1 chest summary:\n1. logs: need 3\n2. planks: need 12\n3. crafting_table: need 1\n4. chest: need 1\n"
+ },
+ "compass": {
+  "release": "craft 1 compass summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 7\n11. iron_pickaxe: need 1\n12. redstone_ore: need 1\n13. redstone: need 1\n14. compass: need 1\n",
+  "fixed": "craft 1 compass summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 7\n10. iron_ingot: need 7\n11. iron_pickaxe: need 1\n12. redstone_ore: need 1\n13. redstone: need 1\n14. compass: need 1\n"
+ },
+ "crafting_table": {
+  "release": "craft 1 crafting_table summary:\n1. logs: need 1\n2. planks: need 4\n3. crafting_table: need 1\n",
+  "fixed": "craft 1 crafting_table summary:\n1. logs: need 1\n2. planks: need 4\n3. crafting_table: need 1\n"
+ },
+ "diamond": {
+  "release": "craft 1 diamond summary:\n1. logs: need 7\n2. planks: need 21\n3. stick: need 6\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 1\n13. diamond: need 1\n",
+  "fixed": "craft 1 diamond summary:\n1. logs: need 7\n2. planks: need 21\n3. stick: need 6\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 1\n13. diamond: need 1\n"
+ },
+ "diamond_axe": {
+  "release": "craft 1 diamond_axe summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 8\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 1\n13. diamond: need 3\n14. diamond_axe: need 1\n",
+  "fixed": "craft 1 diamond_axe summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 8\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 3\n13. diamond: need 3\n14. diamond_axe: need 1\n"
+ },
+ "diamond_boots": {
+  "release": "craft 1 diamond_boots summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 1\n13. diamond: need 4\n14. diamond_boots: need 1\n",
+  "fixed": "craft 1 diamond_boots summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 4\n13. diamond: need 4\n14. diamond_boots: need 1\n"
+ },
+ "diamond_chestplate": {
+  "release": "craft 1 diamond_chestplate summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 1\n13. diamond: need 8\n14. diamond_chestplate: need 1\n",
+  "fixed": "craft 1 diamond_chestplate summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 8\n13. diamond: need 8\n14. diamond_chestplate: need 1\n"
+ },
+ "diamond_helmet": {
+  "release": "craft 1 diamond_helmet summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 1\n13. diamond: need 5\n14. diamond_helmet: need 1\n",
+  "fixed": "craft 1 diamond_helmet summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 5\n13. diamond: need 5\n14. diamond_helmet: need 1\n"
+ },
+ "diamond_hoe": {
+  "release": "craft 1 diamond_hoe summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 8\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 1\n13. diamond: need 2\n14. diamond_hoe: need 1\n",
+  "fixed": "craft 1 diamond_hoe summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 8\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 2\n13. diamond: need 2\n14. diamond_hoe: need 1\n"
+ },
+ "diamond_leggings": {
+  "release": "craft 1 diamond_leggings summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 1\n13. diamond: need 7\n14. diamond_leggings: need 1\n",
+  "fixed": "craft 1 diamond_leggings summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 7\n13. diamond: need 7\n14. diamond_leggings: need 1\n"
+ },
+ "diamond_pickaxe": {
+  "release": "craft 1 diamond_pickaxe summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 8\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 1\n13. diamond: need 3\n14. diamond_pickaxe: need 1\n",
+  "fixed": "craft 1 diamond_pickaxe summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 8\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 3\n13. diamond: need 3\n14. diamond_pickaxe: need 1\n"
+ },
+ "diamond_shovel": {
+  "release": "craft 1 diamond_shovel summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 8\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 1\n13. diamond: need 1\n14. diamond_shovel: need 1\n",
+  "fixed": "craft 1 diamond_shovel summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 8\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 1\n13. diamond: need 1\n14. diamond_shovel: need 1\n"
+ },
+ "diamond_sword": {
+  "release": "craft 1 diamond_sword summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 7\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 1\n13. diamond: need 2\n14. diamond_sword: need 1\n",
+  "fixed": "craft 1 diamond_sword summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 7\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 2\n13. diamond: need 2\n14. diamond_sword: need 1\n"
+ },
+ "dropper": {
+  "release": "craft 1 dropper summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 18\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. redstone_ore: need 1\n13. redstone: need 1\n14. dropper: need 1\n",
+  "fixed": "craft 1 dropper summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 18\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. redstone_ore: need 1\n13. redstone: need 1\n14. dropper: need 1\n"
+ },
+ "furnace": {
+  "release": "craft 1 furnace summary:\n1. logs: need 4\n2. planks: need 13\n3. crafting_table: need 1\n4. stick: need 2\n5. wooden_pickaxe: need 1\n6. cobblestone: need 8\n7. furnace: need 1\n",
+  "fixed": "craft 1 furnace summary:\n1. logs: need 4\n2. planks: need 13\n3. crafting_table: need 1\n4. stick: need 2\n5. wooden_pickaxe: need 1\n6. cobblestone: need 8\n7. furnace: need 1\n"
+ },
+ "gold_ingot": {
+  "release": "craft 1 gold_ingot summary:\n1. logs: need 7\n2. planks: need 21\n3. stick: need 6\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_block: need 1\n13. gold_ingot: need 1\n",
+  "fixed": "craft 1 gold_ingot summary:\n1. logs: need 7\n2. planks: need 21\n3. stick: need 6\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_ore: need 1\n13. gold_ingot: need 1\n"
+ },
+ "golden_axe": {
+  "release": "craft 1 golden_axe summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 8\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_block: need 3\n13. gold_ingot: need 3\n14. golden_axe: need 1\n",
+  "fixed": "craft 1 golden_axe summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 8\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_ore: need 3\n13. gold_ingot: need 3\n14. golden_axe: need 1\n"
+ },
+ "golden_boots": {
+  "release": "craft 1 golden_boots summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_block: need 4\n13. gold_ingot: need 4\n14. golden_boots: need 1\n",
+  "fixed": "craft 1 golden_boots summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_ore: need 4\n13. gold_ingot: need 4\n14. golden_boots: need 1\n"
+ },
+ "golden_chestplate": {
+  "release": "craft 1 golden_chestplate summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_block: need 8\n13. gold_ingot: need 8\n14. golden_chestplate: need 1\n",
+  "fixed": "craft 1 golden_chestplate summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_ore: need 8\n13. gold_ingot: need 8\n14. golden_chestplate: need 1\n"
+ },
+ "golden_helmet": {
+  "release": "craft 1 golden_helmet summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_block: need 5\n13. gold_ingot: need 5\n14. golden_helmet: need 1\n",
+  "fixed": "craft 1 golden_helmet summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_ore: need 5\n13. gold_ingot: need 5\n14. golden_helmet: need 1\n"
+ },
+ "golden_hoe": {
+  "release": "craft 1 golden_hoe summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 8\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_block: need 2\n13. gold_ingot: need 2\n14. golden_hoe: need 1\n",
+  "fixed": "craft 1 golden_hoe summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 8\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_ore: need 2\n13. gold_ingot: need 2\n14. golden_hoe: need 1\n"
+ },
+ "golden_leggings": {
+  "release": "craft 1 golden_leggings summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_block: need 7\n13. gold_ingot: need 7\n14. golden_leggings: need 1\n",
+  "fixed": "craft 1 golden_leggings summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_ore: need 7\n13. gold_ingot: need 7\n14. golden_leggings: need 1\n"
+ },
+ "golden_pickaxe": {
+  "release": "craft 1 golden_pickaxe summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 8\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_block: need 3\n13. gold_ingot: need 3\n14. golden_pickaxe: need 1\n",
+  "fixed": "craft 1 golden_pickaxe summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 8\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_ore: need 3\n13. gold_ingot: need 3\n14. golden_pickaxe: need 1\n"
+ },
+ "golden_shovel": {
+  "release": "craft 1 golden_shovel summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 8\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_block: need 1\n13. gold_ingot: need 1\n14. golden_shovel: need 1\n",
+  "fixed": "craft 1 golden_shovel summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 8\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_ore: need 1\n13. gold_ingot: need 1\n14. golden_shovel: need 1\n"
+ },
+ "golden_sword": {
+  "release": "craft 1 golden_sword summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 7\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_block: need 2\n13. gold_ingot: need 2\n14. golden_sword: need 1\n",
+  "fixed": "craft 1 golden_sword summary:\n1. logs: need 9\n2. planks: need 27\n3. stick: need 7\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 19\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. gold_ore: need 2\n13. gold_ingot: need 2\n14. golden_sword: need 1\n"
+ },
+ "hopper": {
+  "release": "craft 1 hopper summary:\n1. logs: need 8\n2. planks: need 27\n3. crafting_table: need 1\n4. stick: need 4\n5. chest: need 1\n6. wooden_pickaxe: need 1\n7. cobblestone: need 11\n8. furnace: need 1\n9. stone_pickaxe: need 1\n10. iron_ore: need 1\n11. iron_ingot: need 5\n12. hopper: need 1\n",
+  "fixed": "craft 1 hopper summary:\n1. logs: need 8\n2. planks: need 27\n3. crafting_table: need 1\n4. stick: need 4\n5. chest: need 1\n6. wooden_pickaxe: need 1\n7. cobblestone: need 11\n8. furnace: need 1\n9. stone_pickaxe: need 1\n10. iron_ore: need 5\n11. iron_ingot: need 5\n12. hopper: need 1\n"
+ },
+ "iron_axe": {
+  "release": "craft 1 iron_axe summary:\n1. logs: need 7\n2. planks: need 21\n3. stick: need 6\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_axe: need 1\n",
+  "fixed": "craft 1 iron_axe summary:\n1. logs: need 7\n2. planks: need 21\n3. stick: need 6\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_axe: need 1\n"
+ },
+ "iron_bars": {
+  "release": "craft 1 iron_bars summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 6\n11. iron_bars: need 1\n",
+  "fixed": "craft 1 iron_bars summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 6\n10. iron_ingot: need 6\n11. iron_bars: need 1\n"
+ },
+ "iron_boots": {
+  "release": "craft 1 iron_boots summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 4\n11. iron_boots: need 1\n",
+  "fixed": "craft 1 iron_boots summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 4\n10. iron_ingot: need 4\n11. iron_boots: need 1\n"
+ },
+ "iron_chestplate": {
+  "release": "craft 1 iron_chestplate summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 8\n11. iron_chestplate: need 1\n",
+  "fixed": "craft 1 iron_chestplate summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 8\n10. iron_ingot: need 8\n11. iron_chestplate: need 1\n"
+ },
+ "iron_helmet": {
+  "release": "craft 1 iron_helmet summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 5\n11. iron_helmet: need 1\n",
+  "fixed": "craft 1 iron_helmet summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 5\n10. iron_ingot: need 5\n11. iron_helmet: need 1\n"
+ },
+ "iron_hoe": {
+  "release": "craft 1 iron_hoe summary:\n1. logs: need 7\n2. planks: need 21\n3. stick: need 6\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 2\n11. iron_hoe: need 1\n",
+  "fixed": "craft 1 iron_hoe summary:\n1. logs: need 7\n2. planks: need 21\n3. stick: need 6\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 2\n10. iron_ingot: need 2\n11. iron_hoe: need 1\n"
+ },
+ "iron_leggings": {
+  "release": "craft 1 iron_leggings summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 7\n11. iron_leggings: need 1\n",
+  "fixed": "craft 1 iron_leggings summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 7\n10. iron_ingot: need 7\n11. iron_leggings: need 1\n"
+ },
+ "iron_nugget": {
+  "release": "craft 1 iron_nugget summary:\n1. logs: need 2\n2. cobblestone: need 3\n3. planks: need 6\n4. stick: need 2\n5. crafting_table: need 1\n6. stone_pickaxe: need 1\n7. iron_items: need 1\n8. iron_nugget: need 1\n",
+  "fixed": "craft 1 iron_nugget summary:\n1. logs: need 2\n2. cobblestone: need 3\n3. planks: need 6\n4. stick: need 2\n5. crafting_table: need 1\n6. stone_pickaxe: need 1\n7. iron_items: need 1\n8. iron_nugget: need 1\n"
+ },
+ "iron_pickaxe": {
+  "release": "craft 1 iron_pickaxe summary:\n1. logs: need 7\n2. planks: need 21\n3. stick: need 6\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n",
+  "fixed": "craft 1 iron_pickaxe summary:\n1. logs: need 7\n2. planks: need 21\n3. stick: need 6\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n"
+ },
+ "iron_shovel": {
+  "release": "craft 1 iron_shovel summary:\n1. logs: need 7\n2. planks: need 21\n3. stick: need 6\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 1\n11. iron_shovel: need 1\n",
+  "fixed": "craft 1 iron_shovel summary:\n1. logs: need 7\n2. planks: need 21\n3. stick: need 6\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 1\n11. iron_shovel: need 1\n"
+ },
+ "iron_sword": {
+  "release": "craft 1 iron_sword summary:\n1. logs: need 7\n2. planks: need 21\n3. stick: need 5\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 2\n11. iron_sword: need 1\n",
+  "fixed": "craft 1 iron_sword summary:\n1. logs: need 7\n2. planks: need 21\n3. stick: need 5\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 2\n10. iron_ingot: need 2\n11. iron_sword: need 1\n"
+ },
+ "jukebox": {
+  "release": "craft 1 jukebox summary:\n1. logs: need 10\n2. planks: need 33\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 1\n13. diamond: need 1\n14. jukebox: need 1\n",
+  "fixed": "craft 1 jukebox summary:\n1. logs: need 10\n2. planks: need 33\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. diamond_ore: need 1\n13. diamond: need 1\n14. jukebox: need 1\n"
+ },
+ "ladder": {
+  "release": "craft 1 ladder summary:\n1. logs: need 2\n2. planks: need 8\n3. stick: need 7\n4. crafting_table: need 1\n5. ladder: need 1\n",
+  "fixed": "craft 1 ladder summary:\n1. logs: need 2\n2. planks: need 8\n3. stick: need 7\n4. crafting_table: need 1\n5. ladder: need 1\n"
+ },
+ "note_block": {
+  "release": "craft 1 note_block summary:\n1. logs: need 10\n2. planks: need 33\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. redstone_ore: need 1\n13. redstone: need 1\n14. note_block: need 1\n",
+  "fixed": "craft 1 note_block summary:\n1. logs: need 10\n2. planks: need 33\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. redstone_ore: need 1\n13. redstone: need 1\n14. note_block: need 1\n"
+ },
+ "piston": {
+  "release": "craft 1 piston summary:\n1. logs: need 9\n2. planks: need 28\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 23\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 4\n11. iron_pickaxe: need 1\n12. redstone_ore: need 1\n13. redstone: need 1\n14. piston: need 1\n",
+  "fixed": "craft 1 piston summary:\n1. logs: need 9\n2. planks: need 28\n3. crafting_table: need 1\n4. stick: need 6\n5. wooden_pickaxe: need 1\n6. cobblestone: need 23\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 4\n10. iron_ingot: need 4\n11. iron_pickaxe: need 1\n12. redstone_ore: need 1\n13. redstone: need 1\n14. piston: need 1\n"
+ },
+ "rail": {
+  "release": "craft 1 rail summary:\n1. logs: need 7\n2. planks: need 21\n3. stick: need 5\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 6\n11. rail: need 1\n",
+  "fixed": "craft 1 rail summary:\n1. logs: need 7\n2. planks: need 21\n3. stick: need 5\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 6\n10. iron_ingot: need 6\n11. rail: need 1\n"
+ },
+ "redstone_torch": {
+  "release": "craft 1 redstone_torch summary:\n1. logs: need 8\n2. planks: need 23\n3. stick: need 7\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. redstone_ore: need 1\n13. redstone: need 1\n14. redstone_torch: need 1\n",
+  "fixed": "craft 1 redstone_torch summary:\n1. logs: need 8\n2. planks: need 23\n3. stick: need 7\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. stone_pickaxe: need 1\n8. furnace: need 1\n9. iron_ore: need 3\n10. iron_ingot: need 3\n11. iron_pickaxe: need 1\n12. redstone_ore: need 1\n13. redstone: need 1\n14. redstone_torch: need 1\n"
+ },
+ "shears": {
+  "release": "craft 1 shears summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 2\n11. shears: need 1\n",
+  "fixed": "craft 1 shears summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 2\n10. iron_ingot: need 2\n11. shears: need 1\n"
+ },
+ "shield": {
+  "release": "craft 1 shield summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 1\n11. shield: need 1\n",
+  "fixed": "craft 1 shield summary:\n1. logs: need 8\n2. planks: need 25\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 1\n11. shield: need 1\n"
+ },
+ "smithing_table": {
+  "release": "craft 1 smithing_table summary:\n1. logs: need 7\n2. planks: need 23\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 2\n11. smithing_table: need 1\n",
+  "fixed": "craft 1 smithing_table summary:\n1. logs: need 7\n2. planks: need 23\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 2\n10. iron_ingot: need 2\n11. smithing_table: need 1\n"
+ },
+ "smoker": {
+  "release": "craft 1 smoker summary:\n1. logs: need 8\n2. planks: need 13\n3. crafting_table: need 1\n4. stick: need 2\n5. wooden_pickaxe: need 1\n6. cobblestone: need 8\n7. furnace: need 1\n8. smoker: need 1\n",
+  "fixed": "craft 1 smoker summary:\n1. logs: need 8\n2. planks: need 13\n3. crafting_table: need 1\n4. stick: need 2\n5. wooden_pickaxe: need 1\n6. cobblestone: need 8\n7. furnace: need 1\n8. smoker: need 1\n"
+ },
+ "stick": {
+  "release": "craft 1 stick summary:\n1. logs: need 1\n2. planks: need 2\n3. stick: need 1\n",
+  "fixed": "craft 1 stick summary:\n1. logs: need 1\n2. planks: need 2\n3. stick: need 1\n"
+ },
+ "stone_axe": {
+  "release": "craft 1 stone_axe summary:\n1. logs: need 5\n2. planks: need 15\n3. stick: need 4\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 3\n7. stone_axe: need 1\n",
+  "fixed": "craft 1 stone_axe summary:\n1. logs: need 5\n2. planks: need 15\n3. stick: need 4\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 3\n7. stone_axe: need 1\n"
+ },
+ "stone_hoe": {
+  "release": "craft 1 stone_hoe summary:\n1. logs: need 5\n2. planks: need 15\n3. stick: need 4\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 2\n7. stone_hoe: need 1\n",
+  "fixed": "craft 1 stone_hoe summary:\n1. logs: need 5\n2. planks: need 15\n3. stick: need 4\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 2\n7. stone_hoe: need 1\n"
+ },
+ "stone_pickaxe": {
+  "release": "craft 1 stone_pickaxe summary:\n1. logs: need 5\n2. planks: need 15\n3. stick: need 4\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 3\n7. stone_pickaxe: need 1\n",
+  "fixed": "craft 1 stone_pickaxe summary:\n1. logs: need 5\n2. planks: need 15\n3. stick: need 4\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 3\n7. stone_pickaxe: need 1\n"
+ },
+ "stone_shovel": {
+  "release": "craft 1 stone_shovel summary:\n1. logs: need 5\n2. planks: need 15\n3. stick: need 4\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 1\n7. stone_shovel: need 1\n",
+  "fixed": "craft 1 stone_shovel summary:\n1. logs: need 5\n2. planks: need 15\n3. stick: need 4\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 1\n7. stone_shovel: need 1\n"
+ },
+ "stone_sword": {
+  "release": "craft 1 stone_sword summary:\n1. logs: need 5\n2. planks: need 15\n3. stick: need 3\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 2\n7. stone_sword: need 1\n",
+  "fixed": "craft 1 stone_sword summary:\n1. logs: need 5\n2. planks: need 15\n3. stick: need 3\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 2\n7. stone_sword: need 1\n"
+ },
+ "stonecutter": {
+  "release": "craft 1 stonecutter summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 20\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. stone: need 3\n10. iron_ore: need 1\n11. iron_ingot: need 1\n12. stonecutter: need 1\n",
+  "fixed": "craft 1 stonecutter summary:\n1. logs: need 6\n2. planks: need 19\n3. crafting_table: need 1\n4. stick: need 4\n5. wooden_pickaxe: need 1\n6. cobblestone: need 20\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. stone: need 3\n10. iron_ore: need 1\n11. iron_ingot: need 1\n12. stonecutter: need 1\n"
+ },
+ "torch": {
+  "release": "craft 1 torch summary:\n1. logs: need 4\n2. planks: need 11\n3. stick: need 3\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. coals: need 1\n7. torch: need 1\n",
+  "fixed": "craft 1 torch summary:\n1. logs: need 4\n2. planks: need 11\n3. stick: need 3\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. coals: need 1\n7. torch: need 1\n"
+ },
+ "tripwire_hook": {
+  "release": "craft 1 tripwire_hook summary:\n1. logs: need 8\n2. planks: need 22\n3. stick: need 5\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 1\n11. tripwire_hook: need 1\n",
+  "fixed": "craft 1 tripwire_hook summary:\n1. logs: need 8\n2. planks: need 22\n3. stick: need 5\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n6. cobblestone: need 11\n7. furnace: need 1\n8. stone_pickaxe: need 1\n9. iron_ore: need 1\n10. iron_ingot: need 1\n11. tripwire_hook: need 1\n"
+ },
+ "wooden_axe": {
+  "release": "craft 1 wooden_axe summary:\n1. logs: need 3\n2. planks: need 9\n3. stick: need 2\n4. crafting_table: need 1\n5. wooden_axe: need 1\n",
+  "fixed": "craft 1 wooden_axe summary:\n1. logs: need 3\n2. planks: need 9\n3. stick: need 2\n4. crafting_table: need 1\n5. wooden_axe: need 1\n"
+ },
+ "wooden_hoe": {
+  "release": "craft 1 wooden_hoe summary:\n1. logs: need 3\n2. planks: need 8\n3. stick: need 2\n4. crafting_table: need 1\n5. wooden_hoe: need 1\n",
+  "fixed": "craft 1 wooden_hoe summary:\n1. logs: need 3\n2. planks: need 8\n3. stick: need 2\n4. crafting_table: need 1\n5. wooden_hoe: need 1\n"
+ },
+ "wooden_pickaxe": {
+  "release": "craft 1 wooden_pickaxe summary:\n1. logs: need 3\n2. planks: need 9\n3. stick: need 2\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n",
+  "fixed": "craft 1 wooden_pickaxe summary:\n1. logs: need 3\n2. planks: need 9\n3. stick: need 2\n4. crafting_table: need 1\n5. wooden_pickaxe: need 1\n"
+ },
+ "wooden_shovel": {
+  "release": "craft 1 wooden_shovel summary:\n1. logs: need 3\n2. planks: need 7\n3. stick: need 2\n4. crafting_table: need 1\n5. wooden_shovel: need 1\n",
+  "fixed": "craft 1 wooden_shovel summary:\n1. logs: need 3\n2. planks: need 7\n3. stick: need 2\n4. crafting_table: need 1\n5. wooden_shovel: need 1\n"
+ },
+ "wooden_sword": {
+  "release": "craft 1 wooden_sword summary:\n1. logs: need 3\n2. planks: need 8\n3. stick: need 1\n4. crafting_table: need 1\n5. wooden_sword: need 1\n",
+  "fixed": "craft 1 wooden_sword summary:\n1. logs: need 3\n2. planks: need 8\n3. stick: need 1\n4. crafting_table: need 1\n5. wooden_sword: need 1\n"
+ }
+}

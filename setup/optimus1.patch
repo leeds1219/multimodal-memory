@@ -1,0 +1,91 @@
+diff --git a/app.py b/app.py
+index e4c0e41..4211afa 100644
+--- a/app.py
++++ b/app.py
+@@ -66,7 +66,7 @@ def chat(req: MCRequest) -> MCResponse:
+     match req.type:
+         case "retrieval":
+             retry = 0
+-            while True:
++            while retry < 10:  # REPRO: bounded (was `while True`)
+                 try:
+                     plans_retrieval = agent.retrieve(
+                         req.task_or_instruction,
+@@ -79,7 +79,7 @@ def chat(req: MCRequest) -> MCResponse:
+                     print("connection error, retry: ", retry)
+         case "plan":
+             retry = 0
+-            while True:
++            while retry < 10:  # REPRO: bounded (was `while True`)
+                 try:
+                     plans = agent.plan(
+                         req.task_or_instruction,
+diff --git a/src/optimus1/memories/memory.py b/src/optimus1/memories/memory.py
+index 32fe637..ee635be 100644
+--- a/src/optimus1/memories/memory.py
++++ b/src/optimus1/memories/memory.py
+@@ -254,6 +254,8 @@ class Memory:
+         except FileNotFoundError:
+             # from stratch
+             return None, False
++        if not lst_dir:  # REPRO: empty memory == from scratch (extractOne(None) crashed)
++            return None, False
+         target = get_best_match_recipe(task + ".json", lst_dir)
+         has_done = task + ".json" == target
+         print(f"Find example: {target}")
+diff --git a/src/optimus1/models/gpt4_planning.py b/src/optimus1/models/gpt4_planning.py
+index 51af6f1..f1355f4 100644
+--- a/src/optimus1/models/gpt4_planning.py
++++ b/src/optimus1/models/gpt4_planning.py
+@@ -5,11 +5,10 @@ import openai
+ 
+ from .base_model import BasePlanningModel, BaseReflectionModel
+ 
+-client = openai.OpenAI(
+-    api_key="<your api key>",
+-    timeout=2000,
+-    max_retries=3,
+-)
++# DEVIATION: GPT-4o -> Gemini via shared client (model set in common/llm.yaml)
++from gemini_client import GeminiClient
++
++client = GeminiClient()
+ 
+ ## retrieval_prompt
+ retrieval_prompt = """
+@@ -152,7 +151,7 @@ class PlanningModel(BasePlanningModel, BaseReflectionModel):
+                     ],
+                 },
+             ],
+-            model="gpt-4o",
++            model="FROM_CONFIG",
+             max_tokens=2000,
+         )
+         return response.choices[0].message.content
+@@ -189,7 +188,7 @@ class PlanningModel(BasePlanningModel, BaseReflectionModel):
+                     ],
+                 },
+             ],
+-            model="gpt-4o",
++            model="FROM_CONFIG",
+             max_tokens=2000,
+         )
+         return response.choices[0].message.content
+@@ -252,7 +251,7 @@ class PlanningModel(BasePlanningModel, BaseReflectionModel):
+                     ],
+                 }
+             ],
+-            model="gpt-4o",
++            model="FROM_CONFIG",
+             max_tokens=2000,
+         )
+         return response.choices[0].message.content
+@@ -371,7 +370,7 @@ class PlanningModel(BasePlanningModel, BaseReflectionModel):
+                     "content": content,
+                 }
+             ],
+-            model="gpt-4o",
++            model="FROM_CONFIG",
+             max_tokens=2000,
+         )
+         return result.choices[0].message.content

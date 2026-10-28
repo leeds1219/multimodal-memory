@@ -1,0 +1,14 @@
+# Results and run data are large and local: only the two top-level folders are committed (empty, with .gitkeep).
+results/*
+!results/.gitkeep
+run_data/*
+!run_data/.gitkeep
+
+__pycache__/
+*.pyc
+.venv/
+.idea/
+.vscode/
+*.swp
+.env
+env.yaml

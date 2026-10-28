@@ -1,0 +1,6 @@
+plan/success/craft_crafting_table.json: kept first 662771 of 662842 chars (error at 662842); records kept ~492
+plan/success/dig_down_and_break_down_cobblestone.json: extra data after char 468363 dropped; records kept ~273
+reflection/chop_trees.json: kept first 2628160 of 2628168 chars (error at 2628168); records kept ~17081
+reflection/dig_down_and_mine_diamond.json: kept first 334089 of 780334 chars (error at 334089); records kept ~1727
+reflection/dig_down_and_mine_diamond.json: kept first 431559 of 780336 chars (error at 431562); records kept ~1728
+reflection/dig_down_and_mine_diamond.json: rebuilt from all image-name pairs (see counts above)

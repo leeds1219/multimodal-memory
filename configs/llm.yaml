@@ -1,0 +1,42 @@
+# Single source of truth for the planner backbone (every method, every env).
+model: gemini-3-flash-preview
+base_url: https://generativelanguage.googleapis.com/v1beta/openai/
+api_key_file: env.yaml        # GOOGLE_API_KEY="..." (git-ignored); the GOOGLE_API_KEY environment variable wins
+request_timeout_s: 300
+
+# Retries: exponential backoff 2^k s (capped at 60 s), then raise.
+max_retries: 6
+
+# Gemini counts thinking tokens against max_tokens. Methods' max_tokens were
+# set for non-thinking models (GPT-4o / Qwen) and bound the visible answer, so
+# the layer sends method_max_tokens + thinking_headroom.
+thinking_headroom_tokens: 32768
+
+# Fallbacks used ONLY when a method's original code does not set them.
+default_temperature: null     # null -> provider default
+default_max_tokens: null
+
+# Cost accounting (USD per 1M tokens). Thinking tokens are billed as output.
+# gemini-3-flash-preview list price; re-check against billing console.
+price_in_per_m: 0.50
+price_out_per_m: 3.00
+
+# Runaway guards (safety, not a budget).
+global_cap_usd: 3000.0                  # summed over all processes via ledger
+# Tripwires against unattended waste: either one writes
+# <log_root>/STOP_BUDGET; from then on every call fails at $0 until a human
+# removes that file (see RESUME.md).
+soft_cap_usd: 1500.0                    # ~1.25x the projected upper bound
+max_usd_per_hour: 40.0                  # projected average ~$8/h
+ledger_path: run_data/llm_ledger.jsonl
+episode_cost_multiplier: 10.0           # anomaly if > 10x smoke-test rate x episode horizon
+episode_call_multiplier: 10.0
+# Smoke-test rates per env step (09-23), scaled by each episode's horizon.
+episode_rates_per_step: {"optimus1": {"cost_per_step": 3.11e-06, "calls_per_step": 0.000877}, "deps": {"cost_per_step": 5.785e-05, "calls_per_step": 0.005737}, "mineevolve": {"cost_per_step": 8.76e-05, "calls_per_step": 0.007061}, "jarvis1": {"cost_per_step": 8.613e-05, "calls_per_step": 0.022831}}
+
+# Response cache: OFF for evaluation; only for debugging.
+cache: false
+cache_dir: run_data/llm_cache
+
+# Mock mode (offline checks): LLM_MOCK=1 routes calls to llm/mock.py.
+log_root: run_data
