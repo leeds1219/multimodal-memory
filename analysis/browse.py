@@ -3,9 +3,11 @@
     python analysis/browse.py baseline/standard gt_world_rule/nolava      # build run_data/site/
     python -m http.server 8800                                            # from the repository root     # open http://<host>:8800/run_data/site/
 
-index.html lists the episodes of each condition (filter by task group, world, success). An episode page shows the
-height over time with deaths, the keyframes (every 100 steps), and every turn: command, the VLM's thought, outcome
-and what changed. Images are linked from results/, not copied.
+index.html lists the episodes of each condition (filter by task group, world, success, and whether the task needs
+natural ore, ore_supply.py). An episode page shows the height over time with deaths and ore pickups, how much ore the
+rule placed against how much was picked up (more picked up than placed = natural ore), the keyframes (every 100
+steps), and every turn: command, the VLM's thought, outcome and what changed. Images are linked from results/, not
+copied.
 """
 from __future__ import annotations
 
@@ -13,13 +15,16 @@ import argparse
 import gzip
 import html
 import json
+import re
 import sys
+from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import paths  # noqa: E402,F401
 
 from benchmark import RESULTS, RUN_DATA, SEEDS  # noqa: E402
+from ore_supply import needs_natural_ore  # noqa: E402
 
 WORLDS = {0: "A", 1: "B", 4: "C"}
 SITE = RUN_DATA / "site"
@@ -31,7 +36,7 @@ a{color:var(--acc)} table{border-collapse:collapse;width:100%} td,th{border-bott
 text-align:left;vertical-align:top} th{color:var(--mut);font-weight:600} .ok{color:var(--ok)} .bad{color:var(--bad)}
 .mut{color:var(--mut)} .strip{display:flex;gap:4px;overflow-x:auto;padding:6px 0} .strip img{height:90px}
 .strip figure{margin:0;text-align:center;font-size:11px;color:var(--mut)} code{font-size:12px} select{margin-right:8px}
-td.th{max-width:420px} img.turn{height:72px}
+td.th{max-width:420px} img.turn{height:72px} .gold{color:#c9a400} .dia{color:#1fb5c9}
 """
 
 
@@ -74,7 +79,32 @@ def trajectory(ep: Path):
     return ts, ys, deaths
 
 
-def height_svg(ts, ys, deaths, horizon) -> str:
+ORES = {"gold": ("gold_ore", "gold"), "diamond": ("diamond", "dia"), "iron": ("iron_ore", "mut"), "coal": ("coal", "mut")}
+
+
+def ore_placed(ep: Path) -> Counter:
+    """Ore blocks the hidden rule placed (the release prints "<kind> ore at <y>")."""
+    try:
+        return Counter(m.group(1) for m in re.finditer(r"(\w+) ore at", (ep / "client.log").read_text(errors="ignore")))
+    except OSError:
+        return Counter()
+
+
+def ore_pickups(turns) -> list[tuple[int, str, int]]:
+    """(step, kind, n) for every turn whose inventory gained ore."""
+    out = []
+    for t in turns:
+        m = re.search(r"inventory change (\{.*?\})", t.get("effect") or "")
+        if not m:
+            continue
+        change = json.loads(m.group(1))
+        for kind, (item, _) in ORES.items():
+            if change.get(item, 0) > 0:
+                out.append((t["t1"], kind, change[item]))
+    return out
+
+
+def height_svg(ts, ys, deaths, horizon, pickups=()) -> str:
     if not ts:
         return ""
     W, H = 1100, 160
@@ -88,8 +118,11 @@ def height_svg(ts, ys, deaths, horizon) -> str:
                    for v in (14, 26, 45, 63) if lo <= v <= hi)
     dead = "".join(f"<line x1='{x(t):.1f}' x2='{x(t):.1f}' y1='10' y2='{H - 20}' stroke='var(--bad)' stroke-dasharray='3 3'/>"
                    for t in deaths)
+    yat = lambda t: ys[min(range(len(ts)), key=lambda i: abs(ts[i] - t))]
+    ore = "".join(f"<circle cx='{x(t):.1f}' cy='{y(yat(t)):.1f}' r='4' fill='{'#c9a400' if k == 'gold' else '#1fb5c9'}'>"
+                  f"<title>step {t:,}: +{n} {k}</title></circle>" for t, k, n in pickups if k in ("gold", "diamond"))
     return (f"<svg viewBox='0 0 {W} {H}' width='100%' role='img' aria-label='height over steps'>{grid}{dead}"
-            f"<polyline points='{pts}' fill='none' stroke='var(--acc)' stroke-width='1.2'/>"
+            f"<polyline points='{pts}' fill='none' stroke='var(--acc)' stroke-width='1.2'/>{ore}"
             f"<text x='{W - 10}' y='{H - 4}' font-size='10' text-anchor='end' fill='var(--mut)'>step {horizon:,}</text></svg>")
 
 
@@ -108,12 +141,24 @@ def episode_page(ep: Path, cond: str, order: str, task: str, world: str, r: dict
         rows.append(f"<tr><td>{t['turn']}</td><td class='mut'>{t['t0']:,}-{t['t1']:,}</td>"
                     f"<td><code>{html.escape(json.dumps(t['cmd']))}</code></td><td class='th'>{html.escape(t.get('thought') or '')}</td>"
                     f"<td>{html.escape(str(t['outcome']))}<div class='mut'>{html.escape(t.get('effect') or '')}</div></td><td>{img}</td></tr>")
+    placed, picked = ore_placed(ep), Counter()
+    pickups = ore_pickups(turns)
+    for _, k, n in pickups:
+        picked[k] += n
+    ore_rows = "".join(f"<tr><td class='{c}'>{k}</td><td>{placed[k]}</td><td>{picked[k]}</td>"
+                       f"<td>{max(0, picked[k] - placed[k]) or ''}</td></tr>" for k, (_, c) in ORES.items())
+    ore_table = ("<table style='width:auto'><tr><th>ore</th><th>placed by the rule</th><th>picked up</th>"
+                 "<th>natural (at least)</th></tr>" + ore_rows + "</table>")
     res = "<span class='ok'>success</span>" if r.get("success") else "<span class='bad'>failed</span>"
     head = (f"<p><a href='index.html'>&larr; all episodes</a></p><h1>{task} &middot; world {world}</h1>"
             f"<p>{cond} &middot; {order} &middot; {res} &middot; {r.get('steps', 0):,} / {r.get('horizon_steps', 0):,} steps "
             f"&middot; {len(turns)} turns &middot; {len(deaths)} deaths &middot; ${r.get('cost_usd') or 0:.2f}</p>"
             f"<p class='mut'>Final inventory: {html.escape(json.dumps(r.get('final_inventory') or {}))}</p>")
-    body = (head + "<h2>Height</h2>" + height_svg(ts, ys, deaths, r.get("horizon_steps") or (ts[-1] if ts else 1))
+    nat = " &middot; <b>task needs natural ore</b>" if needs_natural_ore(task) else ""
+    body = (head.replace("</h1>", f"</h1><p class='mut'>dots: <span class='gold'>gold</span> and "
+                         f"<span class='dia'>diamond</span> picked up{nat}</p>", 1)
+            + "<h2>Height</h2>" + height_svg(ts, ys, deaths, r.get("horizon_steps") or (ts[-1] if ts else 1), pickups)
+            + "<h2>Ore</h2>" + ore_table
             + "<h2>Keyframes</h2><div class='strip'>" + strip + "</div><h2>Turns</h2><table><tr><th>#</th><th>steps</th>"
             "<th>command</th><th>thought</th><th>outcome / effect</th><th>view</th></tr>" + "".join(rows) + "</table>")
     out.write_text(page(f"{task} {world}", body))
@@ -134,22 +179,26 @@ def main() -> int:
             world = WORLDS.get(seed - SEEDS[task], "?")
             name = f"{cond.replace('/', '__')}__{order}__{task}.html"
             episode_page(ep, cond, order, task, world, r, SITE / name)
-            rows.append((cond, task.split("_")[1], world, bool(r.get("success")), order, task, r, name))
+            rows.append((cond, task.split("_")[1], world, bool(r.get("success")), order, task, r, name,
+                         "natural ore needed" if needs_natural_ore(task) else "rule ore enough"))
     trs = "".join(
-        f"<tr data-c='{c}' data-g='{g}' data-w='{w}' data-s='{int(s)}'><td>{c}</td><td><a href='{n}'>{t}</a></td><td>{w}</td>"
+        f"<tr data-c='{c}' data-g='{g}' data-w='{w}' data-s='{int(s)}' data-o='{o2}'><td>{c}</td><td><a href='{n}'>{t}</a></td><td>{w}</td>"
         f"<td class='{'ok' if s else 'bad'}'>{'yes' if s else 'no'}</td><td>{r.get('steps', 0):,}</td>"
-        f"<td>${r.get('cost_usd') or 0:.2f}</td><td class='mut'>{o}</td></tr>" for c, g, w, s, o, t, r, n in rows)
+        f"<td>${r.get('cost_usd') or 0:.2f}</td><td class='mut'>{o2}</td><td class='mut'>{o}</td></tr>"
+        for c, g, w, s, o, t, r, n, o2 in rows)
     opts = lambda vals: "".join(f"<option>{v}</option>" for v in sorted(set(vals)))
     filt = (f"<p><select id='c'><option value=''>all conditions</option>{opts(r[0] for r in rows)}</select>"
             f"<select id='g'><option value=''>all groups</option>{opts(r[1] for r in rows)}</select>"
             f"<select id='w'><option value=''>all worlds</option>{opts(r[2] for r in rows)}</select>"
             "<select id='s'><option value=''>success and failure</option><option value='1'>success</option>"
-            "<option value='0'>failure</option></select> <span id='n' class='mut'></span></p>")
-    js = ("<script>const f=['c','g','w','s'];function u(){let n=0;document.querySelectorAll('tbody tr').forEach(r=>{"
+            "<option value='0'>failure</option></select>"
+            f"<select id='o'><option value=''>all tasks</option>{opts(r[8] for r in rows)}</select>"
+            " <span id='n' class='mut'></span></p>")
+    js = ("<script>const f=['c','g','w','s','o'];function u(){let n=0;document.querySelectorAll('tbody tr').forEach(r=>{"
           "const ok=f.every(k=>{const v=document.getElementById(k).value;return !v||r.dataset[k]===v});r.hidden=!ok;n+=ok});"
           "document.getElementById('n').textContent=n+' episodes'}f.forEach(k=>document.getElementById(k).onchange=u);u()</script>")
     body = ("<h1>Episodes</h1>" + filt + "<table><thead><tr><th>condition</th><th>task</th><th>world</th><th>success</th>"
-            "<th>steps</th><th>cost</th><th>chain</th></tr></thead><tbody>" + trs + "</tbody></table>" + js)
+            "<th>steps</th><th>cost</th><th>ore</th><th>chain</th></tr></thead><tbody>" + trs + "</tbody></table>" + js)
     (SITE / "index.html").write_text(page("Episodes", body))
     print(f"{len(rows)} episodes -> {SITE / 'index.html'}")
     return 0

@@ -15,6 +15,10 @@ in worlds A, B and C: 96 episodes each.
 Every run also takes `--prefix <name> --gpus <list> --port <first port>`. Results are in
 `results/<method>/<world>/`.
 
+Two tasks need more gold than the ore rule can ever place (golden leggings, golden chestplate), so they need natural
+ore, which is luck within the time limit. They stay in the totals; `analysis/summary.py` also reports success on
+the tasks the rule can supply and on these two separately (`analysis/ore_supply.py`).
+
 ## 1. Optimus-1 reproduction
 
 The released Optimus-1, run with gemini-3.8-flash as its planner. Corrections to bugs in the release are switches,
@@ -43,7 +47,15 @@ gold ingots come from smelting gold ore, and each ore count matches the ingots o
 
 ## 5. Baseline + GT World Rule
 
-The hidden ore rule (ENVIRONMENT.md) is stated in the prompt. Code: `ORE_HINT` in `system1/prompts.py`.
+The hidden ore rule (ENVIRONMENT.md) is stated in the prompt, in one of two versions (`system1/prompts.py`):
+
+| Version | Method | Prompt text |
+|---|---|---|
+| v1 | `gt_world_rule` | the rule in short (`ORE_HINT`) |
+| v2 | `gt_world_rule_v2` | what the placing code does, step by step (`ORE_RULE_CODE`) |
+
+Episodes that fail with v1 on tasks the rule can supply are run again with v2. If v2 solves them, the no-lava
+world is solvable once the rule is fully known.
 
 ## 6. Ours
 

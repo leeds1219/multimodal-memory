@@ -3,7 +3,7 @@ task chunk, spread over the given GPUs. Each chain is experiments/chain.py.
 
     python experiments/run.py --method baseline --world standard --prefix vt --gpus 0,4 --port 29000 [--dry-run]
     python experiments/run.py --method gt_world_rule --world nolava --prefix ub --gpus 0 --port 29000
-    python experiments/run.py --method baseline --world nolava --save 600 --prefix nb --gpus 4 --port 29200
+    python experiments/run.py --method baseline --world nolava --save 600 --rule-ore-only --prefix nb --gpus 4 --port 29200
     python experiments/run.py --method ours --world nolava --knowledge pl1 --prefix ev --gpus 0 --port 29400
 
 Results: <runs>/results/<method>/<world>/<order>/...; orders are <prefix><offset>_<chunk> (e.g. vt0_3);
@@ -24,6 +24,7 @@ import paths  # noqa: E402,F401
 
 from benchmark import RUN_DATA  # noqa: E402
 from conditions import add_args, from_args  # noqa: E402
+from ore_supply import needs_natural_ore  # noqa: E402
 
 WORLD_OFFSETS = {"A": 0, "B": 1, "C": 4}  # --seed-offset of worlds A, B, C
 HARD_CHUNKS = [  # the 32 hard tasks in 5 chunks, the same split for every condition
@@ -44,6 +45,8 @@ def main() -> int:
     ap.add_argument("--chunks", default="0,1,2,3,4")
     ap.add_argument("--gpus", required=True, help="comma list; chains are dealt round-robin")
     ap.add_argument("--port", type=int, required=True, help="first port; each chain uses port and port+1000")
+    ap.add_argument("--rule-ore-only", action="store_true",
+                    help="leave out the tasks that need natural ore (analysis/ore_supply.py)")
     ap.add_argument("--mock", action="store_true", help="LLM_MOCK: no API calls")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
@@ -60,7 +63,8 @@ def main() -> int:
         off = WORLD_OFFSETS[w]
         for k in (int(c) for c in a.chunks.split(",")):
             order = f"{a.prefix}{off}_{k}"
-            cmd = [PY, str(REPO / "experiments" / "chain.py"), *cond_args, "--order", order, "--tasks", HARD_CHUNKS[k],
+            tasks = ",".join(t for t in HARD_CHUNKS[k].split(",") if not (a.rule_ore_only and needs_natural_ore(t)))
+            cmd = [PY, str(REPO / "experiments" / "chain.py"), *cond_args, "--order", order, "--tasks", tasks,
                    "--gpu", str(gpus[n % len(gpus)]), "--port", str(port), "--seed-offset", str(off)] + (["--mock"] if a.mock else [])
             print(" ".join(cmd))
             if not a.dry_run:

@@ -38,13 +38,19 @@ from images import img, jpeg
 from inventory import inv_counts
 
 GRAPHS = Path(__file__).resolve().parents[1] / "configs/suites/optimus1/craft_graphs.json"
-NOLAVA_EVERY, NOLAVA_R = 20, 12  # (2R+1)^3 = 15625 blocks, under /fill's 32768
+NOLAVA_EVERY, NOLAVA_R = 10, 12  # (2R+1)^3 = 15625 blocks, under /fill's 32768
 # The fill is run by an invisible marker armor stand at the agent: a /fill that finds no lava fails, and a failure
 # run by the player prints a red "No blocks were filled" on its screen; run by the stand it prints nothing.
-NOLAVA_CMDS = ('/execute at @p run summon minecraft:armor_stand ~ ~ ~ {Invisible:1b,Marker:1b,NoGravity:1b,Silent:1b,Tags:["nolava"]}',
-               f"/execute as @e[tag=nolava] at @s run fill ~-{NOLAVA_R} ~-{NOLAVA_R} ~-{NOLAVA_R} ~{NOLAVA_R} ~{NOLAVA_R} ~{NOLAVA_R} "
-               "minecraft:stone replace minecraft:lava",
-               "/kill @e[tag=nolava]")
+# /fill refuses the whole box when a corner is below y 0, so the box is centred at max(y, R): near the bottom it is
+# y 0 to 2R, which still holds the agent.
+
+
+def nolava_cmds(y: float) -> tuple[str, str, str]:
+    r = NOLAVA_R
+    return ('/execute at @p run summon minecraft:armor_stand ~ ~ ~ {Invisible:1b,Marker:1b,NoGravity:1b,Silent:1b,Tags:["nolava"]}',
+            f"/execute as @e[tag=nolava] at @s positioned ~ {max(int(y), r)} ~ run fill ~-{r} ~-{r} ~-{r} ~{r} ~{r} ~{r} "
+            "minecraft:stone replace minecraft:lava",
+            "/kill @e[tag=nolava]")
 
 
 class EnvBroken(RuntimeError):
@@ -86,7 +92,7 @@ class VLMAgent(Controller):
 
     def step(self, action, tag):
         if self.opts.get("nolava") and self.t % NOLAVA_EVERY == 0:
-            self.chat += NOLAVA_CMDS
+            self.chat += nolava_cmds(self.prev["pos"][1])
         sent = None
         if self.chat:
             sent = self.chat.pop(0)
@@ -119,7 +125,7 @@ class VLMAgent(Controller):
     def system(self):
         out = P.SYSTEM.format(task=self.task, subgoal=P.NO_SUBGOAL, commands="\n".join([P.CMD_KEYS, P.CMD_STEVE, P.CMD_HELPERS]))
         if self.opts.get("ore_hint"):
-            out += P.ORE_HINT
+            out += {"1": P.ORE_HINT, "2": P.ORE_RULE_CODE}[self.opts["ore_hint"]]
         if self.opts.get("graph"):
             out += P.GRAPH_NOTE.format(graph=self.opts["graph"].strip())
         if self.opts.get("me") is not None:
@@ -176,7 +182,7 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
         remaining = min(remaining, int(os.environ["OPTIMUS_MAX_STEPS"]))
     exp = json.loads(Path(os.environ["OPTIMUS_EXPERIMENT"]).read_text()) if os.environ.get("OPTIMUS_EXPERIMENT") else {}
     opts = {"graph": craft_graph(target), "me": None,
-            "ore_hint": os.environ.get("OPTIMUS_VLM_OREHINT") == "1", "nolava": os.environ.get("OPTIMUS_NOLAVA") == "1",
+            "ore_hint": os.environ.get("OPTIMUS_VLM_OREHINT"), "nolava": os.environ.get("OPTIMUS_NOLAVA") == "1",
             "knowledge": exp.get("knowledge") if exp else world_knowledge.load(os.environ.get("OPTIMUS_VLM_WK")),
             "experiment": exp.get("hypothesis")}
     save_every = int(os.environ.get("OPTIMUS_CKPT_EVERY") or 0)

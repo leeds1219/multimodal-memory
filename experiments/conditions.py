@@ -20,7 +20,8 @@ METHODS = {
     "baseline": {"switches": VLM},
     "mineevolve": {"switches": VLM, "mineevolve": "mineevolve"},  # store run_data/memory/me_mineevolve.json
     "gt_recipe": {"switches": VLM + [("OPTIMUS_VLM_RECIPES", "fixed")]},
-    "gt_world_rule": {"switches": VLM + [("OPTIMUS_VLM_OREHINT", "1")]},
+    "gt_world_rule": {"switches": VLM + [("OPTIMUS_VLM_OREHINT", "1")]},  # the rule in short
+    "gt_world_rule_v2": {"switches": VLM + [("OPTIMUS_VLM_OREHINT", "2")]},  # what the placing code does, step by step
     "ours": {"switches": VLM},  # + the World Knowledge store, Condition(knowledge=...)
 }
 WORLDS = {
