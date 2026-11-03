@@ -27,6 +27,7 @@ METHODS = {
 WORLDS = {
     "standard": [],  # Optimus-1's env as released (with its hidden ore rule)
     "nolava": [("OPTIMUS_NOLAVA", "1")],  # lava near the agent becomes stone
+    "nolava_equipfix": [("OPTIMUS_NOLAVA", "1"), ("OPTIMUS_EQUIPFIX", "1")],  # + equip drops nothing (system1/tools/craft_helpers.py)
 }
 
 

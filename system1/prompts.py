@@ -1,7 +1,7 @@
 """Every text the Baseline agent's VLM gets, in one place.
 
 The system prompt is SYSTEM with the command list (CMD_KEYS, CMD_STEVE, CMD_HELPERS), plus the additions of the
-experiment: GRAPH_NOTE (GT Recipe), ORE_HINT / ORE_RULE_CODE (GT World Rule v1 / v2), EXP_NOTE (an experiment of Ours), World Knowledge
+experiment: GRAPH_NOTE (GT Recipe), ORE_HINT / ORE_RULE_CODE (GT World Rule v1 / v2), EXP_NOTE / EXP_NOTE_START (an experiment of Ours, from a save / from the start), World Knowledge
 (memory/world_knowledge.py) and MineEvolve's own text (memory/mineevolve_memory.py).
 """
 
@@ -60,5 +60,7 @@ ORE_RULE_CODE = (
     "Ore generated with the world also exists, but you have to find it.")
 EXP_NOTE = ("\n\nThis attempt starts from a saved moment of an earlier attempt at this task: the world, your position, "
             "inventory and your last commands are as they were then. In the earlier attempt the task failed. "
-            "From here, try this change:\n{change}\nExpected result of the change: {prediction}\nHow to try it: {plan}\n"
+            "From here, try this change:\n{change}\nHow to try it: {plan}\n"
             "Keep working on the overall task after trying it.")
+EXP_NOTE_START = ("\n\nThis attempt starts from the beginning, in the same world as an earlier attempt at this task. In the "
+                  "earlier attempt the task failed. This time, try this change:\n{change}\nHow to try it: {plan}\nKeep working on the overall task after trying it.")

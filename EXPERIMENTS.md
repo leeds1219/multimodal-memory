@@ -69,16 +69,23 @@ In the nolava world, lava near the agent becomes stone, so that deaths in lava d
 | Evaluation with the knowledge | `run.py --method ours --knowledge <name> --world nolava` | `results/ours_<name>/nolava/` |
 
 The learning loop runs on each failed episode:
-1. System 2 finds the failure point, the turn whose decision caused the failure (`system2/failure_point.py`).
-2. It proposes a hypothesis: a change, the result it predicts, how to try it, and a statement about the world
-   (`system2/hypothesis.py`). It sees the agent's own turns around the failure point (8 before, 3 after).
+1. System 2 lists the failure points (`system2/failure_point.py`): turns whose decision was a mistake from what the
+   agent could know then (or its response to an effect it did not decide, such as an item lost) and that likely
+   caused the failure. The loop takes them earliest first.
+2. It proposes a hypothesis (`system2/hypothesis.py`), seeing the other failure points of the list as well as the
+   agent's own turns around this one (8 before, 3 after): the problem the decision caused later, the belief about
+   how to avoid it, the change that tests the belief there, the moment the belief is checked at (the next time the
+   agent needs what the problem was about) and what it predicts then.
 3. The game restarts from the last save before that turn (saves are 600 steps apart), and the agent tries the
-   change. It is told the change, the expected result and how to try it (`world/replay.py`).
-4. System 2 judges whether the prediction was observed after the change, regardless of task success
-   (`system2/judge.py`): Supported, Refuted, or Not tried (the change was never made). It reads only what the game
-   recorded, not the agent's thoughts. A Supported statement goes to World Knowledge.
-5. If the hypothesis was refuted, the loop proposes another at the same failure point. If it was supported, the
-   loop looks for the next failure point. The loop stops on task success or after 5 experiments.
+   change. It is told the change and how to make it, not the prediction (`world/replay.py`).
+4. System 2 judges the experiment (`system2/judge.py`) from what the game recorded, not the agent's thoughts:
+   Not reached (the check moment never came), Supported or Refuted (what the log shows at the first check
+   moment). Task success does not decide it. A Supported problem and belief go to World Knowledge.
+5. Otherwise the loop proposes again at the same failure point, with the hypotheses tested there and what their
+   experiments showed; after 3 experiments there without support, it moves to the next failure point of the list.
+   If it was supported, the loop lists the failure points again, in the experiment's log. When the failure points
+   of a list are used up, it lists them again in the latest experiment's log. The loop stops on task success or
+   after 10 experiments (or when the latest experiment's log has no failure point).
 
 ## Episode folder
 

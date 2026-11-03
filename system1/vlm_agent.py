@@ -133,7 +133,8 @@ class VLMAgent(Controller):
         out += world_knowledge.prompt_text(self.opts.get("knowledge"))
         if self.opts.get("experiment"):
             h = self.opts["experiment"]
-            out += P.EXP_NOTE.format(change=h["change"], prediction=h["prediction"], plan=h["plan"])
+            note = P.EXP_NOTE_START if self.opts.get("from_start") else P.EXP_NOTE
+            out += note.format(change=h["change"], plan=h["plan"])  # not the prediction: the agent must not aim at it
         return out
 
     def ask(self, client, history, n_turn):
@@ -184,7 +185,7 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
     opts = {"graph": craft_graph(target), "me": None,
             "ore_hint": os.environ.get("OPTIMUS_VLM_OREHINT"), "nolava": os.environ.get("OPTIMUS_NOLAVA") == "1",
             "knowledge": exp.get("knowledge") if exp else world_knowledge.load(os.environ.get("OPTIMUS_VLM_WK")),
-            "experiment": exp.get("hypothesis")}
+            "experiment": exp.get("hypothesis"), "from_start": exp.get("from_start")}
     save_every = int(os.environ.get("OPTIMUS_CKPT_EVERY") or 0)
     out = ep / "vlm"
     (out / "frames").mkdir(parents=True, exist_ok=True)

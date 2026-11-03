@@ -1,9 +1,10 @@
 """Compressed view of one vlmtask episode for System 2.
 
-One line per VLM turn: step range, height y before -> after (from the trajectory's positions), what the command was,
-how it ended, the change in position / health / inventory, deaths. No VLM thoughts (those go in the raw window
-around a failure point, raw_window()). Reads only turns.jsonl, trajectory.jsonl.gz and result.json: client.log,
-which names the ore placements, is never read.
+A timeline first: the turn each item was first obtained, and commands that failed more than once. Then one line per
+VLM turn: step range, height y before -> after (from the trajectory's positions), what the command was, how it
+ended, the change in position / health / inventory, deaths, and the start of the agent's own thought (what it saw
+and meant to do; the full thoughts go in the raw window around a failure point, raw_window()). Reads only
+turns.jsonl, trajectory.jsonl.gz and result.json: client.log, which names the ore placements, is never read.
 
     python system2/episode_log.py <episode dir> [--raw T0 T1]
 """
@@ -64,6 +65,42 @@ def _effect_short(eff: str) -> str:
     return "; ".join(out)
 
 
+THOUGHT_CHARS = 160
+
+
+def _thought(t) -> str:
+    th = " ".join(str(t.get("thought") or "").split())
+    return f'thought: "{th[:THOUGHT_CHARS]}{"..." if len(th) > THOUGHT_CHARS else ""}"' if th else ""
+
+
+def _turn_at(turns, t):
+    return next((x["turn"] for x in turns if x["t0"] <= t < x["t1"]), turns[-1]["turn"] if turns else 0)
+
+
+def timeline(ep: Path, turns: list) -> list[str]:
+    """Facts already in the log, gathered: first time each item was in the inventory; repeated failures."""
+    first = {}
+    for line in gzip.open(ep / "trajectory.jsonl.gz", "rt"):
+        d = json.loads(line)
+        for k, v in (d.get("inv") or {}).items():
+            if v > 0 and k not in first:
+                first[k] = d["t"]
+    out = ["Timeline. First time each item was in the inventory (turn, step):",
+           "  " + ", ".join(f"{k} T{_turn_at(turns, t)} ({t})" for k, t in sorted(first.items(), key=lambda x: x[1]))]
+    fails = {}
+    for t in turns:
+        if str(t.get("outcome", "")).startswith("failed"):
+            fails.setdefault(_cmd_short(t["cmd"]), []).append(t)
+    rep = [(c, f) for c, f in fails.items() if len(f) >= 2]
+    if rep:
+        out.append("Commands that failed more than once:")
+        for c, f in sorted(rep, key=lambda x: x[1][0]["t0"]):
+            why = sorted({str(x.get("outcome"))[:60] for x in f})
+            out.append(f"  {c}: {len(f)} times, T{f[0]['turn']} ({f[0]['t0']}) to T{f[-1]['turn']} ({f[-1]['t0']}); "
+                       + " / ".join(why))
+    return out
+
+
 def checkpoints(ep: Path) -> list[int]:
     return sorted(int(p.stem[1:]) for p in (ep / "ckpt").glob("s*.zip")) if (ep / "ckpt").exists() else []
 
@@ -80,7 +117,8 @@ def compress(ep: Path) -> str:
             f"{len(turns)} turns. Final inventory: {json.dumps(res.get('final_inventory') or {})}",
             *([f"This attempt started from a saved moment of an earlier attempt, at step {summ['start_step']} "
                f"(turn {turns[0]['turn'] - 1 if turns else '?'} of that attempt)."] if summ.get("start_step") else []),
-            "Columns: turn | steps | height y start->end | command | how it ended | changes"
+            *timeline(ep, turns),
+            "Turns. Columns: turn | steps | height y start->end | command | how it ended | changes | the agent's thought"
             + (" | [saved] = the world was saved after this turn" if ck else "")]
     rows = []
     for t in turns:
@@ -94,6 +132,7 @@ def compress(ep: Path) -> str:
         if any(t["t0"] < s <= t["t1"] for s in died):
             ch = "DIED (respawned)" + (f"; {ch}" if ch else "")
         d.append(ch)
+        d.append(_thought(t))
         rows.append((t, d, t["t1"] in ck))
     return "\n".join(head + _merge(rows))
 
@@ -104,12 +143,13 @@ def _merge(rows) -> list[str]:
 
     def flush():
         if len(run) < 3:
-            out.extend(" | ".join(d) for _, d, _ in run)
+            out.extend(" | ".join(x for x in d if x) for _, d, _ in run)
         else:
             (t0, d0, _), (t1, d1, _) = run[0], run[-1]
             kinds = sorted({_cmd_short(t["cmd"]).split(" ")[0] for t, _, _ in run})
             out.append(" | ".join([f"T{t0['turn']}-T{t1['turn']}", f"{t0['t0']}-{t1['t1']}", d0[2],
-                                   f"{len(run)} turns of {'/'.join(kinds)}, e.g. {d0[3]}", "nothing changed"]))
+                                   f"{len(run)} turns of {'/'.join(kinds)}, e.g. {d0[3]}", "nothing changed"]
+                                  + ([f"first {d0[6]}"] if d0[6] else [])))
         run.clear()
 
     for t, d, saved in rows:
@@ -122,7 +162,7 @@ def _merge(rows) -> list[str]:
         if quiet:
             run.append((t, d, saved))
         else:
-            out.append(" | ".join(d + (["[saved]"] if saved else [])))
+            out.append(" | ".join([x for x in d[:6]] + ([d[6]] if d[6] else []) + (["[saved]"] if saved else [])))
     flush()
     return out
 
