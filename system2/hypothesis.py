@@ -1,5 +1,11 @@
-"""System 2, step 2: propose one hypothesis at a failure point: the change to make there, the result it predicts,
-how to try it, and the statement about the world it tests (kept as World Knowledge if Supported).
+"""System 2, step 2: propose one hypothesis at a failure point: the problem the decision there caused later, the
+belief about how to avoid it, the change that tests the belief there, the moment
+the belief is checked at (the next time the agent needs what the problem was about) and what it predicts then, and
+how to make the change. The statement kept as World Knowledge if Supported is the problem and the belief, said
+in general; the evidence (turns of this attempt) is kept apart.
+The failure point is chosen by the loop (earliest first); the other failure points of the same log are context.
+A retry at the same failure point gets the hypotheses tested there, with what their experiments showed, and
+proposes a different one (or the same change with a plan the agent can follow).
 """
 from __future__ import annotations
 
@@ -7,34 +13,67 @@ import json
 
 from llm_json import ask_json
 
-PROPOSE_SYSTEM = """You improve a Minecraft agent that failed a task. You get the failure point (the turn where a decision
-caused the failure), the reasoning for why it caused the failure, the agent's own turns around it as logged
-(command, its thought, how it ended, what changed), and the state then.
-Propose one hypothesis to test there:
-- change: what to do differently from that point; it must be something the agent can do from there.
-- prediction: what will be observed in the game if the hypothesis is right. Write it so that the game log
-  (heights, position changes, inventory changes, health, deaths, command results) can show it happened or not.
-- plan: how the agent should try the change, in a few steps.
-- statement: the belief about the world, or about what works in it, that this hypothesis tests. One sentence that
-  could be used in other attempts at other tasks, not only at this point.
+INPUT = """You improve a Minecraft agent that failed a task. You get:
+- the failure point: the turn where a decision caused the failure, and why it caused the failure;
+- the other failure points found in the same failed attempt, with their turns;
+- the agent's own turns from the restart point to just after the failure point, as logged (command, its thought,
+  how it ended, what changed);
+- the restart point: the last save before the failure point, and the agent's state there.
+An experiment will restart the game at the restart point. The turns between it and the failure point are played
+again and need not go the same way: something that happened then (for example, an item lost) may not happen again,
+or may happen differently."""
+
+PROPOSE_SYSTEM = INPUT + """
+Propose a hypothesis and the change that tests it. Work in this order:
+1. blocked: the earliest later moment of the failed attempt where the agent was blocked because of the decision at
+   the failure point: its turn, and what blocked it then, as the log shows.
+2. evidence: the turns and log lines that show how the decision at the failure point led to the block.
+3. problem: what goes wrong, said in general: what such a decision causes later (for example, what the agent
+   then lacks and why). No turns, no details only this attempt had: it must make sense to an agent in another
+   attempt at another task.
+4. hypothesis: the belief about how to avoid the problem, as the agent should act on it at such a moment.
+5. change: what the agent should do from the restart point on to test the hypothesis. If it answers something that
+   happened between the restart point and the failure point, write it as what to do when that happens (when ...,
+   do ...), since it may not happen the same way again. It must be something the agent can do from there.
+6. check_when: the moment the hypothesis is checked at: the next time the agent needs what the problem was about
+   (for example, the next time it tries the action it was blocked at). Describe it by what the agent does or has
+   then, not by turn numbers.
+7. prediction: what the game log will show at that moment if the hypothesis is right.
+8. plan: how the agent should make the change, in a few steps. Only the steps of the change itself: after it, the
+   agent goes on with the task on its own.
+check_when and prediction: write them so that the game log (heights, position changes, inventory changes,
+health, deaths, command results) can show them. The experiment has its own turn numbers, so name turns only in
+evidence.
 {extra}
 Answer with JSON only:
-{{"change": "...", "prediction": "...", "plan": "...", "statement": "..."}}"""
+{{"blocked": {{"turn": <turn number>, "what": "..."}}, "evidence": "...", "problem": "...", "hypothesis": "...", "change": "...",
+  "check_when": "...", "prediction": "...", "plan": "..."}}"""
 
-PROPOSE_EXTRA_REFUTED = """Hypotheses already tested at this failure point whose predictions were not observed. Do not repeat
-them; use why they failed:
-{refuted}"""
+EXTRA_TRIED = """Hypotheses already tested from this restart point that were not supported, with what the experiment's log
+showed. Propose a different hypothesis or a different change, or the same change with a plan the agent can
+follow if the log shows it did not make it:
+{tried}"""
 
-FIELDS = ("change", "prediction", "plan", "statement")
+FIELDS = ("evidence", "problem", "hypothesis", "change", "check_when", "prediction", "plan")
+STATEMENT = "{problem} {hypothesis}"
 
 
-def propose(fp: dict, raw: list, state: dict, refuted: list, log: list) -> dict | None:
-    """`fp`: {turn, decision, reason}; `raw`: the agent's own turns around it; `state`: task, step, height,
-    inventory then; `refuted`: hypotheses already tried at this failure point."""
-    extra = PROPOSE_EXTRA_REFUTED.format(refuted="\n".join(json.dumps(r, ensure_ascii=False) for r in refuted)) if refuted else ""
-    user = json.dumps({"task": state.get("task"), "failure_point": fp, "state_then": state,
-                       "turns_around_it": raw}, ensure_ascii=False)
-    out = ask_json(PROPOSE_SYSTEM.format(extra=extra), user, log, "propose")
-    if not out or not all(isinstance(out.get(k), str) and out[k].strip() for k in FIELDS):
-        return None
-    return {k: out[k].strip() for k in FIELDS}
+def _user(fp, others, raw, state, **more) -> str:
+    return json.dumps({"task": state.get("task"), "failure_point": fp, "other_failure_points": others,
+                       "restart_point": state, "turns_from_restart": raw, **more}, ensure_ascii=False)
+
+
+def propose(fp: dict, others: list, raw: list, state: dict, tried: list, log: list, attempts: int = 3) -> dict | None:
+    """`fp`: {turn, decision, reason}; `others`: the other failure points of the same log; `raw`: the agent's own
+    turns from the restart point to just after fp; `state`: task, turn, step, height, inventory at the restart
+    point; `tried`: earlier experiments at fp, each the hypothesis with its verdict, observed and reason.
+    An unparsable answer is asked again, up to `attempts` calls; None if none parses."""
+    extra = EXTRA_TRIED.format(tried="\n".join(json.dumps({k: t[k] for k in ("hypothesis", "change", "plan", "check_when",
+                                                                         "prediction", "verdict", "observed", "reason")},
+                                                          ensure_ascii=False) for t in tried)) if tried else ""
+    for _ in range(attempts):
+        out = ask_json(PROPOSE_SYSTEM.format(extra=extra), _user(fp, others, raw, state), log, "propose")
+        if out and all(isinstance(out.get(k), str) and out[k].strip() for k in FIELDS):
+            h = {k: out[k].strip() for k in FIELDS}
+            return {**h, "statement": STATEMENT.format(**h), "blocked": out.get("blocked")}
+    return None

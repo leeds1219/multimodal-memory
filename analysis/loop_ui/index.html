@@ -1,0 +1,481 @@
+<title>Failure Loop Results</title>
+<script>window.MathJax = {tex:{inlineMath:[["\\(","\\)"]]}, svg:{fontCache:"global"}};</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" async></script>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Colors, font and diagram copied from the pipeline slide. Top: pipeline with totals; then run list + selected run (retry chain, then one retry's real input/output) */
+:root{
+  --bg:#ffffff; --surface:#ffffff; --sunk:#f4f4f4; --fg:#262626; --muted:#595959; --faint:#8c8c8c; --line:#bfbfbf;
+  --maroon:#7e0015; --maroon-bg:#f6e9ec; --navy:#2f3c7e; --navy-bg:#e6e9f4; --green:#4f9a45; --green-dk:#2e6a27; --green-bg:#eaf4e6;
+  --node:#ffffff; --dark:#262626; --on-dark:#ffffff;
+  --sans:Arial,"Helvetica Neue",Helvetica,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#17181b; --surface:#1e1f23; --sunk:#26272c; --fg:#e8e8e8; --muted:#b0b0b0; --faint:#8a8a8a; --line:#44464d;
+  --maroon:#e07a8a; --maroon-bg:#3a1e24; --navy:#9fadf0; --navy-bg:#232a47; --green:#7cc471; --green-dk:#9ad890; --green-bg:#1f3320;
+  --node:#1e1f23; --dark:#d8d8d8; --on-dark:#17181b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#17181b; --surface:#1e1f23; --sunk:#26272c; --fg:#e8e8e8; --muted:#b0b0b0; --faint:#8a8a8a; --line:#44464d;
+  --maroon:#e07a8a; --maroon-bg:#3a1e24; --navy:#9fadf0; --navy-bg:#232a47; --green:#7cc471; --green-dk:#9ad890; --green-bg:#1f3320;
+  --node:#1e1f23; --dark:#d8d8d8; --on-dark:#17181b; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:14px;line-height:1.45}
+.wrap{max-width:1280px;margin:0 auto;padding-block:24px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:20px}
+h1{font-size:1.5rem;margin:0;font-weight:700}
+h2{font-size:1.05rem;margin:0;font-weight:700}
+.muted{color:var(--muted)}
+.mono{font-family:var(--mono)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.panel.ex{border:1.5px dashed var(--maroon)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.8rem;color:var(--muted)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.rules{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px;font-size:.88rem}
+.rules b{color:var(--maroon)}
+.svgbox{overflow-x:auto}
+svg{font-family:var(--sans)}
+svg.pipe{width:100%;min-width:640px;height:auto;display:block}
+svg text{fill:var(--fg)}
+.pn rect{stroke-width:1.2}
+.pn.s2 rect{fill:var(--navy-bg);stroke:var(--navy)} .pn.s2 .t1{fill:var(--navy)}
+.pn.mem rect{fill:var(--maroon-bg);stroke:var(--maroon)} .pn.mem .t1{fill:var(--maroon)}
+.pn.wk rect{fill:var(--green-bg);stroke:var(--green)} .pn.wk .t1{fill:var(--green-dk)}
+.pn.gray rect{fill:var(--node);stroke:var(--faint)}
+.pn.blk rect{fill:var(--node);stroke:var(--dark)}
+.pn.fill-m rect{fill:var(--maroon);stroke:none} .pn.fill-m text{fill:var(--on-dark)}
+.pn.fill-g rect{fill:var(--green);stroke:none} .pn.fill-g text{fill:var(--on-dark)}
+.pn .t2{fill:var(--muted)}
+.pn.off{opacity:.35}
+.pn.hot rect{stroke-width:2}
+.edge{stroke:var(--maroon);stroke-width:1.5;fill:none}
+.edge.g{stroke:var(--green)} .edge.gray{stroke:var(--faint)} .edge.dash{stroke-dasharray:5 3}
+.edge.off{opacity:.18}
+.edge.hot{stroke-width:2}
+.letter circle{fill:var(--dark)} .letter text{fill:var(--on-dark);font-size:10px;font-weight:700}
+.tot rect{stroke:none} .tot text{font-weight:700;font-size:12px;fill:var(--on-dark)}
+.tbl{border-collapse:collapse;font-size:.85rem}
+.tbl td,.tbl th{padding:5px 12px;border-bottom:1px solid var(--line);text-align:center}
+.tbl th{font-weight:700;color:var(--muted)}
+.tbl td:first-child,.tbl th:first-child{text-align:left}
+.main{display:grid;grid-template-columns:310px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:860px){.main{grid-template-columns:1fr}}
+.runs{display:flex;flex-direction:column;gap:14px}
+.grp h3{font-size:.75rem;color:var(--maroon);margin:0 0 6px;font-weight:700}
+.grp h3 b{color:var(--fg)}
+.run{display:flex;flex-direction:column;gap:5px;padding:8px 10px;border-radius:8px;border:1px solid transparent;cursor:pointer;background:none;text-align:left;color:inherit;font:inherit;width:100%}
+.run:hover{background:var(--sunk)}
+.run.on{border-color:var(--maroon);background:var(--maroon-bg)}
+.run:focus-visible,.dot:focus-visible,.tab:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.run .t{font-weight:700}
+.dots{display:flex;flex-wrap:wrap;gap:6px 3px;align-items:center;padding-bottom:4px}
+.dot{width:18px;height:18px;border-radius:4px;border:none;padding:0;cursor:pointer;font:700 9px var(--mono);color:#fff;display:inline-flex;align-items:center;justify-content:center;position:relative}
+.dot.on{outline:2px solid var(--fg);outline-offset:1px}
+.dot.up::before{content:"";position:absolute;left:1px;right:1px;bottom:-6px;height:3px;background:var(--green);border-radius:2px}
+.dot.win::after{content:"";position:absolute;inset:-3px;border:2px solid var(--green);border-radius:6px}
+.v-hit{background:var(--green)} .v-miss{background:var(--maroon)} .v-none{background:var(--faint)}
+.chip{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.c-hit{color:var(--green-dk);background:var(--green-bg)} .c-miss{color:var(--maroon);background:var(--maroon-bg)} .c-none{color:var(--muted);background:var(--sunk)}
+.detail{display:flex;flex-direction:column;gap:14px;min-width:0}
+.head{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;justify-content:space-between}
+.recipe{display:flex;flex-wrap:wrap;gap:4px;align-items:center;font-size:.8rem}
+.recipe span{background:var(--sunk);border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-family:var(--mono)}
+.base{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+figure{margin:0;display:flex;flex-direction:column;gap:4px;min-width:0}
+figure img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:6px;border:1px solid var(--line);image-rendering:pixelated;background:var(--sunk)}
+figcaption{font-size:.75rem;color:var(--muted)}
+svg.chain{width:100%;min-width:600px;height:auto;display:block}
+.crow{cursor:pointer}
+.crow:hover .bg{fill:var(--sunk)}
+.crow.on .bg{fill:var(--maroon-bg)}
+.tabs{display:flex;flex-wrap:wrap;gap:4px}
+.tab{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:6px;padding:4px 9px;font:700 .8rem var(--sans);cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.tab.on{border-color:var(--maroon);box-shadow:inset 0 0 0 1px var(--maroon)}
+.tab i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.stage{border:1px solid var(--line);border-radius:10px;background:var(--surface);min-width:0}
+.stage.s2{border-color:var(--navy)}
+.stage.ex{border:1.5px dashed var(--maroon)}
+.stage>summary{cursor:pointer;padding:9px 12px;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-weight:700}
+.stage>summary .L{width:18px;height:18px;border-radius:50%;background:var(--dark);color:var(--on-dark);font-size:10px;display:inline-flex;align-items:center;justify-content:center}
+.stage>summary .s{font-weight:400;color:var(--muted);font-size:.85rem;min-width:0}
+.stage .bd{padding:0 12px 12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.io{display:flex;flex-direction:column;gap:6px;min-width:0}
+.io>.lbl{font-weight:700;font-size:.72rem;color:var(--maroon)}
+.kv{display:grid;grid-template-columns:110px minmax(0,1fr);gap:4px 10px;font-size:.85rem}
+.kv dt{color:var(--muted);font-family:var(--mono);font-size:.75rem;padding-top:2px}
+.kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.tt{overflow-x:auto;border:1px solid var(--line);border-radius:6px}
+.tt table{border-collapse:collapse;width:100%;font-size:.78rem;min-width:520px}
+.tt td,.tt th{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.tt th{color:var(--muted);font-weight:700}
+.tt tr:last-child td{border-bottom:none}
+.tt tr.hl td{background:var(--navy-bg)} .tt tr.ar{cursor:pointer} .tt tr.ar:hover td{background:var(--sunk)} .tt tr.ar.hl td{background:var(--maroon-bg)}
+.tt td.c{font-family:var(--mono);white-space:nowrap}
+.fail{color:var(--maroon);font-weight:700}
+.pn.go{cursor:pointer} .pn.go:hover rect{stroke-width:3;filter:brightness(.97)}
+#st-a,.stage{scroll-margin-top:12px}
+@keyframes flash{0%{box-shadow:0 0 0 4px var(--maroon)}100%{box-shadow:0 0 0 0 transparent}}
+.flash{animation:flash 1.4s ease-out}
+/* meta.json old_rule=false: the runs already list the failure points again in the latest retry log */
+.newrule .algo li.new{background:none} .newrule .algo li.new .tag{display:none}
+.symfo{overflow:visible} .symfo div{display:flex;justify-content:flex-end;align-items:center;height:100%}
+.symfo span{color:var(--maroon);font-size:10px;line-height:14px;white-space:nowrap;padding:0 2px}
+.algo{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:14px 24px;margin-top:14px;border-top:1px solid var(--line);padding-top:14px}
+@media (max-width:860px){.algo{grid-template-columns:1fr}}
+.algo ol{margin:0;padding:0;list-style:none;counter-reset:ln;font-size:.9rem;display:flex;flex-direction:column;gap:2px;min-width:0}
+.algo li{counter-increment:ln;display:grid;grid-template-columns:26px minmax(0,1fr) 22px;align-items:center;gap:6px;padding:1px 6px;border-radius:4px}
+.algo li::before{content:counter(ln);color:var(--faint);font-size:.75rem;text-align:right}
+.algo li .c{color:var(--muted);font-size:.8rem;margin-left:10px}
+.algo .L{width:18px;height:18px;border-radius:50%;background:var(--dark);color:var(--on-dark);font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.algo li.new{background:var(--sunk)}
+.algo li.new .tag{font-size:.7rem;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:0 6px;margin-left:8px;white-space:nowrap}
+.algo .i1{padding-left:22px} .algo .i2{padding-left:44px} .algo .i3{padding-left:66px}
+.algo b{color:var(--navy)}
+.algo .req{margin-bottom:4px} .algo li.inp{counter-increment:none;color:var(--muted);font-size:.85rem} .algo li.inp::before{content:""}
+.algo dl{display:grid;grid-template-columns:70px minmax(0,1fr);gap:4px 10px;font-size:.85rem;margin:0}
+.algo dt{text-align:right}
+.algo dd{margin:0;color:var(--muted)}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Learning from Failure: Results</h1>
+    <div class="muted" id="sub"></div>
+  </header>
+
+  <section class="panel">
+    <div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>Totals at each output</h2><span class="muted" style="font-size:.8rem">click a box: jump to its input/output for the selected retry</span></div>
+    <div class="svgbox"><svg class="pipe" id="pipe" viewBox="20 58 915 494" role="img" aria-label="Pipeline with totals"></svg></div>
+    <div class="algo">
+      <div style="min-width:0">
+        <ol class="req"><li class="inp"><span class="i0"><b>Input</b> failed episode \(\tau_0\) · max retries \(N={{N}}\) · tries per failure point \(M={{M}}\)</span><span class="L">a</span></li></ol>
+        <ol><li class=""><span class="i0">\(\mathcal{K} \gets \emptyset\);&nbsp; \(\mathcal{F} \gets \textsf{FindFailurePoints}(\tau_0)\)</span><span class=L>b</span></li><li class=""><span class="i0"><b>for</b> \(k = 1, \dots, N\) <b>do</b><span class=c>▷ loop until task success or \(N\) retries</span></span><span class=L>g</span></li><li class="new"><span class="i1"><b>if</b> \(\mathcal{F} = \emptyset\) <b>then</b><span class=c>▷ candidates used up</span><span class=tag>added after these runs</span></span><span></span></li><li class="new"><span class="i2">\(\mathcal{F} \gets \textsf{FindFailurePoints}(\tau_{k-1})\)<span class=c>▷ latest retry</span><span class=tag>added after these runs</span></span><span class=L>b</span></li><li class="new"><span class="i2"><b>if</b> \(\mathcal{F} = \emptyset\) <b>then return</b> \(\mathcal{K}\)<span class=tag>added after these runs</span></span><span></span></li><li class=""><span class="i1">\(f \gets\) earliest in \(\mathcal{F}\)</span><span></span></li><li class=""><span class="i1">\(h \gets \textsf{Propose}(f, \mathcal{R}_f)\)<span class=c>▷ \(\mathcal{R}_f\): past tries at \(f\)</span></span><span class=L>c</span></li><li class=""><span class="i1">\(\tau_k \gets \textsf{Replay}(f, h, \mathcal{K})\)<span class=c>▷ from the save before \(f\)</span></span><span class=L>d</span></li><li class=""><span class="i1">\(v \gets \textsf{Judge}(h, \tau_k)\)</span><span class=L>e</span></li><li class=""><span class="i1"><b>if</b> \(v = \text{Supported}\) <b>then</b></span><span></span></li><li class=""><span class="i2">\(\mathcal{K} \gets \mathcal{K} \cup \{h\}\);&nbsp; \(\mathcal{F} \gets \textsf{FindFailurePoints}(\tau_k)\)</span><span class=L>b</span></li><li class=""><span class="i1"><b>else</b></span><span></span></li><li class=""><span class="i2">\(\mathcal{R}_f \gets \mathcal{R}_f \cup \{(h, v, \tau_k)\}\)</span><span></span></li><li class=""><span class="i2"><b>if</b> \(|\mathcal{R}_f| = M\) <b>then</b> \(\mathcal{F} \gets \mathcal{F} \setminus \{f\}\)</span><span></span></li><li class=""><span class="i1"><b>if</b> \(\textsf{TaskSuccess}(\tau_k)\) <b>then return</b> \(\mathcal{K}\)</span><span class=L>f</span></li><li class=""><span class="i0"><b>return</b> \(\mathcal{K}\)</span><span></span></li></ol>
+      </div>
+      <dl>
+        <dt>\(\tau_0\)</dt><dd>baseline log</dd>
+        <dt>\(\tau_k\)</dt><dd>retry \(k\) log</dd>
+        <dt>\(\mathcal{F}\)</dt><dd>failure point candidates</dd>
+        <dt>\(f\)</dt><dd>failure point</dd>
+        <dt>\(h\)</dt><dd>hypothesis</dd>
+        <dt>\(v\)</dt><dd>Judge verdict: Supported · Refuted · Not reached</dd>
+        <dt>\(\mathcal{K}\)</dt><dd>World Knowledge</dd>
+        <dt>b–f</dt><dd>stage in the diagram</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="main">
+    <div style="display:flex;flex-direction:column;gap:14px;min-width:0">
+      <div class="panel">
+        <h2 style="margin-bottom:8px">What one retry is</h2>
+        <ul class="rules">
+          <li><b>1 retry</b> = one pass b → f: restart from a save, play to {{H_TXT}}</li>
+          <li><b>Restart from</b>: the last retry judged <i>Supported</i>; else the same save again</li>
+          <li><b>Stop</b>: task success · 10 retries · no failure point left</li>
+        </ul>
+      </div>
+      <div class="panel" id="tot"></div>
+      <nav class="panel runs" id="runs" aria-label="Runs"></nav>
+    </div>
+    <div class="detail" id="detail"></div>
+  </section>
+</div>
+
+<script>
+
+let H = {{H}};  // filled in by build.py (episode horizon)
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const fmt = n => n == null ? "–" : n.toLocaleString("en-US");
+const cmdStr = c => typeof c === "string" ? c : JSON.stringify(c ?? "");  // the domain adapter formats commands
+const shortEff = e => esc(String(e||"").replace(/, attack held.*$/,"").replace(/turned [+-]\d+ deg, /,"").replace(/health ([\d.]+)->\1, /,""));
+const V = v => v === "Supported" ? "hit" : v === "Refuted" ? "miss" : "none";
+const VNAME = {hit:"Supported", miss:"Refuted", none:"Not reached"};
+const STOP = d => d.startsWith("task succeeded") ? "task success" : d.startsWith("max") ? "10 retries used" : "no failure point left";
+const best = r => Math.max(...r.its.map(i => i.max));
+const better = r => best(r) > r.orig.max, same = r => best(r) === r.orig.max;
+const up = (r, i) => !i.success && i.max > r.orig.max;
+const progChip = (r, i) => i.success ? "" : i.max > r.orig.max ? `<span class="chip c-hit">▲ +${i.max - r.orig.max} vs baseline</span>` : i.max === r.orig.max ? `<span class="chip c-none">= baseline</span>` : `<span class="chip c-miss">▼ ${i.max - r.orig.max} vs baseline</span>`;
+const src = p => p === "orig" ? "Baseline" : `Retry ${p}`;
+
+let RUNS = [], BY = {}, sel = {run:null, k:null};
+
+/* ---------- pipeline diagram (positions in points, copied from the slide) ---------- */
+const N = {
+  ep:{x:42,y:163,w:151,h:40,t:["Episode Log","Trajectories + Verdicts"],c:"mem"},
+  fpo:{x:218,y:163,w:151,h:40,t:["Failure Point","Wrong Decision + Context"],c:"mem"},
+  hypo:{x:423,y:163,w:151,h:40,t:["Hypothesis","Change + Prediction"],c:"mem"},
+  wk:{x:746,y:163,w:151,h:40,t:["World Knowledge","Verified Hypotheses"],c:"wk"},
+  b:{x:207,y:86,w:173,h:43,t:["System 2","Find Failure Point"],L:"b",c:"s2"},
+  c:{x:413,y:86,w:173,h:43,t:["System 2","Propose Hypothesis"],L:"c",c:"s2"},
+  s1:{x:413,y:238,w:173,h:43,t:["System 1","Test Hypothesis"],c:"gray"},
+  tools:{x:413,y:297,w:173,h:36,t:["Tools","Policy · Primitives"],c:"gray"},
+  d:{x:413,y:348,w:173,h:36,t:["Replay World","From Failure Point"],L:"d",c:"blk"},
+  e:{x:413,y:432,w:173,h:43,t:["System 2","Judge Hypothesis"],L:"e",c:"s2"},
+  f:{x:413,y:490,w:173,h:36,t:["Task Check","Auto · Target Item?"],L:"f",c:"blk"},
+  a:{x:71,y:324,w:94,h:27,t:["Failed Episode"],c:"fill-m"},
+  end:{x:600,y:494,w:94,h:27,t:["End Loop"],c:"fill-g"},
+  es1:{x:735,y:238,w:173,h:43,t:["System 1","Solve Task"],c:"gray"},
+  etools:{x:735,y:297,w:173,h:36,t:["Tools","Policy · Primitives"],c:"gray"},
+  eworld:{x:735,y:348,w:173,h:36,t:["World","Fresh Episode"],c:"gray"},
+};
+const SYM = {ep:String.raw`\tau_0 \cdot \tau_k`, fpo:String.raw`f \in \mathcal{F}`, hypo:"h", wk:String.raw`\mathcal{K}`,
+  b:String.raw`\textsf{FindFailurePoints}(\tau) \to \mathcal{F}`, c:String.raw`\textsf{Propose}(f) \to h`, d:String.raw`\textsf{Replay} \to \tau_k`,
+  e:String.raw`\textsf{Judge} \to v`, f:String.raw`\textsf{TaskSuccess}(\tau_k)`};
+// symbols are typeset by MathJax (same rendering as the algorithm below the diagram)
+const mj = el => { if (window.MathJax && MathJax.startup && MathJax.startup.promise) MathJax.startup.promise.then(() => MathJax.typesetPromise([el])); };
+// clicking a box jumps to that stage's input/output of the selected retry
+const GO = {a:"a", ep:"b", b:"b", fpo:"b", c:"c", hypo:"c", s1:"d", tools:"d", d:"d", e:"e", wk:"e", f:"f", end:"f"};
+function jump(letter){
+  const el = document.getElementById("st-" + letter);
+  if (!el) return;
+  if (el.tagName === "DETAILS") el.open = true;
+  el.scrollIntoView({behavior:"smooth", block:"start"});
+  el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+}
+const LET_A = {x:176,y:337}, LET_G = {x:102,y:390};
+function drawPipe(svgId, mode){
+  // mode.tot = totals for the overview; mode.it = one retry (Supported/success light up the exit it took)
+  const svg = document.getElementById(svgId), mk = "ah_" + svgId, P = [];
+  const hit = mode.it ? V(mode.it.verdict) === "hit" : null, ok = mode.it ? mode.it.success : null;
+  const arrow = (d, cls="", m="m") => P.push(`<path class="edge ${cls}" d="${d}" marker-end="url(#${mk}_${m})"/>`);
+  P.push(`<defs>${[["m","var(--maroon)"],["g","var(--green)"],["x","var(--faint)"]].map(([k,c]) =>
+    `<marker id="${mk}_${k}" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${c}"/></marker>`).join("")}</defs>`);
+  P.push(`<rect x="35" y="137" width="893" height="81" rx="10" fill="none" stroke="var(--line)" stroke-width="1"/><text x="43" y="154" font-size="12" font-weight="700" fill="var(--muted)">Memory</text>`);
+  P.push(`<rect x="396" y="225" width="205" height="190" rx="10" fill="none" stroke="var(--maroon)" stroke-dasharray="5 3"/><text x="405" y="405" font-size="12" font-weight="700" fill="var(--maroon)">Experiment</text>`);
+  P.push(`<rect x="719" y="225" width="205" height="190" rx="10" fill="none" stroke="var(--faint)" stroke-dasharray="5 3"/><text x="727" y="405" font-size="12" font-weight="700" fill="var(--muted)">Evaluation</text>`);
+  P.push(`<text x="31" y="409" font-size="10" font-weight="700" fill="var(--maroon)">Loop Until</text><text x="31" y="421" font-size="10" fill="var(--muted)">Task Success</text><text x="31" y="433" font-size="10" fill="var(--muted)">or N Iterations</text>`);
+  P.push(`<text x="608" y="434" font-size="10" font-weight="700" fill="var(--green-dk)">If Hypothesis</text><text x="608" y="446" font-size="10" font-weight="700" fill="var(--green-dk)">Is Supported</text>`);
+  P.push(`<text x="204" y="304" font-size="9" font-weight="700" fill="var(--maroon)">Restore World</text><text x="204" y="315" font-size="8" fill="var(--muted)">Full Snapshot</text>`);
+  P.push(`<text x="32" y="327" font-size="9" font-weight="700" fill="var(--maroon)">Start</text><text x="123" y="500" font-size="10" font-weight="700" fill="var(--maroon)">Fail</text>`);
+  const offFail = mode.it && ok ? " off" : "", hot = mode.it ? " hot" : "";
+  arrow("M32,338 L69,338");
+  arrow("M117,323 L117,205");
+  arrow("M117,163 L117,108 L205,108", hot);
+  arrow("M294,130 L294,161", hot);
+  arrow("M369,183 L390,183 L390,108 L411,108", hot);
+  arrow("M499,130 L499,161", hot);
+  arrow("M499,203 L499,236", hot);
+  P.push(`<path class="edge${hot}" d="M490,281 L490,295"/><path class="edge${hot}" d="M508,281 L508,295"/><path class="edge${hot}" d="M490,333 L490,346"/><path class="edge${hot}" d="M508,333 L508,346"/>`);
+  arrow("M294,203 L294,366 L411,366", hot);
+  arrow("M499,384 L499,430", hot);
+  arrow("M499,475 L499,488", hot);
+  arrow("M586,454 L665,454 L665,183 L744,183", "g" + (mode.it ? (hit ? " hot" : " off") : ""), "g");
+  arrow("M586,508 L598,508", "g dash" + (mode.it ? (ok ? " hot" : " off") : ""), "g");
+  arrow("M413,507 L117,507 L117,353", (mode.it ? (ok ? " off" : " hot") : ""));
+  arrow("M821,203 L821,236", "g", "g");
+  P.push(`<path class="edge gray" d="M813,281 L813,295"/><path class="edge gray" d="M830,281 L830,295"/><path class="edge gray" d="M813,333 L813,346"/><path class="edge gray" d="M830,333 L830,346"/>`);
+  for (const [id, n] of Object.entries(N)) {
+    let cls = "pn " + n.c;
+    if (["es1","etools","eworld"].includes(id)) cls += " off";
+    if (mode.it) {
+      if (id === "wk" && !hit) cls += " off";
+      if (id === "end" && !ok) cls += " off";
+      if (["b","c","s1","tools","d","e","f"].includes(id)) cls += " hot";
+    }
+    const cy = n.y + n.h/2, L = n.t;
+    const tx = L.length === 1
+      ? `<text x="${n.x+n.w/2}" y="${cy+4}" text-anchor="middle" font-size="11" font-weight="700">${L[0]}</text>`
+      : `<text class="t1" x="${n.x+n.w/2}" y="${cy-3}" text-anchor="middle" font-size="13" font-weight="700">${L[0]}</text><text class="t2" x="${n.x+n.w/2}" y="${cy+11}" text-anchor="middle" font-size="10">${L[1]}</text>`;
+    P.push(`<g class="${cls}${GO[id]?" go":""}" data-node="${id}"><rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="8"/>${tx}</g>`);
+    // symbol just outside the box (above b and c, below the rest) so it never covers the box text
+    if (SYM[id]) P.push(`<foreignObject class="symfo" x="${n.x}" y="${["b","c"].includes(id) ? n.y-15 : n.y+n.h+1}" width="${n.w}" height="14"><div xmlns="http://www.w3.org/1999/xhtml"><span>\\(${SYM[id]}\\)</span></div></foreignObject>`);
+    if (n.L) P.push(`<g class="letter"><circle cx="${n.x+14}" cy="${n.y+14}" r="8.5"/><text x="${n.x+14}" y="${n.y+17.5}" text-anchor="middle">${n.L}</text></g>`);
+  }
+  for (const [l, p] of [["a", LET_A], ["g", LET_G]]) P.push(`<g class="letter"><circle cx="${p.x}" cy="${p.y}" r="8.5"/><text x="${p.x}" y="${p.y+3.5}" text-anchor="middle">${l}</text></g>`);
+  if (mode.tot) {
+    const T = mode.tot, pill = (x, y, txt, fill) => {
+      const w = txt.length * 6.6 + 14;
+      P.push(`<g class="tot"><rect x="${x}" y="${y}" width="${w}" height="20" rx="10" style="fill:${fill}"/><text x="${x+w/2}" y="${y+14}" text-anchor="middle">${txt}</text></g>`);
+    };
+    pill(605, 88, `${T.retries} retries`, "var(--maroon)");
+    pill(60, 288, `${T.runs} runs`, "var(--maroon)");
+    pill(602, 300, `Supported ${T.hit}`, "var(--green)");
+    pill(200, 444, `Refuted ${T.miss} · Not reached ${T.none}`, "var(--maroon)");
+    pill(700, 497, `Task success ${T.okRuns} / ${T.runs} runs`, "var(--green)");
+  }
+  svg.innerHTML = P.join("");
+  mj(svg);
+  svg.querySelectorAll(".pn.go").forEach(el => el.addEventListener("click", () => jump(GO[el.dataset.node])));
+}
+
+/* ---------- totals + run list ---------- */
+function totals(){
+  const all = RUNS.flatMap(r => r.its);
+  const c = v => all.filter(i => V(i.verdict) === v).length;
+  const won = r => r.its.findIndex(i => i.success) + 1;
+  const T = {runs:RUNS.length, retries:all.length, hit:c("hit"), miss:c("miss"), none:c("none"),
+             okRuns:RUNS.filter(r => won(r)).length};
+  document.getElementById("sub").textContent = `${T.runs} failed baseline runs · Task success in ${T.okRuns} of ${T.runs}`;
+  drawPipe("pipe", {tot:T});
+  const at = k => RUNS.filter(r => won(r) === k).length, maxK = Math.max(...RUNS.map(won));
+  const taskRows = Array.from({length:maxK}, (_, j) => `<tr><td><span class="chip c-hit">Task success</span> at retry ${j+1}</td><td><b>${at(j+1)}</b></td></tr>`).join("");
+  const vRow = v => `<tr><td><span class="chip c-${v}">${VNAME[v]}</span></td><td><b>${c(v)}</b></td></tr>`;
+  document.getElementById("tot").innerHTML = `
+    <h2 style="margin-bottom:6px">Task Check · per run</h2>
+    <table class="tbl" style="margin-bottom:16px"><thead><tr><th>${T.runs} failed baseline runs</th><th>runs</th></tr></thead>
+    <tbody>${taskRows}<tr><td><span class="chip c-miss">Task fail</span> · more ore than baseline</td><td><b>${RUNS.filter(r => !won(r) && better(r)).length}</b></td></tr><tr><td><span class="chip c-miss">Task fail</span> · same ore as baseline</td><td><b>${RUNS.filter(r => !won(r) && same(r)).length}</b></td></tr><tr><td><span class="chip c-miss">Task fail</span> · less ore than baseline</td><td><b>${RUNS.filter(r => !won(r) && !better(r) && !same(r)).length}</b></td></tr></tbody></table>
+    <h2 style="margin-bottom:6px">Judge verdict · per retry</h2>
+    <table class="tbl"><thead><tr><th>${T.retries} retries</th><th>retries</th></tr></thead>
+    <tbody>${vRow("hit")}${vRow("miss")}${vRow("none")}</tbody></table>`;
+}
+
+function groups(){
+  const G = [], add = (name, f) => { const ids = RUNS.filter(f).map(r => r.id); if (ids.length) G.push({name, ids}); };
+  const won = r => r.its.findIndex(i => i.success) + 1;
+  add("Task success", r => won(r));
+  add("Task fail · more ore than baseline", r => !won(r) && better(r));
+  add("Task fail · same ore as baseline", r => !won(r) && same(r));
+  add("Task fail · less ore than baseline", r => !won(r) && !better(r) && !same(r));
+  return G;
+}
+
+function runList(){
+  const el = document.getElementById("runs");
+  el.innerHTML = groups().map(g => `<div class="grp"><h3><b>${g.ids.length}</b> · ${g.name}</h3>${
+    g.ids.map(id => { const r = BY[id]; return `<div class="run ${sel.run===id?"on":""}" data-run="${id}" role="button" tabindex="0">
+      <span class="t">${cap(r.item)}${r.world>1?` <span class="muted" style="font-weight:400">· world ${r.world}</span>`:""} <span class="muted mono" style="font-weight:400;font-size:.75rem">${r.its.length} ${r.its.length>1?"retries":"retry"}</span></span>
+      ${r.its.some(i => i.success) ? "" : (() => { const b = Math.max(...r.its.map(i => i.max)); return `<span style="font-size:.75rem"><span class="chip ${b > r.orig.max ? "c-hit" : b === r.orig.max ? "c-none" : "c-miss"}">${r.unit_short}: baseline ${r.orig.max} → best ${b}</span></span>`; })()}
+      <span class="dots">${r.its.map(i => `<button class="dot v-${V(i.verdict)} ${i.success?"win":""} ${up(r,i)?"up":""} ${sel.run===id&&sel.k===i.k?"on":""}" data-run="${id}" data-k="${i.k}" title="Retry ${i.k}: ${VNAME[V(i.verdict)]}${i.success?" · task success":up(r,i)?` · ${i.max} vs baseline ${r.orig.max}`:""}" aria-label="Retry ${i.k}">${i.k}</button>`).join("")}</span>
+    </div>`; }).join("")}</div>`).join("") +
+    `<div class="legend"><span><i class="v-hit"></i>Supported</span><span><i class="v-miss"></i>Refuted</span><span><i class="v-none"></i>Not reached</span><span><i style="border:2px solid var(--green);background:none"></i>task success</span><span><i style="height:3px;background:var(--green)"></i>task fail, more ore than baseline</span></div>`;
+  el.querySelectorAll(".run").forEach(b => {
+    b.addEventListener("click", e => { if (!e.target.closest(".dot")) select(b.dataset.run, null); });
+    b.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); select(b.dataset.run, null); } });
+  });
+  el.querySelectorAll(".dot").forEach(b => b.addEventListener("click", e => { e.stopPropagation(); select(b.dataset.run, +b.dataset.k); }));
+}
+
+function select(id, k){
+  const r = BY[id];
+  if (k == null) k = (r.its.find(i => i.success) || r.its[r.its.length-1]).k;
+  sel = {run:id, k};
+  runList(); detail();
+  drawPipe("pipe2", {it: r.its.find(i => i.k === k)});
+}
+
+/* ---------- retry chain: one row per retry on the game clock, linked to the run it restarted from ---------- */
+function chain(r){
+  const W = 900, L = 175, R = 16, rowH = 26, top = 26, x = t => L + (W - L - R) * t / H;
+  const rows = [{id:"orig", label:"Baseline", start:0, end:H, success:false}].concat(r.its.map(i => ({id:i.k, label:`Retry ${i.k}`, it:i, start:i.start, end:i.end, success:i.success, parent:i.parent})));
+  const yOf = id => top + rows.findIndex(q => q.id === id) * rowH;
+  const P = [];
+  [0, H/4, H/2, 3*H/4, H].forEach(t => P.push(`<line x1="${x(t)}" x2="${x(t)}" y1="${top-8}" y2="${top + rows.length*rowH}" stroke="var(--line)" stroke-width=".8"/><text x="${x(t)}" y="${top-12}" font-size="10" text-anchor="middle" fill="var(--muted)">${fmt(t)}</text>`));
+  rows.forEach((q, j) => {
+    const y = top + j * rowH, on = q.it && q.it.k === sel.k;
+    P.push(`<g class="crow ${on?"on":""}" ${q.it?`data-k="${q.it.k}"`:""}><rect class="bg" x="0" y="${y}" width="${W}" height="${rowH}" fill="transparent" rx="4"/>`);
+    if (q.it) {
+      const v = V(q.it.verdict);
+      P.push(`<rect x="6" y="${y+6}" width="14" height="14" rx="3" class="v-${v}" style="fill:var(--${v==="hit"?"green":v==="miss"?"maroon":"faint"})"/>`);
+      P.push(`<text x="26" y="${y+17}" font-size="12" font-weight="700">${q.label}</text><text x="86" y="${y+17}" font-size="10" fill="var(--muted)">from ${q.parent==="orig"?"Baseline":"Retry "+q.parent}</text>`);
+    } else P.push(`<text x="26" y="${y+17}" font-size="12" font-weight="700" fill="var(--maroon)">Baseline</text>`);
+    P.push(`<rect x="${x(q.start)}" y="${y+7}" width="${Math.max(2, x(q.end)-x(q.start))}" height="12" rx="3" style="fill:${q.success?"var(--green)":q.it&&up(r,q.it)?"var(--green-bg)":q.it?"var(--maroon-bg)":"var(--sunk)"};stroke:${q.success||(q.it&&up(r,q.it))?"var(--green)":q.it?"var(--maroon)":"var(--faint)"}" stroke-width="1"/>`);
+    if (!q.success) { const n = q.it ? q.it.max : r.orig.max, g = q.it && up(r, q.it);
+      P.push(`<text x="${x(q.end)-5}" y="${y+16.5}" font-size="10" font-weight="700" text-anchor="end" fill="${g?"var(--green-dk)":q.it && n < r.orig.max?"var(--maroon)":"var(--muted)"}">${r.unit_short} ${n}${g ? " ▲" : q.it && n < r.orig.max ? " ▼" : ""}</text>`); }
+    if (q.success) P.push(`<text x="${x(q.end)+5}" y="${y+17}" font-size="10" font-weight="700" fill="var(--green-dk)">success ${fmt(q.end)}</text>`);
+    if (q.it) {
+      const py = yOf(q.parent) + rowH/2;
+      P.push(`<path d="M${x(q.start)},${py} L${x(q.start)},${y+7}" stroke="var(--maroon)" stroke-width="1.2" fill="none" stroke-dasharray="3 2"/><circle cx="${x(q.start)}" cy="${py}" r="3" fill="var(--maroon)"/>`);
+    }
+    P.push(`</g>`);
+  });
+  const h = top + rows.length * rowH + 4;
+  return `<div class="panel ex"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h2>${r.its.length} ${r.its.length>1?"retries":"retry"} on the game clock</h2><span class="muted" style="font-size:.8rem">stopped: ${STOP(r.done)}</span></div>
+    <div class="svgbox"><svg class="chain" viewBox="0 0 ${W} ${h}" role="img" aria-label="Retry chain">${P.join("")}</svg></div>
+    <div class="legend"><span><i style="background:var(--maroon)"></i>● restart point (save in the run above)</span><span><i style="background:var(--maroon-bg);border:1px solid var(--maroon)"></i>played, task fail</span><span><i style="background:var(--green-bg);border:1px solid var(--green)"></i>task fail, more ore than baseline ▲</span><span><i style="background:var(--green)"></i>played, task success</span></div></div>`;
+}
+
+function verdictChip(v){ const s = V(v); return `<span class="chip c-${s}">${VNAME[s]}</span>`; }
+function taskChip(s){ return s ? `<span class="chip c-hit">Task success</span>` : `<span class="chip c-miss">Task fail</span>`; }
+function turnTable(rows, hlTurn){
+  if (!rows || !rows.length) return `<div class="muted">–</div>`;
+  return `<div class="tt"><table><thead><tr><th>turn</th><th>step</th><th>command</th><th>result</th><th>what changed</th></tr></thead><tbody>${
+    rows.map(x => `<tr class="${x.turn===hlTurn?"hl":""}"><td class="c">${x.turn}</td><td class="c">${fmt(x.t0)}</td><td class="c">${esc(cmdStr(x.cmd))}</td><td class="${String(x.outcome).startsWith("failed")?"fail":""}">${esc(x.outcome)}</td><td>${shortEff(x.effect)}</td></tr>`).join("")
+  }</tbody></table></div>`;
+}
+function fig(src, cap){ return src ? `<figure><img src="${src}" alt="${esc(cap)}" loading="lazy"><figcaption>${cap}</figcaption></figure>` : ""; }
+function stage(letter, name, cls, summary, body, open){
+  return `<details id="st-${letter}" class="stage ${cls}" ${open?"open":""}><summary><span class="L">${letter}</span>${name}<span class="s">${summary}</span></summary><div class="bd">${allRetries(letter)}${body}</div></details>`;
+}
+// the loop runs each stage once per retry: this stage's output in every retry of the run (click a row to open it)
+const cut = (t, n) => { t = String(t ?? ""); return esc(t.length > n ? t.slice(0, n) + "…" : t); };
+function allRetries(letter){
+  const r = BY[sel.run], unit = r.unit;
+  const COLS = {
+    b: [["input log", i => src(i.parent)], ["failure point", i => `turn ${i.fp.turn}: ${cut(i.fp.decision, 90)}`]],
+    c: [["change", i => cut(i.hyp.change, 90)], ["prediction", i => cut(i.hyp.prediction, 90)]],
+    d: [["check_turn", i => i.check.turn != null ? `turn ${i.check.turn}` : "Not reached"], ["failed commands", i => i.n_fails], [unit, i => `${i.max} ${progChip(r, i)}`]],
+    e: [["verdict", i => verdictChip(i.verdict)], ["observed", i => cut(i.observed, 110)]],
+    f: [["task", i => taskChip(i.success)], [r.item, i => `${i.target} / 1`], [unit, i => `${i.max} ${progChip(r, i)}`]],
+  }[letter];
+  if (!COLS || r.its.length < 2) return "";
+  return `<div class="io" style="grid-column:1/-1"><div class="lbl">Output in each retry · ${r.its.length} retries</div><div class="tt"><table><thead><tr><th>retry</th>${COLS.map(c => `<th>${esc(c[0])}</th>`).join("")}</tr></thead><tbody>${
+    r.its.map(i => `<tr class="ar ${i.k===sel.k?"hl":""}" data-k="${i.k}" data-st="${letter}"><td class="c">${i.k}</td>${COLS.map(c => `<td>${c[1](i)}</td>`).join("")}</tr>`).join("")
+  }</tbody></table></div></div>`;
+}
+
+function detail(){
+  const r = BY[sel.run], it = r.its.find(i => i.k === sel.k);
+  const unit = r.unit;
+  const h = it.hyp, first = r.its[0];
+  const el = document.getElementById("detail");
+  el.innerHTML = `
+  <div class="panel head" id="st-a">
+    <div style="display:flex;flex-direction:column;gap:6px;min-width:0">
+      <h2>${cap(r.item)}${r.world>1?` <span class="muted">· world ${r.world}</span>`:""}</h2>
+      <div class="recipe">needs ${(r.needs || []).map(x=>`<span>${esc(x)}</span>`).join(" ")}</div>
+      <div class="row">Baseline: ${taskChip(false)}<span class="mono">${r.item} ${r.orig.target} / 1</span><span class="muted">· ${unit} ${r.orig.max} (recipe ${r.need}) · at ${fmt(H)} steps</span></div>
+    </div>
+    <div class="base" style="flex:1;max-width:520px">
+      ${fig(first.fp.frame, `Baseline failure point · turn ${first.fp.turn} · ${esc(cmdStr(first.fp.rec&&first.fp.rec.cmd))}`)}
+      ${fig(r.orig_end_frame, `Baseline end (${fmt(H)})`)}
+    </div>
+  </div>
+
+  ${chain(r)}
+
+  <div class="tabs" role="tablist">${r.its.map(i => `<button class="tab ${i.k===sel.k?"on":""}" data-k="${i.k}" role="tab" aria-selected="${i.k===sel.k}"><i class="v-${V(i.verdict)}"></i>Retry ${i.k}</button>`).join("")}</div>
+
+  <div class="row"><b>Retry ${it.k}</b><span class="muted">restart from ${src(it.parent)} at step ${fmt(it.start)}</span>${verdictChip(it.verdict)}${taskChip(it.success)}<span class="mono">${r.item} ${it.target} / 1</span><span class="mono muted">· ${unit} ${it.max} (recipe ${r.need})</span>${progChip(r, it)}</div>
+  <div class="panel svgbox"><svg class="pipe" id="pipe2" viewBox="20 58 915 494" role="img" aria-label="Pipeline for this retry"></svg></div>
+
+  <div class="panel base">
+    ${fig(it.fp.frame, `b · failure point · turn ${it.fp.turn} in ${src(it.parent)}`)}
+    ${fig(it.check.frame, it.check.turn!=null?`e · check_turn ${it.check.turn}`:"e · Not reached")}
+    ${fig(it.end_frame, it.success?`f · task success · step ${fmt(it.end)}`:`f · end · ${fmt(H)}`)}
+  </div>
+
+  ${stage("b", "Find Failure Point", "s2", `turn ${it.fp.turn}: ${esc(it.fp.decision)}`, `
+    <div class="io"><div class="lbl">Input · ${src(it.parent)} log around the failure point</div>${turnTable(it.fp_ctx, it.fp.turn)}</div>
+    <div class="io"><div class="lbl">Output</div><dl class="kv">
+      <dt>decision</dt><dd>${esc(it.fp.decision)}</dd><dt>better</dt><dd>${esc(it.fp.better)}</dd><dt>why it failed</dt><dd>${esc(it.fp.reason)}</dd>
+      <dt>restart</dt><dd class="mono">step ${fmt(it.start)} · ${fmt(H-it.start)} steps left</dd></dl></div>`)}
+
+  ${stage("c", "Propose Hypothesis", "s2", esc(h.change), `
+    <div class="io"><div class="lbl">Output</div><dl class="kv">
+      <dt>problem</dt><dd>${esc(h.problem)}</dd><dt>hypothesis</dt><dd>${esc(h.hypothesis)}</dd><dt>change</dt><dd>${esc(h.change)}</dd>
+      <dt>check_when</dt><dd>${esc(h.check_when)}</dd><dt>prediction</dt><dd>${esc(h.prediction)}</dd><dt>plan</dt><dd style="white-space:pre-line">${esc(h.plan)}</dd></dl></div>`)}
+
+  ${stage("d", "System 1 + Tools in the replayed world", "ex", it.check.turn!=null?`check_turn ${it.check.turn}: ${esc(cmdStr(it.check.rec&&it.check.rec.cmd))} → ${esc(it.check.rec&&it.check.rec.outcome)}`:`Not reached · ${it.n_fails} failed commands`, `
+    <div class="io"><div class="lbl">Output · turns up to the check</div>${turnTable(it.check_ctx, it.check.turn)}</div>
+    <div class="io"><div class="lbl">Failed commands in this retry · ${it.n_fails}${it.n_fails>8?" (first 8)":""}</div>${turnTable(it.fails, null)}</div>`)}
+
+  ${stage("e", "Judge Hypothesis", "s2", `${VNAME[V(it.verdict)]}${it.check.turn!=null?" at turn "+it.check.turn:""}`, `
+    <div class="io"><div class="lbl">Input</div><dl class="kv"><dt>check_when</dt><dd>${esc(h.check_when)}</dd><dt>prediction</dt><dd>${esc(h.prediction)}</dd></dl></div>
+    <div class="io"><div class="lbl">Output</div><dl class="kv"><dt>verdict</dt><dd>${verdictChip(it.verdict)}</dd><dt>observed</dt><dd>${esc(it.observed)}</dd><dt>reason</dt><dd>${esc(it.reason)}</dd></dl></div>`)}
+
+  ${stage("f", "Task Check", "", it.success?`success at step ${fmt(it.end)}`:`fail at ${fmt(H)}`, `
+    <div class="io"><dl class="kv"><dt>task</dt><dd>${taskChip(it.success)}</dd><dt>${r.item}</dt><dd class="mono">${it.target} / 1</dd><dt>${unit}</dt><dd class="mono">${it.max} (recipe ${r.need}) · baseline ${r.orig.max} ${progChip(r, it)}</dd></dl></div>`)}
+  `;
+  el.querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => select(sel.run, +b.dataset.k)));
+  el.querySelectorAll(".crow[data-k]").forEach(g => g.addEventListener("click", () => select(sel.run, +g.dataset.k)));
+  el.querySelectorAll("tr.ar").forEach(t => t.addEventListener("click", () => { const st = t.dataset.st; select(sel.run, +t.dataset.k); jump(st); }));
+}
+
+fetch("meta.json").then(r => r.json()).then(m => { if (!m.old_rule) document.body.classList.add("newrule"); }).catch(() => {});
+fetch("data.json").then(r => r.json()).then(data => {
+  RUNS = data; data.forEach(r => BY[r.id] = r);
+  totals(); runList();
+  select(groups()[0].ids[0], null);
+}).catch(() => { document.getElementById("detail").innerHTML = `<div class="panel">Could not load data.json.</div>`; });
+</script>

@@ -5,7 +5,8 @@
 
 A condition is a folder results/<method>/<world>/. --orders keeps the chains whose name starts with one of the
 prefixes (a condition folder can hold several runs, e.g. a rerun). Crashed attempts are left out; an episode that
-crashed on every attempt counts as a failure.
+crashed on every attempt counts as a failure. Tasks that need natural ore (ore_supply.py: the ore rule alone cannot
+supply them) are kept, and their success is also shown apart from the other tasks.
 """
 from __future__ import annotations
 
@@ -19,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import paths  # noqa: E402,F401
 
 from benchmark import RESULTS, RUN_DATA, SEEDS  # noqa: E402
+from ore_supply import needs_natural_ore  # noqa: E402
 
 GROUPS = ("wooden", "stone", "iron", "gold", "redstone", "diamond", "armor")
 WORLDS = {0: "A", 1: "B", 4: "C"}
@@ -36,7 +38,8 @@ def episodes(cond: str, prefixes: list[str]) -> list[dict]:
             continue
         off = int(seed) - SEEDS[task]
         out.append({"order": order, "task": task, "group": r.get("group") or task.split("_")[1],
-                    "world": WORLDS.get(off, f"+{off}"), "success": bool(r.get("success")),
+                    "world": WORLDS.get(off, f"+{off}"), "natural_ore": needs_natural_ore(task),
+                    "success": bool(r.get("success")),
                     "steps": r.get("steps") or 0, "cost": r.get("cost_usd") or 0.0})
     return out
 
@@ -71,10 +74,11 @@ def main() -> int:
         by_group[cond] = {k: frac(v) for k, v in g.items()}
         by_world[cond] = {k: frac(v) for k, v in w.items()}
         n = len(eps) or 1
-        totals[cond] = {"success": frac(eps), "mean steps": f"{sum(e['steps'] for e in eps) / n:,.0f}",
+        totals[cond] = {"success": frac(eps), "rule ore enough": frac([e for e in eps if not e["natural_ore"]]),
+                        "natural ore needed": frac([e for e in eps if e["natural_ore"]]), "mean steps": f"{sum(e['steps'] for e in eps) / n:,.0f}",
                         "LLM cost": f"${sum(e['cost'] for e in eps):,.0f}", "$/episode": f"{sum(e['cost'] for e in eps) / n:.2f}"}
     groups = [x for x in GROUPS if any(x in r for r in by_group.values())]
-    print(table(totals, ["success", "mean steps", "LLM cost", "$/episode"]), "\n")
+    print(table(totals, ["success", "rule ore enough", "natural ore needed", "mean steps", "LLM cost", "$/episode"]), "\n")
     print(table(by_group, groups), "\n")
     print(table(by_world, ["A", "B", "C"]))
     if a.csv:

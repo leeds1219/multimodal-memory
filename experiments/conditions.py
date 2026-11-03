@@ -20,12 +20,14 @@ METHODS = {
     "baseline": {"switches": VLM},
     "mineevolve": {"switches": VLM, "mineevolve": "mineevolve"},  # store run_data/memory/me_mineevolve.json
     "gt_recipe": {"switches": VLM + [("OPTIMUS_VLM_RECIPES", "fixed")]},
-    "gt_world_rule": {"switches": VLM + [("OPTIMUS_VLM_OREHINT", "1")]},
+    "gt_world_rule": {"switches": VLM + [("OPTIMUS_VLM_OREHINT", "1")]},  # the rule in short
+    "gt_world_rule_v2": {"switches": VLM + [("OPTIMUS_VLM_OREHINT", "2")]},  # what the placing code does, step by step
     "ours": {"switches": VLM},  # + the World Knowledge store, Condition(knowledge=...)
 }
 WORLDS = {
     "standard": [],  # Optimus-1's env as released (with its hidden ore rule)
     "nolava": [("OPTIMUS_NOLAVA", "1")],  # lava near the agent becomes stone
+    "nolava_equipfix": [("OPTIMUS_NOLAVA", "1"), ("OPTIMUS_EQUIPFIX", "1")],  # + equip drops nothing (system1/tools/craft_helpers.py)
 }
 
 

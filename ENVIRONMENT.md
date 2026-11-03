@@ -74,7 +74,7 @@ paper** = a value from the paper where the code differs, **ours** = set by this 
 | Command output | hidden from the screen (`sendCommandFeedback false`) | Optimus-1 code (reset commands) |
 | Spawn biome | forest for wooden, gold, redstone, diamond, armor; plains for stone, iron | Optimus-1 code (`conf/benchmark/<group>.yaml`) |
 | Start inventory | empty | Optimus-1 code (`conf/benchmark/<group>.yaml`) |
-| Hidden ore rule | when the agent first reaches a height, 10% chance per step that an ore is placed 3-5 blocks below it, once per height; coal 45-50, iron 26-43, gold 15-26, redstone ≤ 16, diamond ≤ 14 | Optimus-1 code (`env/wrapper.py` `random_ore`) |
+| Hidden ore rule | 10% chance per step that an ore is placed 3-5 blocks below the agent; each height (the agent's and the ore's) is used once. By agent height y (ore landing height): coal 45-50 (≥ 45), iron 26-43 (≥ 26), gold 15-25 (≥ 17), else redstone (≤ 16), diamond ≤ 14 (≥ 1) | Optimus-1 code (`env/wrapper.py` `random_ore`) |
 | Action filters | dropping items is disabled; while attacking, jump/strafe/sneak/sprint are released; below y 70 the best pickaxe in the hotbar is selected automatically | Optimus-1 code (`env/wrapper.py`) |
 | Tasks | the 67 craft tasks of the benchmark | Optimus-1 paper (Table 5) and code (`conf/benchmark/`) |
 | Horizon | 3,600 / 7,200 / 12,000 / 36,000 steps (wooden / stone / iron / gold and harder); 20 steps = 1 s | Optimus-1 paper (Table 5); the code uses 2 / 5 / 20 / 30 minutes |
@@ -93,5 +93,5 @@ World options of an experiment (`--world`, `--save`):
 
 | Option | Effect |
 |---|---|
-| `--world nolava` | Every 20 steps, lava within 12 blocks of the agent becomes stone. Nothing appears on screen, and no game time is added |
+| `--world nolava` | Every 10 steps, lava within 12 blocks of the agent becomes stone (near the bottom: y 0 to 24). Nothing appears on screen, and no game time is added |
 | `--save N` | The world is saved every N steps, as starting points for the replay world. No game time is added |
