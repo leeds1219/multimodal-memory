@@ -56,7 +56,7 @@ def collect():
 
 
 def ledger():
-    from gemini_client import ledger_total
+    from client import ledger_total
     return ledger_total()
 
 

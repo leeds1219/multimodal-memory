@@ -177,7 +177,7 @@ def craft_graph(target: str | None) -> str | None:
 
 def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | None = None,
              task_id: str | None = None, mcdir: Path | None = None, side: dict | None = None) -> dict:
-    from gemini_client import GeminiClient
+    from client import LLMClient
     remaining = max(1, int(env.timeout) - int(env.num_steps))
     if os.environ.get("OPTIMUS_MAX_STEPS"):  # tests only: end the episode after this many steps
         remaining = min(remaining, int(os.environ["OPTIMUS_MAX_STEPS"]))
@@ -193,12 +193,12 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
     agent = VLMAgent(_Env(env), cfg, remaining, lambda m: lines.append(m), obs, mon, instruction, opts)
     me = None
     if os.environ.get("OPTIMUS_VLM_ME"):
-        from gemini_client import context
+        from client import context
         ctx = context()
         me = opts["me"] = mineevolve_memory.MineEvolve(os.environ["OPTIMUS_VLM_ME"], instruction, task_id, ctx.get("seed"),
                                                        ctx.get("order_id", ""))
         me.start(agent.prev, inv_counts(agent.obs))
-    client = GeminiClient()
+    client = LLMClient()
     history, n, t0 = [], 0, time.time()
     step0 = int(side["step"]) if side else 0  # episode step of the save this episode starts from
     if side:

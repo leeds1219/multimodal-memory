@@ -7,9 +7,9 @@ import re
 
 def ask_json(system: str, user: str, log: list, kind: str, max_tokens: int = 4000) -> dict | None:
     """The JSON object in the answer, or None; every call is appended to `log`."""
-    from gemini_client import GeminiClient
+    from client import LLMClient
     try:
-        resp = GeminiClient().chat.completions.create(
+        resp = LLMClient().chat.completions.create(
             model="FROM_CONFIG", max_tokens=max_tokens,
             messages=[{"role": "system", "content": system}, {"role": "user", "content": user}])
         txt = resp.choices[0].message.content or ""

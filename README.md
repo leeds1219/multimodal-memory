@@ -20,7 +20,7 @@ memory/         World Knowledge store, MineEvolve memory
 experiments/    conditions.py (method x world), run.py (start a condition), chain.py (episodes on one GPU),
                 ours_loop.py (the learning loop), optimus1/ (the Optimus-1 reproduction)
 analysis/       results: summary tables, episode browser pages
-llm/            the one LLM client (cost ledger, caps, retries, logs) and a mock for $0 tests
+llm/            the one LLM client (cost ledger, caps, retries, logs); backends in providers.py (Gemini, OpenAI-compatible/local, mock)
 configs/        LLM configs, the 67 benchmark tasks, seeds, recipe graphs
 setup/          environment setup, patches to the authors' code, pinned packages
 scripts/        server start, status, cleanup, the replay-world test

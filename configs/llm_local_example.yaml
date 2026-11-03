@@ -1,0 +1,22 @@
+# Example: a local model served with an OpenAI-compatible API, e.g.
+#   vllm serve Qwen/Qwen2.5-VL-7B-Instruct --port 8000      or      ollama serve (base_url http://localhost:11434/v1/)
+# Use it with LLM_CONFIG=configs/llm_local_example.yaml (or "llm": "local_example" in experiments/conditions.py).
+provider: openai
+model: Qwen/Qwen2.5-VL-7B-Instruct
+base_url: http://localhost:8000/v1/
+api_key_env: null             # local server without keys
+request_timeout_s: 300
+max_retries: 6
+default_temperature: null
+default_max_tokens: null
+price_in_per_m: 0.0           # local: no API cost (GPU time is not counted here)
+price_out_per_m: 0.0
+global_cap_usd: 6000.0
+soft_cap_usd: 4000.0
+max_usd_per_hour: 150.0
+ledger_path: run_data/llm_ledger.jsonl
+episode_cost_multiplier: 2000.0
+episode_call_multiplier: 2000.0
+cache: false
+cache_dir: run_data/llm_cache
+log_root: run_data

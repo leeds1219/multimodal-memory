@@ -26,7 +26,7 @@ Known traps:
   rebuilds it. The setup script sets the variable.
 - **transformers 5.x breaks the import of Optimus-1.** Keep 4.44.2.
 - **The patched Optimus-1 imports `gemini_client` by name.** The setup script writes `llm/` into a `.pth` file of
-  the env.
+  the env, and `llm/gemini_client.py` re-exports `llm/client.py` under that name.
 - **World saves need the patched jar.** `setup/build_saveall_jar.py` builds it, and only runs with world saves use
   it. In the released client the player cannot run `/save-all`.
 
@@ -43,7 +43,15 @@ repository root (git-ignored).
 
 ## LLM calls
 
-Every LLM call goes through `llm/gemini_client.py`:
+Every LLM call goes through `llm/client.py` (`LLMClient`, the OpenAI chat-completions interface). The config's
+`provider:` picks the backend in `llm/providers.py`:
+- `gemini`: Google's OpenAI-compatible endpoint (current runs).
+- `openai`: any OpenAI-compatible server (OpenAI, vLLM, Ollama, OpenRouter). A local model is served by vLLM or
+  Ollama and used with a localhost `base_url` and prices 0 (`configs/llm_local_example.yaml`).
+- `mock`: canned answers for $0 tests (also forced by `LLM_MOCK=1`).
+
+A backend without an OpenAI-compatible API gets its own class in `llm/providers.py`. The class converts the messages
+and returns the same response shape. Every call is handled the same way whatever the backend:
 - **Ledger.** Each call's cost is logged to `run_data/llm_ledger.jsonl`, and the call itself to
   `<episode>/llm/calls.jsonl`.
 - **Caps.** There is a global cap, an hourly cap and a per-episode runaway guard (`configs/llm_g38mon.yaml`). When

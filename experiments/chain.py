@@ -209,7 +209,7 @@ class Chain:
 
     # ------------------------------------------------------------------ main
     def run(self, tasks: list[str]) -> int:
-        from gemini_client import CFG, ledger_total
+        from client import CFG, ledger_total
         # The episodes run with the condition's LLM config (e.g. llm_g38mon.yaml): check that config's cap,
         # not the default llm.yaml one this process loaded.
         if self.env_vars.get("LLM_CONFIG"):

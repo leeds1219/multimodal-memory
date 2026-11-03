@@ -236,7 +236,7 @@ def main() -> int:
         os.environ["LLM_MOCK"] = "1"
     from conditions import Condition
     os.environ.setdefault("LLM_CONFIG", Condition("baseline", a.world, a.save).env_vars(RUN_DATA, REPRO)["LLM_CONFIG"])
-    from gemini_client import CFG
+    from client import CFG
     ctx = RUN_DATA / "state" / "ours_loop" / a.name / "ctx.json"
     ctx.parent.mkdir(parents=True, exist_ok=True)
     os.environ["LLM_CTX_FILE"] = str(ctx)
