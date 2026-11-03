@@ -197,7 +197,8 @@ def main() -> int:
     js = ("<script>const f=['c','g','w','s','o'];function u(){let n=0;document.querySelectorAll('tbody tr').forEach(r=>{"
           "const ok=f.every(k=>{const v=document.getElementById(k).value;return !v||r.dataset[k]===v});r.hidden=!ok;n+=ok});"
           "document.getElementById('n').textContent=n+' episodes'}f.forEach(k=>document.getElementById(k).onchange=u);u()</script>")
-    body = ("<h1>Episodes</h1>" + filt + "<table><thead><tr><th>condition</th><th>task</th><th>world</th><th>success</th>"
+    loop = "<p><a href='loop/index.html'>Learning-from-failure loop results &rarr;</a></p>" if (SITE / "loop" / "index.html").exists() else ""
+    body = ("<h1>Episodes</h1>" + loop + filt + "<table><thead><tr><th>condition</th><th>task</th><th>world</th><th>success</th>"
             "<th>steps</th><th>cost</th><th>ore</th><th>chain</th></tr></thead><tbody>" + trs + "</tbody></table>" + js)
     (SITE / "index.html").write_text(page("Episodes", body))
     print(f"{len(rows)} episodes -> {SITE / 'index.html'}")
