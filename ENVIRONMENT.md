@@ -93,9 +93,9 @@ What our code changes in every run (ours):
 
 | Change | Why | Where |
 |---|---|---|
-| A private Minecraft folder per episode | In the released setup, parallel instances share `saves/`, so the same seed could give a different world | `world/private_world.py` |
-| No "stuck" `/kill` | The released wrapper kills an agent that stays 8,000 steps at one height; the VLM decides instead | `system1/controller.py` |
-| No code stop on health or falls | The VLM decides | `system1/controller.py` |
+| A private Minecraft folder per episode | In the released setup, parallel instances share `saves/`, so the same seed could give a different world | `domains/minecraft/world/private_world.py` |
+| No "stuck" `/kill` | The released wrapper kills an agent that stays 8,000 steps at one height; the VLM decides instead | `domains/minecraft/agent/controller.py` |
+| No code stop on health or falls | The VLM decides | `domains/minecraft/agent/controller.py` |
 
 World options of an experiment (`--world`, `--save`):
 

@@ -180,7 +180,7 @@ class Chain:
                                   "instruction": TASKS[task]["instruction"], "episode_dir": str(ep),
                                   "run_id": f"{self.chain_id}/{self.a.order}/{task}"})
         server = self.start_server(ep)
-        cmd = ["xvfb-run", "-a", PY, str(REPRO / "world" / "episode.py"), "--task", task,
+        cmd = ["xvfb-run", "-a", PY, str(REPRO / "domains" / "minecraft" / "world" / "episode.py"), "--task", task,
                "--seed", str(seed), "--order-id", self.a.order, "--episode-dir", str(ep), "--port", str(self.a.port),
                "--workdir", str(self.wd)]
         t0 = time.time()

@@ -13,7 +13,7 @@ import json
 
 from llm_json import ask_json
 
-INPUT = """You improve a Minecraft agent that failed a task. You get:
+INPUT = """You improve a {domain} agent that failed a task. You get:
 - the failure point: the turn where a decision caused the failure, and why it caused the failure;
 - the other failure points found in the same failed attempt, with their turns;
 - the agent's own turns from the restart point to just after the failure point, as logged (command, its thought,
@@ -41,8 +41,7 @@ Propose a hypothesis and the change that tests it. Work in this order:
 7. prediction: what the game log will show at that moment if the hypothesis is right.
 8. plan: how the agent should make the change, in a few steps. Only the steps of the change itself: after it, the
    agent goes on with the task on its own.
-check_when and prediction: write them so that the game log (heights, position changes, inventory changes,
-health, deaths, command results) can show them. The experiment has its own turn numbers, so name turns only in
+check_when and prediction: write them so that the game log ({log_shows}) can show them. The experiment has its own turn numbers, so name turns only in
 evidence.
 {extra}
 Answer with JSON only:
@@ -63,16 +62,22 @@ def _user(fp, others, raw, state, **more) -> str:
                        "restart_point": state, "turns_from_restart": raw, **more}, ensure_ascii=False)
 
 
-def propose(fp: dict, others: list, raw: list, state: dict, tried: list, log: list, attempts: int = 3) -> dict | None:
+def propose_system(vocab, extra: str = "") -> str:
+    return PROPOSE_SYSTEM.format(domain=vocab.name, log_shows=vocab.log_shows, extra=extra)
+
+
+def propose(fp: dict, others: list, raw: list, state: dict, tried: list, log: list, vocab,
+            attempts: int = 3) -> dict | None:
     """`fp`: {turn, decision, reason}; `others`: the other failure points of the same log; `raw`: the agent's own
     turns from the restart point to just after fp; `state`: task, turn, step, height, inventory at the restart
-    point; `tried`: earlier experiments at fp, each the hypothesis with its verdict, observed and reason.
+    point; `tried`: earlier experiments at fp, each the hypothesis with its verdict, observed and reason;
+    `vocab`: the domain's words (domains/base.py).
     An unparsable answer is asked again, up to `attempts` calls; None if none parses."""
     extra = EXTRA_TRIED.format(tried="\n".join(json.dumps({k: t[k] for k in ("hypothesis", "change", "plan", "check_when",
                                                                          "prediction", "verdict", "observed", "reason")},
                                                           ensure_ascii=False) for t in tried)) if tried else ""
     for _ in range(attempts):
-        out = ask_json(PROPOSE_SYSTEM.format(extra=extra), _user(fp, others, raw, state), log, "propose")
+        out = ask_json(propose_system(vocab, extra), _user(fp, others, raw, state), log, "propose")
         if out and all(isinstance(out.get(k), str) and out[k].strip() for k in FIELDS):
             h = {k: out[k].strip() for k in FIELDS}
             return {**h, "statement": STATEMENT.format(**h), "blocked": out.get("blocked")}

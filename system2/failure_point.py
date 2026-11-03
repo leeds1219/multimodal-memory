@@ -1,6 +1,6 @@
-"""System 2, step 1: find the failure points in a compressed episode log (system2/episode_log.py): the turns whose
-decision was a mistake from what the agent could know then, and caused the failure. System 2 never sees the game,
-only the logs and the knowledge verified earlier.
+"""System 2, step 1: find the failure points in a compressed episode log (the domain's compress(), e.g.
+domains/minecraft/episode_log.py): the turns whose decision was a mistake from what the agent could know then, and
+caused the failure. System 2 never sees the game, only the logs and the knowledge verified earlier. The domain's words (domains/base.py Vocabulary) fill the prompt.
 """
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import json
 
 from llm_json import ask_json
 
-FIND_SYSTEM = """You review a failed attempt at a Minecraft task, made by an agent that sends one command per turn.
+FIND_SYSTEM = """You review a failed attempt at a {domain} task, made by an agent that sends one command per turn.
 You get a compressed log: a timeline, then one line per turn (or per run of turns where nothing changed), with the
 start of the agent's own thought.
 Find the failure points. A turn is a failure point only if both hold:
@@ -51,11 +51,15 @@ The log you get is the attempt after those changes; find the other causes of the
 {prev}"""
 
 
-def find(compressed: str, earlier: list, log: list) -> list | None:
+def find_system(vocab, extra: str = "") -> str:
+    return FIND_SYSTEM.format(domain=vocab.name, extra=extra)
+
+
+def find(compressed: str, earlier: list, log: list, vocab) -> list | None:
     """[{turn, decision, reason}], earliest turn first, or None for an unparsable answer. `earlier`: failure points
     whose change was supported earlier in this loop."""
     extra = FIND_EXTRA_NEXT.format(prev="\n".join(json.dumps(e, ensure_ascii=False) for e in earlier)) if earlier else ""
-    out = ask_json(FIND_SYSTEM.format(extra=extra), compressed, log, "find_failure_point")
+    out = ask_json(find_system(vocab, extra), compressed, log, "find_failure_point")
     if not out or not isinstance(out.get("failure_points"), list):
         return None
     found = {}

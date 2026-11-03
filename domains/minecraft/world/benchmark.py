@@ -25,16 +25,13 @@ from typing import Any, Dict, Mapping, Optional
 import numpy as np
 import yaml
 
-REPRO = Path(__file__).resolve().parents[1]
 # Data volume: the authors' clone (official/) and the conda env. Results and run data live in this repository
 # (both git-ignored): results/<agent>/<world>/... and run_data/ (memory stores, chain state, logs, LLM ledger).
-from paths import DATA  # noqa: E402
+from paths import DATA, RESULTS, RUN_DATA, ROOT as REPRO  # noqa: E402,F401
 OPTIMUS1_DIR = DATA / "official" / "NeurIPS24-Optimus-1"
 # The Optimus-1 paper's own tasks (configs/suites/optimus1/).
 SUITE = os.environ.get("REPRO_SUITE", "optimus1")
 CONFIGS = REPRO / "configs" / "suites" / SUITE
-RESULTS = REPRO / "results"
-RUN_DATA = REPRO / "run_data"
 MIN_FREE_GB = 5.0
 
 
@@ -90,10 +87,7 @@ def item_tags() -> Dict[str, list]:
     return {k: [i for m in vs for i in (raw.get(m, [m]) if m in raw else [m])] for k, vs in raw.items()}
 
 
-def write_ctx(ctx_file: str | os.PathLike, ctx: Mapping[str, Any]) -> None:
-    tmp = Path(str(ctx_file) + ".tmp")
-    tmp.write_text(json.dumps(dict(ctx)))
-    os.replace(tmp, ctx_file)
+from llm_context import write_ctx  # noqa: E402,F401  (the LLM call context; llm/llm_context.py)
 
 
 # ----------------------------------------------------------------------------

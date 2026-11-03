@@ -6,7 +6,7 @@ ended, the change in position / health / inventory, deaths, and the start of the
 and meant to do; the full thoughts go in the raw window around a failure point, raw_window()). Reads only
 turns.jsonl, trajectory.jsonl.gz and result.json: client.log, which names the ore placements, is never read.
 
-    python system2/episode_log.py <episode dir> [--raw T0 T1]
+    python domains/minecraft/episode_log.py <episode dir> [--raw T0 T1]
 """
 from __future__ import annotations
 

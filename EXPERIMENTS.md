@@ -30,7 +30,7 @@ At each turn the game pauses. The VLM (gemini-3.8-flash) sees the screen and its
 start, facing, health and inventory. It also sees its last 10 commands and what they did. It sends one command,
 which runs for the number of steps it chose: raw keys, a STEVE-1 instruction, or an equip / craft / smelt helper.
 The helpers are Optimus-1's own and are kept as released, quirks included: coping with an imperfect tool is part of
-what a method should learn. Code: `system1/`.
+what a method should learn. Code: `domains/minecraft/agent/` (with `system1/extras.py`).
 
 ## 3. Baseline + MineEvolve
 
@@ -47,7 +47,7 @@ gold ingots come from smelting gold ore, and each ore count matches the ingots o
 
 ## 5. Baseline + GT World Rule
 
-The hidden ore rule (ENVIRONMENT.md) is stated in the prompt, in one of two versions (`system1/prompts.py`):
+The hidden ore rule (ENVIRONMENT.md) is stated in the prompt, in one of two versions (`domains/minecraft/agent/prompts.py`):
 
 | Version | Method | Prompt text |
 |---|---|---|
@@ -77,7 +77,7 @@ The learning loop runs on each failed episode:
    how to avoid it, the change that tests the belief there, the moment the belief is checked at (the next time the
    agent needs what the problem was about) and what it predicts then.
 3. The game restarts from the last save before that turn (saves are 600 steps apart), and the agent tries the
-   change. It is told the change and how to make it, not the prediction (`world/replay.py`).
+   change. It is told the change and how to make it, not the prediction (`domains/minecraft/world/replay.py`).
 4. System 2 judges the experiment (`system2/judge.py`) from what the game recorded, not the agent's thoughts:
    Not reached (the check moment never came), Supported or Refuted (what the log shows at the first check
    moment). Task success does not decide it. A Supported problem and belief go to World Knowledge.

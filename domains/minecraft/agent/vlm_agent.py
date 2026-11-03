@@ -1,21 +1,21 @@
 """System 1: the Baseline agent. A VLM does the whole benchmark task, pausing the game every turn.
 
 Each turn gemini gets the overall task, the screen, the game-reported height, position relative to the start,
-facing, health and inventory, and how its last 10 commands ended (system1/prompts.py). It sends one command that
-runs for the number of steps it chose (system1/controller.py). No memory, no recipes, no reflection. The episode
-ends when the paper's success check (world/benchmark.py EpisodeMonitor) is met or the horizon runs out; deaths
+facing, health and inventory, and how its last 10 commands ended (domains/minecraft/agent/prompts.py). It sends one command that
+runs for the number of steps it chose (domains/minecraft/agent/controller.py). No memory, no recipes, no reflection. The episode
+ends when the paper's success check (domains/minecraft/world/benchmark.py EpisodeMonitor) is met or the horizon runs out; deaths
 respawn the agent, as in Optimus-1.
 
 What an experiment adds (environment variables set from the variant tokens by experiments/chain.py):
   OPTIMUS_VLM_RECIPES         the recipe graph in the prompt (GT Recipe; setup/build_craft_graphs.py)
   OPTIMUS_VLM_OREHINT=1       the hidden ore rule in the prompt (GT World Rule)
   OPTIMUS_VLM_ME              MineEvolve memory (memory/mineevolve_memory.py)
-  OPTIMUS_VLM_WK              verified World Knowledge in the prompt (memory/world_knowledge.py)
-  OPTIMUS_EXPERIMENT          an experiment of experiments/ours_loop.py: the change to try, in the prompt
-  OPTIMUS_NOLAVA=1            lava near the agent becomes stone every NOLAVA_EVERY steps (world change)
-  OPTIMUS_CKPT_EVERY=N        the world is saved every N steps (world/save.py)
+  OPTIMUS_VLM_WK              verified World Knowledge in the prompt (system1/extras.py)
+  OPTIMUS_EXPERIMENT          an experiment of experiments/ours_loop.py: the change to try (system1/extras.py)
+  OPTIMUS_NOLAVA=1            lava near the agent becomes stone every NOLAVA_EVERY steps (domains/minecraft/world/nolava.py)
+  OPTIMUS_CKPT_EVERY=N        the world is saved every N steps (domains/minecraft/world/save.py)
   OPTIMUS_MAX_STEPS=N         tests only: the episode ends after N steps
-An episode started from a save (world/replay.py) gets `side`: the step count, the VLM's history and start position.
+An episode started from a save (domains/minecraft/world/replay.py) gets `side`: the step count, the VLM's history and start position.
 
 Game commands sent during the episode (nolava, the world save) ride on the chat field of the agent's own action,
 one per step: an extra no-op tick would release held keys (Minecraft resets block breaking when attack is released)
@@ -29,30 +29,17 @@ import re
 import time
 from pathlib import Path
 
+import extras
 import mineevolve_memory
 import prompts as P
 import save
-import world_knowledge
 from controller import Controller
 from images import img, jpeg
 from inventory import inv_counts
+from nolava import NOLAVA_EVERY, nolava_cmds
+from paths import ROOT
 
-GRAPHS = Path(__file__).resolve().parents[1] / "configs/suites/optimus1/craft_graphs.json"
-NOLAVA_EVERY, NOLAVA_R = 10, 12  # (2R+1)^3 = 15625 blocks, under /fill's 32768
-# The fill is run by an invisible marker armor stand at the agent: a /fill that finds no lava fails, and a failure
-# run by the player prints a red "No blocks were filled" on its screen; run by the stand it prints nothing.
-# /fill refuses the whole box when a corner is below y 0, so the box is centred at max(y, R): near the bottom it is
-# y 0 to 2R, which still holds the agent.
-
-
-def nolava_cmds(y: float) -> tuple[str, str, str]:
-    r = NOLAVA_R
-    return ('/execute at @p run summon minecraft:armor_stand ~ ~ ~ {Invisible:1b,Marker:1b,NoGravity:1b,Silent:1b,Tags:["nolava"]}',
-            f"/execute as @e[tag=nolava] at @s positioned ~ {max(int(y), r)} ~ run fill ~-{r} ~-{r} ~-{r} ~{r} ~{r} ~{r} "
-            "minecraft:stone replace minecraft:lava",
-            "/kill @e[tag=nolava]")
-
-
+GRAPHS = ROOT / "configs/suites/optimus1/craft_graphs.json"
 class EnvBroken(RuntimeError):
     """Minecraft stopped answering (MineRL step timeout -> random observation, then done=True on every step).
     Raised out of the episode so the chain records a crash and retries it, instead of scoring an agent failure."""
@@ -130,12 +117,7 @@ class VLMAgent(Controller):
             out += P.GRAPH_NOTE.format(graph=self.opts["graph"].strip())
         if self.opts.get("me") is not None:
             out = out.replace(mineevolve_memory.ANSWER_LINE, mineevolve_memory.SUBGOAL_FORMAT) + self.opts["me"].prompt_text()
-        out += world_knowledge.prompt_text(self.opts.get("knowledge"))
-        if self.opts.get("experiment"):
-            h = self.opts["experiment"]
-            note = P.EXP_NOTE_START if self.opts.get("from_start") else P.EXP_NOTE
-            out += note.format(change=h["change"], plan=h["plan"])  # not the prediction: the agent must not aim at it
-        return out
+        return out + extras.prompt_text(self.opts)
 
     def ask(self, client, history, n_turn):
         hist = "\n".join(history[-P.N_HISTORY:]) or "(none yet)"
@@ -181,11 +163,9 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
     remaining = max(1, int(env.timeout) - int(env.num_steps))
     if os.environ.get("OPTIMUS_MAX_STEPS"):  # tests only: end the episode after this many steps
         remaining = min(remaining, int(os.environ["OPTIMUS_MAX_STEPS"]))
-    exp = json.loads(Path(os.environ["OPTIMUS_EXPERIMENT"]).read_text()) if os.environ.get("OPTIMUS_EXPERIMENT") else {}
     opts = {"graph": craft_graph(target), "me": None,
             "ore_hint": os.environ.get("OPTIMUS_VLM_OREHINT"), "nolava": os.environ.get("OPTIMUS_NOLAVA") == "1",
-            "knowledge": exp.get("knowledge") if exp else world_knowledge.load(os.environ.get("OPTIMUS_VLM_WK")),
-            "experiment": exp.get("hypothesis"), "from_start": exp.get("from_start")}
+            **extras.load()}  # World Knowledge, the experiment's change (system1/extras.py)
     save_every = int(os.environ.get("OPTIMUS_CKPT_EVERY") or 0)
     out = ep / "vlm"
     (out / "frames").mkdir(parents=True, exist_ok=True)

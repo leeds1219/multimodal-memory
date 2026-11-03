@@ -11,20 +11,31 @@ World Knowledge for later episodes. The hidden rule is how ore appears (ENVIRONM
 ## Layout
 
 ```
-system1/        the acting agent: VLM turn loop (vlm_agent.py), prompts, controller
-  tools/        what a command runs: raw keys, STEVE-1, Optimus-1's equip/craft/smelt helpers
-system2/        reasoning over episode logs: failure_point.py, hypothesis.py, judge.py, episode_log.py
-world/          Minecraft: one episode (episode.py), world saves (save.py), replay world (replay.py),
-                tasks / seeds / success check (benchmark.py), private world folder per episode
+system1/        what the method adds to any agent: World Knowledge and the experiment's change (extras.py)
+system2/        reasoning over episode logs: failure_point.py, hypothesis.py, judge.py (domain-free prompts)
 memory/         World Knowledge store, MineEvolve memory
 experiments/    conditions.py (method x world), run.py (start a condition), chain.py (episodes on one GPU),
                 ours_loop.py (the learning loop), optimus1/ (the Optimus-1 reproduction)
-analysis/       results: summary tables, episode browser pages
+domains/        everything specific to one environment; base.py = what a domain gives the method
+  minecraft/    domain.py (that interface), episode_log.py (the log System 2 reads), loop_ui.py (results page)
+    agent/      System 1: VLM turn loop (vlm_agent.py), prompts, controller, tools/ (keys, STEVE-1, helpers)
+    world/      one episode (episode.py), world saves and replay, tasks / seeds / success check (benchmark.py),
+                world rules (nolava.py), private world folder per episode
+analysis/       results: summary tables, episode browser pages, loop results page (loop_ui/)
 llm/            the one LLM client (cost ledger, caps, retries, logs); backends in providers.py (Gemini, OpenAI-compatible/local, mock)
 configs/        LLM configs, the 67 benchmark tasks, seeds, recipe graphs
 setup/          environment setup, patches to the authors' code, pinned packages
 scripts/        server start, status, cleanup, the replay-world test
 ```
+
+### Another domain or model
+
+- **Another model:** a config in `configs/` with `provider:` (`llm/providers.py`); a local model runs behind vLLM or
+  Ollama (`configs/llm_local_example.yaml`).
+- **Another environment:** a folder `domains/<name>/` with `domain.py` implementing `domains/base.py` (read
+  episodes, saves and states; run an episode), its own System 1 agent that appends `system1/extras.py`'s text to its
+  prompt, and a `Vocabulary` (the words System 2's prompts use). Select it with `MM_DOMAIN=<name>`. System 2, the
+  loop and the LLM layer stay as they are.
 
 ## Quick start
 

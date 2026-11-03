@@ -1,11 +1,11 @@
-"""The replay world: an episode that starts from a save of an earlier episode (world/save.py).
+"""The replay world: an episode that starts from a save of an earlier episode (domains/minecraft/world/save.py).
 
 OPTIMUS_LOAD_CKPT=<zip>: the env spec gets MineRL's LoadWorldAgentStart, so the env reset opens the saved world
 instead of generating one (the empty initial inventory and absent placement leave the saved player as is). Each
 load gets a copy of the zip whose world folder has a new unique name: MCP-Reborn unzips into
 java.io.tmpdir/<hex>/saves/<name>, and the unique name is how a later save in the replayed episode finds that folder.
-world/episode.py then restores what the zip does not hold (spawn point, ore rule state, step counters) and
-system1/vlm_agent.py the VLM's command history and start position.
+domains/minecraft/world/episode.py then restores what the zip does not hold (spawn point, ore rule state, step counters) and
+domains/minecraft/agent/vlm_agent.py the VLM's command history and start position.
 """
 from __future__ import annotations
 

@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 # Agents (EXPERIMENTS.md). Each is a list of switches (environment variable, value); LLM = configs/llm_<name>.yaml.
-VLM = [("OPTIMUS_VLMTASK", "1")]  # the Baseline agent, system1/vlm_agent.py
+VLM = [("OPTIMUS_VLMTASK", "1")]  # the Baseline agent, domains/minecraft/agent/vlm_agent.py
 METHODS = {
     "optimus1": {"memory": "prebuilt", "llm": "g38", "switches": [  # released Optimus-1 + labelled fixes
         ("OPTIMUS_LOGFIX", "1"), ("OPTIMUS_CRAFTFIX", "1"), ("OPTIMUS_TAGFIX", "1"), ("OPTIMUS_PROMPTFIX", "1"),
@@ -27,7 +27,7 @@ METHODS = {
 WORLDS = {
     "standard": [],  # Optimus-1's env as released (with its hidden ore rule)
     "nolava": [("OPTIMUS_NOLAVA", "1")],  # lava near the agent becomes stone
-    "nolava_equipfix": [("OPTIMUS_NOLAVA", "1"), ("OPTIMUS_EQUIPFIX", "1")],  # + equip drops nothing (system1/tools/craft_helpers.py)
+    "nolava_equipfix": [("OPTIMUS_NOLAVA", "1"), ("OPTIMUS_EQUIPFIX", "1")],  # + equip drops nothing (domains/minecraft/agent/tools/craft_helpers.py)
 }
 
 
@@ -63,7 +63,7 @@ class Condition:
     def env_vars(self, runs_root: Path, repo: Path) -> dict:
         a = METHODS[self.method]
         out = dict(a["switches"]) | dict(WORLDS[self.world])
-        out["OPTIMUS_ISOWORLD"] = "1"  # every episode in its own Minecraft world folder (world/private_world.py)
+        out["OPTIMUS_ISOWORLD"] = "1"  # every episode in its own Minecraft world folder (domains/minecraft/world/private_world.py)
         out["LLM_CONFIG"] = str(repo / "configs" / f"llm_{a.get('llm', 'g38mon')}.yaml")
         if a.get("mineevolve"):
             out["OPTIMUS_VLM_ME"] = str(runs_root / "memory" / f"me_{a['mineevolve']}.json")
