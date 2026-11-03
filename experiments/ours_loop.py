@@ -210,7 +210,7 @@ def main() -> int:
                         "task": loop.task, "seed": loop.seed, "episode_dir": str(loop.dir),
                         "run_id": f"ours_loop/{a.name}/{loop.task}_{loop.seed}"})
         stop_budget = Path(CFG["log_root"]) / "STOP_BUDGET"
-        if stop_budget.exists():
+        if stop_budget.exists() and not a.mock:  # mock calls cost nothing (the client skips its tripwire too)
             log("STOP: STOP_BUDGET present")
             return 2
         log(f"loop {loop.task} seed {loop.seed} from {line}")

@@ -158,9 +158,12 @@ def _stageb(text: str, kw: dict, ctx: dict) -> str | None:
 
 
 _SYSTEM2 = {  # System 2 roles (system2/): fixed answers, so the learning loop runs end to end at $0
-    "Find the failure point": {"turn": 8, "decision": "mock decision", "reason": "mock reason"},
-    "Propose one hypothesis": {"change": "dig straight down from here", "prediction": "a new ore appears in the inventory",
-                               "plan": "look down and attack", "statement": "mock statement"},
+    "Find the failure points.": {"blocked": "mock blocked", "failure_points": [
+        {"turn": 30, "decision": "mock decision", "known_then": "mock", "better": "mock better", "reason": "mock reason"}]},
+    "Propose a hypothesis and the change": {"blocked": {"turn": 30, "what": "mock"}, "evidence": "mock evidence",
+                                            "problem": "mock problem", "hypothesis": "mock hypothesis",
+                                            "change": "dig straight down from here", "check_when": "mock check moment",
+                                            "prediction": "a new ore appears in the inventory", "plan": "look down and attack"},
     "You judge an experiment": {"verdict": "Refuted", "observed": "mock observed", "reason": "mock reason"},
 }
 
@@ -169,6 +172,9 @@ def mock_response(kw: dict, ctx: dict):
     text = _text(kw)
     for key, answer in _SYSTEM2.items():
         if key in text:
+            if "failure_points" in answer:  # the last turn of the log given, so the failure point is a turn of it
+                turns = [int(t) for t in re.findall(r"^T(\d+)", text, re.M)]
+                answer = {**answer, "failure_points": [{**answer["failure_points"][0], "turn": max(turns, default=30)}]}
             return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=json.dumps(answer)),
                                                             finish_reason="stop")], usage=None)
     if ctx.get("method") in ("deps", "jarvis1"):
