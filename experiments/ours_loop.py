@@ -184,7 +184,7 @@ class Loop:
             if fp is None:
                 self.st["done"] = "no failure point left" + (" (unparsable answer)" if self.st.get("unparsable") else "")
                 break
-            hyp = hypothesis.propose({k_: fp[k_] for k_ in ("turn", "decision", "reason")}, fp.get("others", []),
+            hyp = hypothesis.propose({k_: fp.get(k_, "") for k_ in ("turn", "decision", "known_then", "better", "reason")}, fp.get("others", []),
                                      fp["raw"], fp["state"], fp["refuted"], self.events, self.dom.vocabulary)  # 3.
             if not hyp:
                 self.st["done"] = "proposal unparsable"

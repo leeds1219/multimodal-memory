@@ -14,7 +14,8 @@ import json
 from llm_json import ask_json
 
 INPUT = """You improve a {domain} agent that failed a task. You get:
-- the failure point: the turn where a decision caused the failure, and why it caused the failure;
+- the failure point: the turn where a decision caused the failure, what the agent could know then, the better
+  choice it could have made, and why the decision caused the failure;
 - the other failure points found in the same failed attempt, with their turns;
 - the agent's own turns from the restart point to just after the failure point, as logged (command, its thought,
   how it ended, what changed);
@@ -68,7 +69,7 @@ def propose_system(vocab, extra: str = "") -> str:
 
 def propose(fp: dict, others: list, raw: list, state: dict, tried: list, log: list, vocab,
             attempts: int = 3) -> dict | None:
-    """`fp`: {turn, decision, reason}; `others`: the other failure points of the same log; `raw`: the agent's own
+    """`fp`: {turn, decision, known_then, better, reason}; `others`: the other failure points of the same log; `raw`: the agent's own
     turns from the restart point to just after fp; `state`: task, turn, step, height, inventory at the restart
     point; `tried`: earlier experiments at fp, each the hypothesis with its verdict, observed and reason;
     `vocab`: the domain's words (domains/base.py).
