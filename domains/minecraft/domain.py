@@ -7,32 +7,33 @@ ore placements) reaches it.
 from __future__ import annotations
 
 import argparse
-import gzip
 import json
 from pathlib import Path
 
 import episode_log
+import prompts as P
 from domains.base import Domain, Vocabulary
 
 
 class Minecraft(Domain):
     name = "minecraft"
-    # log_shows keeps the line break the prompts had at this place
-    vocabulary = Vocabulary(name="Minecraft", log_shows="heights, position changes, inventory changes,\n"
-                                                        "health, deaths, command results")
+    vocabulary = Vocabulary(name="Minecraft")
     env_label = "O"
 
     def result(self, ep):
         return json.loads((Path(ep) / "result.json").read_text())
 
-    def turns(self, ep):
-        return [json.loads(l) for l in open(Path(ep) / "vlm" / "turns.jsonl")]
+    def turns(self, ep, until=None):
+        return episode_log.turns_of(Path(ep), until)
 
-    def compress(self, ep, parts=None):
-        return episode_log.compress(Path(ep), parts)
+    def commands(self):
+        return "\n".join([P.CMD_KEYS, P.CMD_STEVE, P.CMD_HELPERS])
 
-    def raw_window(self, ep, t_from, t_to):
-        return episode_log.raw_window(Path(ep), t_from, t_to)
+    def log(self, parts, milestones=None, markers=None):
+        return episode_log.render(parts, milestones, markers)
+
+    def checkpoints(self, ep):
+        return episode_log.checkpoints(Path(ep))
 
     def save_before(self, ep, turn):
         """Saves are taken at turn ends, so the last one at or before the turn's first step."""
@@ -43,37 +44,34 @@ class Minecraft(Domain):
         ok = [s for s in episode_log.checkpoints(ep) if s <= rows[turn]["t0"]]
         return (ep / "ckpt" / f"s{max(ok):06d}.zip", max(ok)) if ok else ("", 0)
 
-    def state_at(self, ep, turn):
-        ep = Path(ep)
-        res = self.result(ep)
-        ts, ps, _ = episode_log._positions(ep)
-        t0 = {t["turn"]: t for t in self.turns(ep)}[turn]["t0"]
-        inv = {}
-        for line in gzip.open(ep / "trajectory.jsonl.gz", "rt"):
-            d = json.loads(line)
-            if d["t"] > t0:
-                break
-            inv = d.get("inv", inv)
-        return {"task": res.get("instruction"), "turn": turn, "step": t0, "of_steps": res.get("horizon_steps"),
-                "height_y": round(episode_log._pos_at(ts, ps, t0)[1]), "inventory": inv}
+    def state_line(self, ep, clock, window):
+        return episode_log.state_line(Path(ep), clock, window)
+
+    def plan(self, ep):
+        f = Path(ep) / "vlm" / "plan.json"
+        plan = json.loads(f.read_text()).get("plan") if f.exists() else None
+        return "\n".join(f"{i}. have {s['count']} {s['item']}" for i, s in enumerate(plan, 1)) if plan else None
 
     def llm_config(self, opts):
         from conditions import Condition
         from paths import ROOT, RUN_DATA
-        return Condition("baseline", opts["world"], opts["save"]).env_vars(RUN_DATA, ROOT)["LLM_CONFIG"]
+        return Condition("baseline", opts["world"], opts["save_every"]).env_vars(RUN_DATA, ROOT)["LLM_CONFIG"]
 
     def run_episode(self, task, seed, ep, start_save, extras_file, opts):
-        """The Baseline agent (agent/vlm_agent.py) in world opts["world"], saving every opts["save"] steps; opts also
-        holds name (the chain's order is loop_<name>), gpu, port, mock."""
+        """The Baseline agent (agent/vlm_agent.py) in world opts["world"], saving every opts["save_every"] steps,
+        ending opts["max_steps"] steps after its start when set; opts also holds name (the chain's order is
+        loop_<name>), gpu, port, mock."""
         from benchmark import SEEDS
         from chain import Chain
-        ns = argparse.Namespace(method="baseline", world=opts["world"], save=opts["save"], knowledge=None,
+        ns = argparse.Namespace(method="baseline", world=opts["world"], save=opts["save_every"], knowledge=None,
                                 order=f"loop_{opts['name']}", gpu=opts["gpu"], port=opts["port"], retries=2,
                                 stall_min=60.0, mock=opts["mock"], seed_offset=seed - SEEDS[task])
         ch = Chain(ns)
         ch.env_vars.update(OPTIMUS_EXPERIMENT=str(extras_file))
         if start_save:
             ch.env_vars.update(OPTIMUS_LOAD_CKPT=str(Path(start_save).resolve()))
+        if opts.get("max_steps"):  # a rollout: the episode ends this many steps after its start
+            ch.env_vars.update(OPTIMUS_MAX_STEPS=str(opts["max_steps"]))
         return ch.run_episode(task, Path(ep))
 
 

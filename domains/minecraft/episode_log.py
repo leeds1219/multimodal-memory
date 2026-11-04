@@ -1,12 +1,11 @@
-"""Compressed view of one vlmtask episode for the Designer.
+"""The log of one vlmtask episode, or of a timeline of episodes, as the Designer reads it (designer/terms.py
+LOG_LAYOUT): one turn row per command, with the step range, height y before -> after (from the trajectory's
+positions), the command, how it ended, the changes (inventory, health, movement, deaths) and the agent's whole
+thought; turns in a row that changed nothing are one line. With milestones, the rows are grouped by segment under a
+heading line. Reads only turns.jsonl, trajectory.jsonl.gz and the saves: client.log, which names the ore
+placements, is never read.
 
-A timeline first: the turn each item was first obtained, and commands that failed more than once. Then one line per
-VLM turn: step range, height y before -> after (from the trajectory's positions), what the command was, how it
-ended, the change in position / health / inventory, deaths, and the start of the agent's own thought (what it saw
-and meant to do; the full thoughts go in the raw window around a failure point, raw_window()). Reads only
-turns.jsonl, trajectory.jsonl.gz and result.json: client.log, which names the ore placements, is never read.
-
-    python domains/minecraft/episode_log.py <episode dir> [--raw T0 T1]
+    python domains/minecraft/episode_log.py <episode dir> [--milestones log,planks,...]
 """
 from __future__ import annotations
 
@@ -65,154 +64,157 @@ def _effect_short(eff: str) -> str:
     return "; ".join(out)
 
 
-THOUGHT_CHARS = 160
+
+FAMILIES = ("log", "planks", "wool")  # generic item names: any <kind>_log counts as log (agent/planner.py)
 
 
 def _thought(t) -> str:
     th = " ".join(str(t.get("thought") or "").split())
-    return f'thought: "{th[:THOUGHT_CHARS]}{"..." if len(th) > THOUGHT_CHARS else ""}"' if th else ""
-
-
-def _turn_at(turns, t):
-    return next((x["turn"] for x in turns if x["t0"] <= t < x["t1"]), turns[-1]["turn"] if turns else 0)
-
-
-def timeline(parts: list, turns: list) -> list[str]:
-    """Facts already in the log, gathered: first time each item was in the inventory; repeated failures.
-    `parts`: [(episode, until_step or None)], the attempt from step 0."""
-    first = {}
-    for ep, until in parts:
-        for line in gzip.open(ep / "trajectory.jsonl.gz", "rt"):
-            d = json.loads(line)
-            if until is not None and d["t"] >= until:
-                break
-            for k, v in (d.get("inv") or {}).items():
-                if v > 0 and k not in first:
-                    first[k] = d["t"]
-    out = ["Timeline. First time each item was in the inventory (turn, step):",
-           "  " + ", ".join(f"{k} T{_turn_at(turns, t)} ({t})" for k, t in sorted(first.items(), key=lambda x: x[1]))]
-    fails = {}
-    for t in turns:
-        if str(t.get("outcome", "")).startswith("failed"):
-            fails.setdefault(_cmd_short(t["cmd"]), []).append(t)
-    rep = [(c, f) for c, f in fails.items() if len(f) >= 2]
-    if rep:
-        out.append("Commands that failed more than once:")
-        for c, f in sorted(rep, key=lambda x: x[1][0]["t0"]):
-            why = sorted({str(x.get("outcome"))[:60] for x in f})
-            out.append(f"  {c}: {len(f)} times, T{f[0]['turn']} ({f[0]['t0']}) to T{f[-1]['turn']} ({f[-1]['t0']}); "
-                       + " / ".join(why))
-    return out
+    return f'thought: "{th}"' if th else ""
 
 
 def checkpoints(ep: Path) -> list[int]:
     return sorted(int(p.stem[1:]) for p in (ep / "ckpt").glob("s*.zip")) if (ep / "ckpt").exists() else []
 
 
+def turns_of(ep: Path, until: int | None = None) -> list:
+    """The turns of episode ep that started before step `until` (None: all)."""
+    out = [json.loads(l) for l in open(Path(ep) / "vlm" / "turns.jsonl")]
+    return [t for t in out if until is None or t["t0"] < until]
+
+
 def _rows(ep: Path, turns: list) -> list:
+    """(turn, [turn, steps, height, command, how it ended, changes, thought]) per turn."""
     ts, ps, died = _positions(ep)
-    ck = checkpoints(ep)
     rows = []
     for t in turns:
         p0, p1 = _pos_at(ts, ps, t["t0"]), _pos_at(ts, ps, t["t1"])
         d = [f"T{t['turn']}", f"{t['t0']}-{t['t1']}", f"y {p0[1]:.0f}->{p1[1]:.0f}", _cmd_short(t["cmd"]),
-             str(t.get("outcome"))[:60]]
+             str(t.get("outcome"))]
         ch = _effect_short(t.get("effect", ""))
         mv = ((p1[0] - p0[0]) ** 2 + (p1[2] - p0[2]) ** 2) ** 0.5
         if mv >= 1:
             ch = f"moved {mv:.0f} blocks sideways" + (f"; {ch}" if ch else "")
         if any(t["t0"] < s <= t["t1"] for s in died):
             ch = "DIED (respawned)" + (f"; {ch}" if ch else "")
-        d.append(ch)
-        d.append(_thought(t))
-        rows.append((t, d, t["t1"] in ck))
+        d += [ch, _thought(t)]
+        rows.append((t, d))
     return rows
 
 
-def compress(ep: Path, parts: list | None = None) -> str:
-    """`parts`: the whole attempt from step 0, [(episode, until_step, note)], the last being `ep` (until None): each
-    part's turns before until_step, the parts after the first replayed from a save of the one before, `note` printed
-    where the part starts. None: `ep` alone."""
-    ep = Path(ep)
-    parts = [(Path(e), u, n) for e, u, n in parts] if parts else [(ep, None, None)]
-    res = json.loads((ep / "result.json").read_text())
-    pturns = [[t for t in (json.loads(l) for l in open(e / "vlm" / "turns.jsonl")) if u is None or t["t0"] < u]
-              for e, u, _ in parts]
-    turns = [t for ts_ in pturns for t in ts_]
-    ck = any(checkpoints(e) for e, _, _ in parts)
-    summ = json.loads((ep / "vlm" / "summary.json").read_text()) if (ep / "vlm" / "summary.json").exists() else {}
-    if len(parts) > 1:
-        start = [f"This attempt is shown from step 0: the turns before step {summ.get('start_step', '?')} come from the "
-                 f"earlier attempts it was replayed from (marked below)."]
-    elif summ.get("start_step"):
-        start = [f"This attempt started from a saved moment of an earlier attempt, at step {summ['start_step']} "
-                 f"(turn {turns[0]['turn'] - 1 if turns else '?'} of that attempt)."]
-    else:
-        start = []
-    head = [f"Task: {res.get('instruction')}",
-            f"Result: {'succeeded' if res.get('success') else 'failed'} after {res.get('steps')} of {res.get('horizon_steps')} steps, "
-            f"{len(turns)} turns. Final inventory: {json.dumps(res.get('final_inventory') or {})}",
-            *start,
-            *timeline([(e, u) for e, u, _ in parts], turns),
-            "Turns. Columns: turn | steps | height y start->end | command | how it ended | changes | the agent's thought"
-            + (" | [saved] = the world was saved after this turn" if ck else "")]
-    body = []
-    for (e, _, note), ts_ in zip(parts, pturns):
-        if note:
-            body.append(f"-- {note} --")
-        body += _merge(_rows(e, ts_))
-    return "\n".join(head + body)
+def _gains(t) -> dict:
+    """Items the turn added to the inventory: {item: n}."""
+    m = re.search(r"inventory change (\{.*?\})", t.get("effect") or "")
+    return {k: v for k, v in json.loads(m.group(1)).items() if v > 0} if m else {}
 
 
-def _merge(rows) -> list[str]:
-    """Runs of turns that changed nothing (same height, no change listed, same command type, no save) -> one line."""
+def _is(item_id: str, milestone: str) -> bool:
+    return item_id == milestone or (milestone in FAMILIES and item_id.endswith("_" + milestone))
+
+
+def _merge(rows, keep: set) -> list[str]:
+    """Runs of 3+ turns that changed nothing (same height, no change listed, same command type) -> one line. A turn
+    in `keep` (a marker goes before it) starts a new run."""
     out, run = [], []
 
     def flush():
         if len(run) < 3:
-            out.extend(" | ".join(x for x in d if x) for _, d, _ in run)
+            out.extend(" | ".join(d) for _, d in run)
         else:
-            (t0, d0, _), (t1, d1, _) = run[0], run[-1]
-            kinds = sorted({_cmd_short(t["cmd"]).split(" ")[0] for t, _, _ in run})
+            (t0, d0), (t1, _) = run[0], run[-1]
+            kinds = sorted({_cmd_short(t["cmd"]).split(" ")[0] for t, _ in run})
             out.append(" | ".join([f"T{t0['turn']}-T{t1['turn']}", f"{t0['t0']}-{t1['t1']}", d0[2],
-                                   f"{len(run)} turns of {'/'.join(kinds)}, e.g. {d0[3]}", "nothing changed"]
-                                  + ([f"first {d0[6]}"] if d0[6] else [])))
+                                   f"{len(run)} turns of {'/'.join(kinds)}, e.g. {d0[3]}", "nothing changed"]))
         run.clear()
 
-    for t, d, saved in rows:
-        quiet = not d[5] and d[2].split("->")[0][2:] == d[2].split("->")[1] and not saved
+    for t, d in rows:
+        quiet = not d[5] and d[2].split("->")[0][2:] == d[2].split("->")[1] and t["turn"] not in keep
         if quiet and run and _cmd_short(run[-1][0]["cmd"]).split(" ")[0] == _cmd_short(t["cmd"]).split(" ")[0] \
                 and run[-1][1][2] == d[2]:
-            run.append((t, d, saved))
+            run.append((t, d))
             continue
         flush()
         if quiet:
-            run.append((t, d, saved))
+            run.append((t, d))
         else:
-            out.append(" | ".join([x for x in d[:6]] + ([d[6]] if d[6] else []) + (["[saved]"] if saved else [])))
+            out.append(" | ".join(d))
     flush()
     return out
 
 
-def raw_window(ep: Path, t_from: int, t_to: int) -> list[dict]:
-    """The turns t_from..t_to as logged (command, thought, outcome, effect), for the failure point's context."""
+def segments(turns: list, milestones: list) -> list:
+    """The turns cut at each milestone's first gain: [(turns, milestone item or None at the timeline end)]."""
+    left, segs, cur = list(milestones), [], []
+    for t in turns:
+        cur.append(t)
+        got = [m for m in left if any(_is(k, m) for k in _gains(t))]
+        if got:
+            for m in got:
+                left.remove(m)
+            segs.append((cur, got[-1]))
+            cur = []
+    if cur:
+        segs.append((cur, None))
+    return segs
+
+
+def render(parts: list, milestones: list | None = None, markers: dict | None = None) -> str:
+    """The log of a timeline: `parts` [(episode, until_step or None, marker line or None)], each part's turns before
+    until_step, the marker printed where the part starts. `milestones` (item names, in order): rows grouped by
+    segment under heading lines; None: rows only. `markers` {turn: [lines]}: printed just before that turn."""
+    markers = {k: list(v) for k, v in (markers or {}).items()}
+    rows, turns = [], []
+    for ep, until, mark in parts:
+        ts_ = turns_of(Path(ep), until)
+        if mark and ts_:
+            markers.setdefault(ts_[0]["turn"], []).insert(0, mark)
+        rows += _rows(Path(ep), ts_)
+        turns += ts_
+    by_turn = {t["turn"]: (t, d) for t, d in rows}
+
+    def lines(ts_):
+        out, run = [], []
+        for t in ts_:
+            if t["turn"] in markers:
+                out += _merge(run, set())
+                run = []
+                out += markers[t["turn"]]
+            run.append(by_turn[t["turn"]])
+        return out + _merge(run, set())
+
+    if milestones is None:
+        return "\n".join(lines(turns))
     out = []
-    for l in open(Path(ep) / "vlm" / "turns.jsonl"):
-        t = json.loads(l)
-        if t_from <= t["turn"] <= t_to:
-            out.append({k: t.get(k) for k in ("turn", "t0", "t1", "cmd", "thought", "outcome", "effect")})
-    return out
+    for n, (ts_, m) in enumerate(segments(turns, milestones), 1):
+        ended = f"ended with milestone {m}" if m else "ended at the timeline end"
+        out.append(f"== Segment {n}: T{ts_[0]['turn']}-T{ts_[-1]['turn']}, steps {ts_[0]['t0']}-{ts_[-1]['t1']} "
+                   f"({ts_[-1]['t1'] - ts_[0]['t0']} steps), {ended} ==")
+        out += lines(ts_)
+    return "\n".join(out)
+
+
+def state_line(ep: Path, step: int, window: int) -> str:
+    """The restart point as the Designer is told it: step, the turn before it, the window, height, inventory."""
+    ep = Path(ep)
+    before = [t for t in turns_of(ep) if t["t1"] <= step]
+    ts, ps, _ = _positions(ep)
+    inv = {}
+    for line in gzip.open(ep / "trajectory.jsonl.gz", "rt"):
+        d = json.loads(line)
+        if d["t"] > step:
+            break
+        inv = d.get("inv", inv)
+    inv_s = ", ".join(f"{k} {v}" for k, v in sorted(inv.items()) if v) or "empty"
+    after = f"after T{before[-1]['turn']}" if before else "before the first turn"
+    return f"step {step} ({after}), window {window} steps, y {_pos_at(ts, ps, step)[1]:.0f}, inventory: {inv_s}"
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("ep")
-    ap.add_argument("--raw", nargs=2, type=int)
+    ap.add_argument("--milestones", default=None, help="comma list: group the rows by segment")
     a = ap.parse_args()
-    if a.raw:
-        print(json.dumps(raw_window(Path(a.ep), *a.raw), indent=1))
-    else:
-        print(compress(Path(a.ep)))
+    print(render([(Path(a.ep), None, None)], a.milestones.split(",") if a.milestones else None))
     return 0
 
 

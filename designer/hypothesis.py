@@ -1,92 +1,111 @@
-"""The Designer, step 2: propose one hypothesis at a failure point: the problem the decision there caused later, the
-belief about how to avoid it, the change that tests the belief there, the moment
-the belief is checked at (the next time the agent needs what the problem was about) and what it predicts then, and
-how to make the change. The statement kept as World Knowledge if Supported is the problem and the belief, said
-in general; the evidence (turns of this attempt) is kept apart.
-The failure point is chosen by the loop (earliest first); the other failure points of the same log are context.
-A retry at the same failure point gets the hypotheses tested there, with what their experiments showed, and
-proposes a different one (or the same change with a plan the agent can follow).
+"""The Designer, step 2: one hypothesis at one failure point (designer/terms.py "Hypothesis"): S, A and R in the
+words of the log, the change the agent is given, and the prediction (when, what) the rollouts are judged by. A retry
+at the same failure point gets that point's experiment record. The statement goes to World Knowledge with its
+verdict.
 """
 from __future__ import annotations
 
-import json
-
 from llm_json import ask_json
+from terms import COMMANDS_INPUT, KNOWLEDGE_LINES, MILESTONES_INPUT, PLAN_INPUT, tagged, terms
 
-INPUT = """You improve a {domain} agent that failed a task. You get:
-- the failure point: the turn where a decision caused the failure, what the agent could know then, the better
-  choice it could have made, and why the decision caused the failure;
-- the other failure points found in the same failed attempt, with their turns;
-- the agent's own turns from the restart point to just after the failure point, as logged (command, its thought,
-  how it ended, what changed);
-- the restart point: the last save before the failure point, and the agent's state there.
-An experiment will restart the game at the restart point. The turns between it and the failure point are played
-again and need not go the same way: something that happened then (for example, an item lost) may not happen again,
-or may happen differently."""
+HEAD = """You are the Designer. You propose one hypothesis at one failure point of a failed attempt at a {domain}
+task, and the experiment that tests it.
 
-PROPOSE_SYSTEM = INPUT + """
-Propose a hypothesis and the change that tests it. Work in this order:
-1. blocked: the earliest later moment of the failed attempt where the agent was blocked because of the decision at
-   the failure point: its turn, and what blocked it then, as the log shows.
-2. evidence: the turns and log lines that show how the decision at the failure point led to the block.
-3. problem: what goes wrong, said in general: what such a decision causes later (for example, what the agent
-   then lacks and why). No turns, no details only this attempt had: it must make sense to an agent in another
-   attempt at another task.
-4. hypothesis: the belief about how to avoid the problem, as the agent should act on it at such a moment.
-5. change: what the agent should do from the restart point on to test the hypothesis. If it answers something that
-   happened between the restart point and the failure point, write it as what to do when that happens (when ...,
-   do ...), since it may not happen the same way again. It must be something the agent can do from there.
-6. check_when: the moment the hypothesis is checked at: the next time the agent needs what the problem was about
-   (for example, the next time it tries the action it was blocked at). Describe it by what the agent does or has
-   then, not by turn numbers.
-7. prediction: what the game log will show at that moment if the hypothesis is right.
-8. plan: how the agent should make the change, in a few steps. Only the steps of the change itself: after it, the
-   agent goes on with the task on its own.
-check_when and prediction: write them so that the game log ({log_shows}) can show them. The experiment has its own turn numbers, so name turns only in
-evidence.
-{extra}
+""" + terms("Episode", "Attempt", "Timeline", "Milestone", "Turn row", "Failure point", "Kinds of failure point",
+            "World Knowledge", "Restart point", "Rollout", "Window", "Hypothesis", "Change", "Prediction",
+            "Experiment record") + """
+
+Input:
+- <task>: the task, one line.
+""" + COMMANDS_INPUT + "\n" + MILESTONES_INPUT + """
+- <failure_point>: the failure point to work on, one field per line:
+    turn: T<turn>
+    kind: <mismatch | missed response | ignored knowledge | judgment>
+    decision: <what the agent decided, and what it believed then>
+    shown: <what the log shows instead; for judgment, the better choice>
+    knowledge: <the Supported item of World Knowledge it went against, or empty>
+    evidence: <the turn rows that show it>
+- <restart>: the restart point, one line:
+    step <step> (after T<turn>), window <window steps> steps, y <height>, inventory: <item> <n>, <item> <n>, ...
+- <log>: the timeline the failure point is in, in the same layout as the failure point search: segment
+  headings, turn rows and markers for episodes replayed from a save. Two more markers show where the
+  restart point and the failure point are:
+    -- Restart point: the experiment starts here --
+    -- Failure point: T<turn> --
+- <knowledge>: the World Knowledge, one hypothesis per line (may be empty):
+""" + KNOWLEDGE_LINES + """
+- <record>: the experiment record of this failure point, one experiment per block (may be empty):
+    hypothesis: <in S, doing A leads to R>
+    change: start <...>; do <...>; stop <...>
+    prediction: when <...>; what <...>
+    verdict: <Refuted | Not reached>
+    observed: <what the log of each rollout showed>"""
+
+WORK = """
+
+Write, in this order:
+1. hypothesis: S, A and R, filled by the kind of the failure point:
+   - mismatch: S is the state at the failure point, A its command, R the unexpected result that came;
+     the hypothesis says this result is a rule, not chance;
+   - missed response: S is the state after the unexpected result, A the command the agent should have
+     sent then, R the result that command should give;
+   - ignored knowledge: S is the state at the failure point, A what the knowledge says to do, R what
+     doing it in this situation gives;
+   - judgment: S is the state at the failure point, A the better choice, R the result it should give.
+   Within the window, the agent must be able to meet S and do A. A hypothesis whose test needs longer
+   than the window is the wrong hypothesis: pick an S and A that come sooner. It must not
+   be in <knowledge> or <record>, unless an observation there shows what is different; then say what is
+   different.
+2. change: start, what to do, stop, using <commands>. It brings the agent to S and has it do A. The agent
+   is given the change, not the hypothesis or the prediction.
+3. plan: the few steps of the change only; after it the agent goes on with the task on its own.
+4. prediction: when and what. If <record> has a verdict Not reached, pick an S and A the agent will meet
+   sooner.
+
 Answer with JSON only:
-{{"blocked": {{"turn": <turn number>, "what": "..."}}, "evidence": "...", "problem": "...", "hypothesis": "...", "change": "...",
-  "check_when": "...", "prediction": "...", "plan": "..."}}"""
-
-EXTRA_TRIED = """Hypotheses already tested from this restart point that were not supported, with what the experiment's log
-showed. Propose a different hypothesis or a different change, or the same change with a plan the agent can
-follow if the log shows it did not make it:
-{tried}"""
-
-EXTRA_FAILED = """Hypotheses tested in earlier experiments (at other failure points or in other episodes) that were not
-supported, with what the experiment's log showed. Use them to avoid proposing what already did not work:
-{failed}"""
-
-FIELDS = ("evidence", "problem", "hypothesis", "change", "check_when", "prediction", "plan")
-STATEMENT = "{problem} {hypothesis}"
+{{"hypothesis": {{"situation": "...", "action": "...", "result": "..."}},
+ "statement": "<one sentence: in S, doing A leads to R>",
+ "change": {{"start": "...", "do": "...", "stop": "..."}}, "plan": "...",
+ "prediction": {{"when": "...", "what": "..."}},
+ "differs_from": "<the item of <knowledge> or <record> it revises and how, or empty>"}}"""
 
 
-def _user(fp, others, raw, state, **more) -> str:
-    return json.dumps({"task": state.get("task"), "failure_point": fp, "other_failure_points": others,
-                       "restart_point": state, "turns_from_restart": raw, **more}, ensure_ascii=False)
+def propose_system(vocab, plan: bool) -> str:
+    return HEAD.format(domain=vocab.name) + ("\n" + PLAN_INPUT if plan else "") + WORK.format()
 
 
-def propose_system(vocab, extra: str = "") -> str:
-    return PROPOSE_SYSTEM.format(domain=vocab.name, log_shows=vocab.log_shows, extra=extra)
+def fp_lines(fp: dict) -> str:
+    return "\n".join([f"turn: T{fp['turn']}"] + [f"{k}: {fp.get(k, '')}" for k in
+                                                 ("kind", "decision", "shown", "knowledge", "evidence")])
 
 
-def propose(fp: dict, others: list, raw: list, state: dict, tried: list, log: list, vocab,
-            attempts: int = 3, failed: list | None = None) -> dict | None:
-    """`fp`: {turn, decision, known_then, better, reason}; `others`: the other failure points of the same log; `raw`: the agent's own
-    turns from the restart point to just after fp; `state`: task, turn, step, height, inventory at the restart
-    point; `tried`: earlier experiments at fp, each the hypothesis with its verdict, observed and reason;
-    `vocab`: the domain's words (domains/base.py); `failed`: hypotheses not supported elsewhere (memory/failed_hypotheses.py).
-    An unparsable answer is asked again, up to `attempts` calls; None if none parses."""
-    extra = EXTRA_TRIED.format(tried="\n".join(json.dumps({k: t[k] for k in ("hypothesis", "change", "plan", "check_when",
-                                                                         "prediction", "verdict", "observed", "reason")},
-                                                          ensure_ascii=False) for t in tried)) if tried else ""
-    if failed:
-        extra += ("\n" if extra else "") + EXTRA_FAILED.format(failed="\n".join(
-            json.dumps({k: f[k] for k in ("statement", "change", "verdict", "observed")}, ensure_ascii=False) for f in failed))
+def change_text(c) -> str:
+    """The change as one line: start, do, stop."""
+    return f"start {c.get('start', '')}; do {c.get('do', '')}; stop {c.get('stop', '')}" if isinstance(c, dict) else str(c)
+
+
+def record_lines(record: list) -> str:
+    return "\n\n".join("\n".join([f"hypothesis: {e['statement']}", f"change: {change_text(e['change'])}",
+                                  f"prediction: when {e['prediction']['when']}; what {e['prediction']['what']}",
+                                  f"verdict: {e['verdict']}", f"observed: {e['observed']}"]) for e in record)
+
+
+def propose(task: str, commands: str, milestones: str, fp: dict, restart: str, log_text: str, knowledge: str,
+            record: list, plan: str | None, events: list, vocab, attempts: int = 3) -> dict | None:
+    """{hypothesis {situation, action, result}, statement, change {start, do, stop}, plan, prediction {when, what},
+    differs_from}; an unparsable answer is asked again, up to `attempts` calls; None if none parses."""
+    user = tagged(task=task, commands=commands, milestones=milestones, failure_point=fp_lines(fp), restart=restart,
+                  log=log_text, knowledge=knowledge, record=record_lines(record), plan=plan)
     for _ in range(attempts):
-        out = ask_json(propose_system(vocab, extra), _user(fp, others, raw, state), log, "propose")
-        if out and all(isinstance(out.get(k), str) and out[k].strip() for k in FIELDS):
-            h = {k: out[k].strip() for k in FIELDS}
-            return {**h, "statement": STATEMENT.format(**h), "blocked": out.get("blocked")}
+        out = ask_json(propose_system(vocab, bool(plan)), user, events, "propose")
+        try:
+            h, c, p = out["hypothesis"], out["change"], out["prediction"]
+            hyp = {"hypothesis": {k: str(h[k]) for k in ("situation", "action", "result")},
+                   "statement": str(out["statement"]), "change": {k: str(c[k]) for k in ("start", "do", "stop")},
+                   "plan": str(out.get("plan", "")), "prediction": {k: str(p[k]) for k in ("when", "what")},
+                   "differs_from": str(out.get("differs_from", ""))}
+        except (TypeError, KeyError):
+            continue
+        if hyp["statement"].strip() and all(hyp["hypothesis"].values()):
+            return hyp
     return None

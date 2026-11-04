@@ -1,73 +1,65 @@
-"""The Designer, step 1: find the failure points in a compressed episode log (the domain's compress(), e.g.
-domains/minecraft/episode_log.py): the turns whose decision was a mistake from what the agent could know then, and
-caused the failure. The Designer never sees the game, only the logs and the knowledge verified earlier. The domain's words (domains/base.py Vocabulary) fill the prompt.
+"""The Designer, step 1: list every failure point of one timeline (designer/terms.py "Failure point"): the turns whose
+turn rows show a mismatch, a missed response, ignored knowledge, or by the Designer's own judgment a better choice.
+The loop tests them by turn, earliest first.
 """
 from __future__ import annotations
 
-import json
-
 from llm_json import ask_json
+from terms import COMMANDS_INPUT, KNOWLEDGE_LINES, MILESTONES_INPUT, PLAN_INPUT, TIMELINE_LOG, tagged, terms
 
-FIND_SYSTEM = """You review a failed attempt at a {domain} task, made by an agent that sends one command per turn.
-You get a compressed log: a timeline, then one line per turn (or per run of turns where nothing changed), with the
-start of the agent's own thought.
-Find the failure points. A turn is a failure point only if both hold:
-- It was a mistake then: from what the agent could know at that turn (the task, its inventory and state, its own
-  thoughts and earlier turns), a better choice was clear. Judge it as the agent stood then, not by what happened
-  later.
-- It mattered: had the agent made that better choice at that turn, from the state it was in then, the task would
-  likely have succeeded.
-Judge each turn on its own, from the state the agent was in at that turn. A turn counts even when an earlier
-failure point also caused the failure: list every turn that passes, not only the first.
-A decision that was reasonable then and turned bad only because of a later mistake is not a failure point; that
-later mistake is.
-When a command had an effect it was not meant to have (for example, an inventory change that the command does
-not explain), or something else the agent did not decide hurt the task (an item lost, used up or broken, damage
-taken), the failure point is the agent's response to it: the first turn after it where the log showed it and
-the agent could still undo or avoid its effect, but did not.
+KINDS = ("mismatch", "missed response", "ignored knowledge", "judgment")
+
+HEAD = """You are the Designer. You review one timeline of a failed attempt at a {domain} task, played by an agent that sends one
+command per turn, and find its failure points.
+
+""" + terms("Episode", "Attempt", "Timeline", "Milestone", "Turn row", "Segment", "Failure point",
+            "Kinds of failure point", "Rollout", "World Knowledge") + """
+
+Input:
+- <task>: the task, one line.
+""" + COMMANDS_INPUT + "\n" + MILESTONES_INPUT + "\n" + TIMELINE_LOG + """
+- <knowledge>: the World Knowledge, one hypothesis per line (may be empty):
+""" + KNOWLEDGE_LINES + """
+  Supported: it holds. Refuted: it does not hold. The agent was given the Supported ones. Hypotheses tried
+  in this attempt outside this timeline are here too."""
+
+WORK = """
+
 Work in this order:
-1. Where did the steps go? Find the periods where the agent made no progress toward the task, and what blocked it
-   in each (the log lines and the agent's thoughts show it).
-2. What did the agent lack when it was blocked? For each such item, find in the inventory changes every turn
-   where it, or what it is made from, was lost or used up, and what the agent did right after.
-3. Collect candidates: the turns found in step 2, the turns that brought about each blocked period, and every turn
-   inside a blocked period where the agent chose what to do about what it lacked.
-4. Test each candidate on its own with both tests above. A turn inside a blocked period, or after an earlier
-   failure point, is not only a consequence: if a better choice was clear then and would likely have led to
-   success from there, it is a failure point.
-5. List every candidate that passes, earliest first.
-An experiment will restart the game from the last save before a failure point (turns marked [saved]); the turns
-between that save and the failure point are played again, and need not go the same way.
-{extra}
+1. Go through the timeline turn by turn. Compare each result with the thought before it, and with what
+   <commands> says the command does.
+2. List every failure point: every turn whose turn rows show one of the four kinds. Do not choose among
+   them or leave one out because it looks small; each will be tested.
+3. For each failure point, write what the agent believed or did, and what the log shows instead (for
+   judgment: the better choice).
+4. A turn a marker line says was tried already: list it only if the log after the marker shows a
+   different cause, and say what is different.
+5. Order the list by turn, earliest first.
+
 Answer with JSON only:
-{{"blocked": "<the periods without progress and what blocked each, with turns>",
-  "failure_points": [{{"turn": <turn number>, "decision": "<what the agent decided at that turn>",
-    "known_then": "<what the agent could see or knew at that turn that made a better choice clear>",
-    "better": "<the better choice it could have made then>",
-    "reason": "<how this decision led to the failure, with the turns and log lines that show it>"}}, ...]}}"""
-
-FIND_EXTRA_NEXT = """This attempt was played in parts: after each failure point found before, the game was replayed from a
-save with a change. The log shows every part from step 0. The experiments so far, each with its failure point, the
-change, the verdict on its prediction and what was observed:
-{prev}
-Find the failure points in the whole log, earlier parts included. Do not list a turn already tried above."""
+{{"failure_points": [{{"turn": <n>, "kind": "mismatch" | "missed response" | "ignored knowledge" | "judgment",
+  "decision": "<what the agent decided, and what it believed then>",
+  "shown": "<what the log shows instead; for judgment, the better choice>",
+  "knowledge": "<the Supported item of <knowledge> it went against, or empty>",
+  "evidence": "<the turn rows that show it>"}}, ...]}}"""
 
 
-def find_system(vocab, extra: str = "") -> str:
-    return FIND_SYSTEM.format(domain=vocab.name, extra=extra)
+def find_system(vocab, plan: bool) -> str:
+    """The prompt; the plan input only when the agent planned (no placeholder otherwise)."""
+    return HEAD.format(domain=vocab.name) + ("\n" + PLAN_INPUT if plan else "") + WORK.format()
 
 
-def find(compressed: str, earlier: list, log: list, vocab) -> list | None:
-    """[{turn, decision, reason}], earliest turn first, or None for an unparsable answer. `earlier`: the experiments
-    so far in this loop (failure point, change, verdict, observed); `compressed`: the whole attempt from step 0."""
-    extra = FIND_EXTRA_NEXT.format(prev="\n".join(json.dumps(e, ensure_ascii=False) for e in earlier)) if earlier else ""
-    out = ask_json(find_system(vocab, extra), compressed, log, "find_failure_point")
+def find(task: str, commands: str, milestones: str, log_text: str, knowledge: str, plan: str | None, events: list,
+         vocab) -> list | None:
+    """[{turn, kind, decision, shown, knowledge, evidence}] by turn, or None for an unparsable answer."""
+    out = ask_json(find_system(vocab, bool(plan)), tagged(task=task, commands=commands, milestones=milestones,
+                                                          log=log_text, knowledge=knowledge, plan=plan),
+                   events, "find_failure_point")
     if not out or not isinstance(out.get("failure_points"), list):
         return None
     found = {}
     for f in out["failure_points"]:
         if isinstance(f, dict) and isinstance(f.get("turn"), int) and f["turn"] not in found:
-            found[f["turn"]] = {"turn": f["turn"], "decision": str(f.get("decision", "")),
-                                "known_then": str(f.get("known_then", "")), "better": str(f.get("better", "")),
-                                "reason": str(f.get("reason", ""))}
+            found[f["turn"]] = {"turn": f["turn"], **{k: str(f.get(k, "")) for k in
+                                                      ("kind", "decision", "shown", "knowledge", "evidence")}}
     return [found[t] for t in sorted(found)]

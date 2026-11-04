@@ -1,40 +1,59 @@
-"""The Designer, step 3: judge an experiment. Did the moment the hypothesis is checked at come, and did the prediction
-show then, in the experiment's log? Task success does not decide the verdict.
+"""The Designer, step 3: in the log of one rollout, the occurrence (designer/terms.py "Occurrence"): the first turn
+where the agent did A while S held, and whether R followed. It gets no other hypotheses, no World Knowledge and no
+milestones, so the mark depends on this rollout alone; the loop counts the marks into the verdict and frequency
+(verdict()).
 """
 from __future__ import annotations
 
-import json
-
 from llm_json import ask_json
+from terms import TURN_ROW_LAYOUT, tagged, terms
 
-JUDGE_SYSTEM = """You judge an experiment in {domain}. A hypothesis was written before the experiment: a change, the
-moment the hypothesis is checked at (check_when), and what it predicts then. The agent then played from a saved
-moment before the failure point and tried the change; the log starts at that moment. You get the hypothesis and the compressed log of the experiment.
-Decide in this order, using only what the game recorded in the log ({log_shows}):
-1. Did the check moment come? Find the first time in the log that shows check_when. If it never came:
-   "Not reached".
-2. At that first check moment, did what the prediction says the hypothesis leads to happen? Judge what it means,
-   not each word: for example, an item the prediction says the agent will have counts if the agent had it then and
-   used it. Yes: "Supported". No, or the opposite: "Refuted".
-Only the first check moment counts. Whether the task succeeded does not matter.
+SYSTEM = """You are the Designer. You read the log of one rollout of an experiment and mark the first time its
+hypothesis was put to the test, and what happened then.
+
+""" + terms("Turn row", "Restart point", "Rollout", "Window", "Hypothesis", "Prediction", "Occurrence") + """
+
+Input:
+- <commands>: the commands the agent can send, one per entry:
+    <command form>   <what it is described to do>
+- <hypothesis>: one field per line:
+    situation: <S>
+    action: <A>
+    result: <R>
+- <prediction>: when <...>; what <...>
+- <log>: this rollout from the restart point to the end of the window, one turn row per line:
+""" + TURN_ROW_LAYOUT + """
+
+Work in this order:
+1. Go through <log> from the start. Find the occurrence: the first turn where the turn rows before it
+   show S and the command sent is A.
+2. Say whether R followed, as how it ended and the changes record it. Read R by the words of
+   <hypothesis> and <prediction>, no stricter and no looser.
+3. If no turn shows S and A, say so. Do not give a verdict; whether the task succeeded does not matter.
+
 Answer with JSON only:
-{{"verdict": "Supported" | "Refuted" | "Not reached", "check_turn": <turn or null>,
- "observed": "<what the log shows at that turn, and whether and when the agent made the change>",
- "reason": "<why this verdict>"}}"""
-
-VERDICTS = ('Supported', 'Refuted', 'Not reached')
+{"occurrence": {"turn": <n>, "situation_shown_by": "<the turn rows that show S>",
+  "result_followed": true | false, "evidence": "<the turn row of the result>"} | null}"""
 
 
-def judge_system(vocab) -> str:
-    return JUDGE_SYSTEM.format(domain=vocab.name, log_shows=vocab.log_shows)
+def occurrence(commands: str, hyp: dict, log_text: str, events: list) -> dict | None:
+    """{turn, situation_shown_by, result_followed, evidence}, or None when no turn showed S and A or the answer was
+    unparsable (events say which)."""
+    h, p = hyp["hypothesis"], hyp["prediction"]
+    user = tagged(commands=commands, hypothesis=f"situation: {h['situation']}\naction: {h['action']}\nresult: "
+                  f"{h['result']}", prediction=f"when {p['when']}; what {p['what']}", log=log_text)
+    out = ask_json(SYSTEM, user, events, "occurrence")
+    occ = out.get("occurrence") if out else None
+    if isinstance(occ, dict) and isinstance(occ.get("turn"), int):
+        return {"turn": occ["turn"], "situation_shown_by": str(occ.get("situation_shown_by", "")),
+                "result_followed": occ.get("result_followed") is True, "evidence": str(occ.get("evidence", ""))}
+    return None
 
 
-def judge(hyp: dict, compressed: str, log: list, vocab) -> dict | None:
-    """{verdict, check_turn, observed, reason} or None."""
-    user = (f"Hypothesis: {json.dumps({k: hyp[k] for k in ('change', 'check_when', 'prediction')}, ensure_ascii=False)}\n\n"
-            f"Experiment log:\n{compressed}")
-    out = ask_json(judge_system(vocab), user, log, "judge")
-    if not out or out.get("verdict") not in VERDICTS:
-        return None
-    return {"verdict": out["verdict"], "check_turn": out.get("check_turn"),
-            "observed": str(out.get("observed", "")), "reason": str(out.get("reason", ""))}
+def verdict(occurrences: list) -> tuple[str, int, int]:
+    """(verdict, k, n) from the rollouts' occurrences (None = none came): Supported when R followed in at least one,
+    Refuted when occurrences came and R never followed, Not reached when none came; k of n rollouts with an
+    occurrence had R."""
+    came = [o for o in occurrences if o]
+    k = sum(o["result_followed"] for o in came)
+    return ("Supported" if k else "Refuted" if came else "Not reached"), k, len(came)

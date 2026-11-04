@@ -1,6 +1,7 @@
-"""What the method adds to a Executor agent of any domain: the World Knowledge verified so far and, in an experiment
-of the learning-from-failure loop (experiments/ours_loop.py), the change to try. The agent appends prompt_text() to
-its system prompt; the prediction is never shown (the agent must not aim at it).
+"""What the method adds to an Executor agent of any domain: the World Knowledge verified so far and, in an experiment
+of the learning-from-failure loop (experiments/ours_loop.py), the change to try (start, do, stop) and its plan. The
+agent appends prompt_text() to its system prompt; the hypothesis and the prediction are never shown (the agent must
+not aim at them).
 
 Read from the environment of the episode:
   OPTIMUS_EXPERIMENT   JSON file {"hypothesis", "knowledge", "from_start"} written by the loop (domains/base.py)
@@ -29,9 +30,15 @@ def load() -> dict:
             "experiment": exp.get("hypothesis"), "from_start": exp.get("from_start")}
 
 
+def change_text(c) -> str:
+    """The change as the agent is told it: when it starts, what to do, when it stops (old experiments: one string)."""
+    return f"When {c['start']}: {c['do']}. Stop when {c['stop']}." if isinstance(c, dict) else str(c)
+
+
 def prompt_text(x: dict) -> str:
     out = world_knowledge.prompt_text(x.get("knowledge"))
     if x.get("experiment"):
         h = x["experiment"]
-        out += (EXP_NOTE_START if x.get("from_start") else EXP_NOTE).format(change=h["change"], plan=h["plan"])
+        out += (EXP_NOTE_START if x.get("from_start") else EXP_NOTE).format(change=change_text(h["change"]),
+                                                                          plan=h["plan"])
     return out
