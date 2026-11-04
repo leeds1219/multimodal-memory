@@ -15,7 +15,9 @@ For each failed episode (run with saves, `experiments/run.py --method baseline -
      and world rules.
   4. System 2 judges the hypothesis from the experiment's log (system2/judge.py): Supported -> its statement (problem
      and belief) goes to World Knowledge (memory/world_knowledge.py, <runs>/memory/wk_<store>.json); Refuted / Not
-     reached -> kept at the failure point, and the next proposal there sees it with what its experiment showed.
+     reached -> kept at the failure point, and the next proposal there sees it with what its experiment showed; it
+     also goes to the failed-hypothesis memory (memory/failed_hypotheses.py, <runs>/memory/fh_<store>.json), which
+     every later proposal gets (other failure points, other episodes of the store).
   5. Task check (the episode's success monitor): success -> loop ends. Otherwise Refuted / Not reached
      -> new proposal at the same failure point, or after --tries experiments there the next failure point of the same
      log; Supported -> the failure points are listed again, in the experiment's log. When the candidates of a log are
@@ -43,6 +45,7 @@ sys.path.insert(0, str(REPRO))
 import paths  # noqa: E402,F401
 
 import domains  # noqa: E402
+import failed_hypotheses  # noqa: E402
 import failure_point  # noqa: E402
 import hypothesis  # noqa: E402
 import judge  # noqa: E402
@@ -50,6 +53,7 @@ import world_knowledge  # noqa: E402
 from llm_context import write_ctx  # noqa: E402
 from paths import RESULTS, RUN_DATA  # noqa: E402
 
+FAILED_MAX = 30  # failed hypotheses of the store (latest first) a proposal gets
 RAW_BEFORE, RAW_AFTER = 8, 3  # raw turns given before (or from the restart point, if earlier) and after the failure point
 
 
@@ -65,6 +69,7 @@ class Loop:
         self.dir = RESULTS / "ours_loop" / a.name / f"{self.task}_{self.seed}"
         self.dir.mkdir(parents=True, exist_ok=True)
         self.state_f = self.dir / "loop.json"
+        self.fh_store = RUN_DATA / "memory" / f"fh_{a.store}.json"  # failed hypotheses, shared by the loops of the store
         self.st = json.loads(self.state_f.read_text()) if self.state_f.exists() else {
             "source": str(self.src), "task": self.task, "seed": self.seed, "iterations": [], "failure_points": [],
             "knowledge": [], "done": None,
@@ -184,8 +189,11 @@ class Loop:
             if fp is None:
                 self.st["done"] = "no failure point left" + (" (unparsable answer)" if self.st.get("unparsable") else "")
                 break
+            here = {r.get("source") for r in fp["refuted"]}  # shown as tried at this failure point already
+            failed = [f for f in failed_hypotheses.load(self.fh_store) if f["source"] not in here][-FAILED_MAX:]
             hyp = hypothesis.propose({k_: fp.get(k_, "") for k_ in ("turn", "decision", "known_then", "better", "reason")}, fp.get("others", []),
-                                     fp["raw"], fp["state"], fp["refuted"], self.events, self.dom.vocabulary)  # 3.
+                                     fp["raw"], fp["state"], fp["refuted"], self.events, self.dom.vocabulary,
+                                     failed=failed)  # 3.
             if not hyp:
                 self.st["done"] = "proposal unparsable"
                 break
@@ -207,7 +215,10 @@ class Loop:
                 fp["closed"] = "Supported"
                 self.st["log"] = str(ep)  # the next failure points come from this experiment's log
             else:
-                fp["refuted"].append({**hyp, "verdict": v["verdict"], "observed": v["observed"], "reason": v["reason"]})
+                failed_h = {**hyp, "verdict": v["verdict"], "observed": v["observed"], "reason": v["reason"],
+                            "source": f"{self.task}_{self.seed}/it{k}"}
+                fp["refuted"].append(failed_h)
+                failed_hypotheses.add(self.fh_store, failed_h)
                 if len(fp["refuted"]) >= self.a.tries:  # next candidate of the same log
                     fp["closed"] = f"{self.a.tries} experiments without support"
             self.save()
@@ -225,7 +236,7 @@ def main() -> int:
     ap.add_argument("--domain", default=None, help="domains/<name> (default $MM_DOMAIN, else minecraft)")
     ap.add_argument("--world", default="nolava", help="world of the experiment episodes (the source episodes' world)")
     ap.add_argument("--save", type=int, default=600, help="world saves in the experiment episodes too (the next failure point)")
-    ap.add_argument("--store", required=True, help="World Knowledge store memory/wk_<store>.json")
+    ap.add_argument("--store", required=True, help="memory stores: World Knowledge wk_<store>.json, failed hypotheses fh_<store>.json")
     ap.add_argument("--gpu", type=int, required=True)
     ap.add_argument("--port", type=int, required=True)
     ap.add_argument("--max-iter", type=int, default=10, help="experiments per episode; 0: no limit")

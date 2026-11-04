@@ -54,6 +54,10 @@ showed. Propose a different hypothesis or a different change, or the same change
 follow if the log shows it did not make it:
 {tried}"""
 
+EXTRA_FAILED = """Hypotheses tested in earlier experiments (at other failure points or in other episodes) that were not
+supported, with what the experiment's log showed. Use them to avoid proposing what already did not work:
+{failed}"""
+
 FIELDS = ("evidence", "problem", "hypothesis", "change", "check_when", "prediction", "plan")
 STATEMENT = "{problem} {hypothesis}"
 
@@ -68,15 +72,18 @@ def propose_system(vocab, extra: str = "") -> str:
 
 
 def propose(fp: dict, others: list, raw: list, state: dict, tried: list, log: list, vocab,
-            attempts: int = 3) -> dict | None:
+            attempts: int = 3, failed: list | None = None) -> dict | None:
     """`fp`: {turn, decision, known_then, better, reason}; `others`: the other failure points of the same log; `raw`: the agent's own
     turns from the restart point to just after fp; `state`: task, turn, step, height, inventory at the restart
     point; `tried`: earlier experiments at fp, each the hypothesis with its verdict, observed and reason;
-    `vocab`: the domain's words (domains/base.py).
+    `vocab`: the domain's words (domains/base.py); `failed`: hypotheses not supported elsewhere (memory/failed_hypotheses.py).
     An unparsable answer is asked again, up to `attempts` calls; None if none parses."""
     extra = EXTRA_TRIED.format(tried="\n".join(json.dumps({k: t[k] for k in ("hypothesis", "change", "plan", "check_when",
                                                                          "prediction", "verdict", "observed", "reason")},
                                                           ensure_ascii=False) for t in tried)) if tried else ""
+    if failed:
+        extra += ("\n" if extra else "") + EXTRA_FAILED.format(failed="\n".join(
+            json.dumps({k: f[k] for k in ("statement", "change", "verdict", "observed")}, ensure_ascii=False) for f in failed))
     for _ in range(attempts):
         out = ask_json(propose_system(vocab, extra), _user(fp, others, raw, state), log, "propose")
         if out and all(isinstance(out.get(k), str) and out[k].strip() for k in FIELDS):
