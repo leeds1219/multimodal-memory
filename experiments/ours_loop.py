@@ -19,7 +19,8 @@ attempt:
      Refuted go to World Knowledge (memory/world_knowledge.py, <runs>/memory/wk_<store>.json); every experiment goes
      to the failure point's experiment record.
   5. Supported: the timeline goes on with a rollout where R followed, up to its last save, then a continuation
-     episode from that save to the episode end; the failure points are listed again in the new timeline.
+     episode from that save to the episode end, whose agent is also given the hypothesis just Supported; the
+     failure points are listed again in the new timeline.
   Ends on task success, after loop.max_experiments hypotheses, or when no failure point is left.
   A rollout is judged at every world save while it plays and ends at the next turn once its occurrence shows.
 Everything about the environment goes through the domain (domains/base.py; --domain, default minecraft). --world is
@@ -278,7 +279,10 @@ class Loop:
             saves = self.dom.checkpoints(Path(r["episode"]))
             last = saves[-1] if saves else None
             cont_ckpt = str(Path(r["episode"]) / "ckpt" / f"s{last:06d}.zip") if last is not None else fp["checkpoint"]
-            cont, res = self.run_episode(f"e{k}_cont", cont_ckpt, exp_f, None)
+            cont_f = self.dir / f"e{k}_cont_experiment.json"  # the change, and the knowledge with this hypothesis in it
+            cont_f.write_text(json.dumps({**json.loads(exp_f.read_text()), "knowledge": wk.supported(self.knowledge()),
+                                          "from_start": not cont_ckpt}, indent=1, ensure_ascii=False))
+            cont, res = self.run_episode(f"e{k}_cont", cont_ckpt, cont_f, None)
             e["continuation"] = str(cont)
             success = bool(res.get("success"))
             self.extend_timeline(fp, r["episode"], last, cont, hyp)
