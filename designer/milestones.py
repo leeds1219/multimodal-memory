@@ -15,7 +15,7 @@ Input:
 - <task>: the task, one line.
 - <log>: the log of the first episode of this task, one turn row per line:
 """ + TURN_ROW_LAYOUT + "\n" + THOUGHT_NOTE + """
-- <knowledge>: the World Knowledge, one hypothesis per line (may be empty):
+- <knowledge>: the World Knowledge, one entry per block (may be empty):
 """ + KNOWLEDGE_LINES + """
   Supported: it holds in this world. Refuted: it does not hold (in its rollouts, the agent did A while S
   held, and R never followed). Where it differs from what you would expect, it is right: this

@@ -31,9 +31,12 @@ def supported(items) -> list:
 
 
 def lines(items) -> str:
-    """The Designer's view: one line per item, "[Supported k/n] ..." or "[Refuted 0/n] ..."."""
-    return "\n".join(f"[{k.get('verdict', 'Supported')} {k.get('k', '?')}/{k.get('n', '?')}] {k['statement']}"
-                     for k in items or [])
+    """The Designer's view: every item as a block of its fields (designer/terms.py KNOWLEDGE_LINES)."""
+    return "\n\n".join(
+        f"verdict: {k.get('verdict', 'Supported')}\n"
+        f"frequency: R followed in {k.get('k', '?')} of {k.get('n', '?')} rollouts\n"
+        f"situation: {k.get('situation', '')}\naction: {k.get('action', '')}\nresult: {k.get('result', '')}\n"
+        f"statement: {k['statement']}\nfrom: {k.get('source', '')}" for k in items or [])
 
 
 def prompt_text(items) -> str:

@@ -32,7 +32,7 @@ Input:
   restart point and the failure point are:
     -- Restart point: the experiment starts here --
     -- Failure point: T<turn> --
-- <knowledge>: the World Knowledge, one hypothesis per line (may be empty):
+- <knowledge>: the World Knowledge, one entry per block (may be empty):
 """ + KNOWLEDGE_LINES + """
 - <record>: the experiment record of this failure point, one experiment per block (may be empty):
     hypothesis: <in S, doing A leads to R>

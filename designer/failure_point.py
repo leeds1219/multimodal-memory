@@ -18,7 +18,7 @@ command per turn, and find its failure points.
 Input:
 - <task>: the task, one line.
 """ + COMMANDS_INPUT + "\n" + MILESTONES_INPUT + "\n" + TIMELINE_LOG + """
-- <knowledge>: the World Knowledge, one hypothesis per line (may be empty):
+- <knowledge>: the World Knowledge, one entry per block (may be empty):
 """ + KNOWLEDGE_LINES + """
   Supported: it holds. Refuted: it does not hold. The agent was given the Supported ones. Hypotheses tried
   in this attempt outside this timeline are here too."""

@@ -90,8 +90,14 @@ TIMELINE_LOG = """\
     -- Step <step>: replayed from a save. Failure point tried: T<turn> (<what happened>). Change given to the agent from here: "<change>". Verdict: <verdict> --
 """ + THOUGHT_NOTE
 KNOWLEDGE_LINES = """\
-    [Supported <k>/<n>] <hypothesis>
-    [Refuted 0/<n>] <hypothesis>"""
+    verdict: <Supported | Refuted>
+    frequency: R followed in <k> of <n> rollouts
+    situation: <S>
+    action: <A>
+    result: <R>
+    statement: <in S, doing A leads to R>
+    from: <the task and experiment it was tested in>
+  Entries are separated by a blank line."""
 PLAN_INPUT = """\
 - <plan>: the sub-goals the agent wrote before its first turn, one per line, in order:
     <n>. have <count> <item>"""
