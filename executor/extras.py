@@ -4,8 +4,10 @@ agent appends prompt_text() to its system prompt; the hypothesis and the predict
 not aim at them).
 
 Read from the environment of the episode:
-  OPTIMUS_EXPERIMENT   JSON file {"hypothesis", "knowledge", "from_start"} written by the loop (domains/base.py)
-  OPTIMUS_VLM_WK       a World Knowledge store (memory/world_knowledge.py), outside experiments
+  OPTIMUS_EXPERIMENT   JSON file {"hypothesis", "knowledge", "from_start", "knowledge_live"} written by the loop
+                       (domains/base.py); "knowledge_live": a store read again every turn (a continuation), else the
+                       "knowledge" written in the file stays fixed for the episode (a rollout: same for all its trials)
+  OPTIMUS_VLM_WK       a World Knowledge store (memory/world_knowledge.py), outside experiments, read again every turn
 """
 from __future__ import annotations
 
@@ -24,10 +26,18 @@ EXP_NOTE_START = ("\n\nThis attempt starts from the beginning, in the same world
 
 
 def load() -> dict:
-    """{"knowledge": [...] | None, "experiment": hypothesis | None, "from_start": bool | None}"""
+    """{"knowledge": [...] | None, "knowledge_live": store path | None, "experiment": hypothesis | None,
+    "from_start": bool | None}"""
     exp = json.loads(Path(os.environ["OPTIMUS_EXPERIMENT"]).read_text()) if os.environ.get("OPTIMUS_EXPERIMENT") else {}
-    return {"knowledge": exp.get("knowledge") if exp else world_knowledge.load(os.environ.get("OPTIMUS_VLM_WK")),
+    live = exp.get("knowledge_live") if exp else os.environ.get("OPTIMUS_VLM_WK")
+    return {"knowledge": world_knowledge.load(live) if live else exp.get("knowledge"), "knowledge_live": live,
             "experiment": exp.get("hypothesis"), "from_start": exp.get("from_start")}
+
+
+def refresh(x: dict) -> None:
+    """The pool as it is now, when the episode reads it live (other loops may have added to it since)."""
+    if x.get("knowledge_live"):
+        x["knowledge"] = world_knowledge.load(x["knowledge_live"])
 
 
 def change_text(c) -> str:

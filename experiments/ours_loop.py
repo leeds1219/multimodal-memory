@@ -281,7 +281,8 @@ class Loop:
             cont_ckpt = str(Path(r["episode"]) / "ckpt" / f"s{last:06d}.zip") if last is not None else fp["checkpoint"]
             cont_f = self.dir / f"e{k}_cont_experiment.json"  # the change, and the knowledge with this hypothesis in it
             cont_f.write_text(json.dumps({**json.loads(exp_f.read_text()), "knowledge": wk.supported(self.knowledge()),
-                                          "from_start": not cont_ckpt}, indent=1, ensure_ascii=False))
+                                          "knowledge_live": str(self.store), "from_start": not cont_ckpt},
+                                         indent=1, ensure_ascii=False))
             cont, res = self.run_episode(f"e{k}_cont", cont_ckpt, cont_f, None)
             e["continuation"] = str(cont)
             success = bool(res.get("success"))

@@ -115,6 +115,7 @@ class VLMAgent(Controller):
 
     # ------------------------------------------------------------ the VLM
     def system(self):
+        extras.refresh(self.opts)  # World Knowledge read live: what other loops added since shows from this turn on
         plan, reached = self.opts.get("plan"), self.opts.get("plan_reached", [])
         subgoal = planner.subgoal_text(plan, reached) if plan else P.NO_SUBGOAL
         out = P.SYSTEM.format(task=self.task, subgoal=subgoal, commands="\n".join([P.CMD_KEYS, P.CMD_STEVE, P.CMD_HELPERS]))
