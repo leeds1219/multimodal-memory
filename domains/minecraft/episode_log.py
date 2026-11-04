@@ -13,13 +13,22 @@ import argparse
 import gzip
 import json
 import re
+import zlib
 from pathlib import Path
+
+
+def _trajectory(ep: Path):
+    """The trajectory records; of an episode still playing, the ones written so far (the gzip may end mid-block)."""
+    try:
+        for line in gzip.open(ep / "trajectory.jsonl.gz", "rt"):
+            yield json.loads(line)
+    except (OSError, EOFError, ValueError, zlib.error):
+        return
 
 
 def _positions(ep: Path) -> tuple[list[int], list[list[float]], set[int]]:
     ts, ps, died, prev = [], [], set(), None
-    for line in gzip.open(ep / "trajectory.jsonl.gz", "rt"):
-        d = json.loads(line)
+    for d in _trajectory(ep):
         if "pos" in d:
             if prev is not None and sum((a - b) ** 2 for a, b in zip(d["pos"], prev)) > 100:
                 died.add(d["t"])  # respawn: a jump of more than 10 blocks
@@ -199,8 +208,7 @@ def state_line(ep: Path, step: int, window: int) -> str:
     before = [t for t in turns_of(ep) if t["t1"] <= step]
     ts, ps, _ = _positions(ep)
     inv = {}
-    for line in gzip.open(ep / "trajectory.jsonl.gz", "rt"):
-        d = json.loads(line)
+    for d in _trajectory(ep):
         if d["t"] > step:
             break
         inv = d.get("inv", inv)

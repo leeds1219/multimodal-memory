@@ -16,6 +16,7 @@ What an experiment adds (environment variables set from the variant tokens by ex
   OPTIMUS_NOLAVA=1            lava near the agent becomes stone every NOLAVA_EVERY steps (domains/minecraft/world/nolava.py)
   OPTIMUS_CKPT_EVERY=N        the world is saved every N steps (domains/minecraft/world/save.py)
   OPTIMUS_MAX_STEPS=N         the episode ends N steps after its start (tests; the loop's rollouts: the window)
+  OPTIMUS_STOP_FILE           the episode ends at the next turn once this file exists (a rollout whose occurrence came)
 An episode started from a save (domains/minecraft/world/replay.py) gets `side`: the step count, the VLM's history and start position.
 
 Game commands sent during the episode (nolava, the world save) ride on the chat field of the agent's own action,
@@ -202,9 +203,13 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
             opts["plan_reached"] = planner.update(opts["plan"], [], inv_counts(agent.obs))
         (out / "plan.json").write_text(json.dumps({"plan": opts["plan"]}, indent=1))
     next_save = (step0 // save_every + 1) * save_every if save_every else None
+    stop_f = os.environ.get("OPTIMUS_STOP_FILE")
     try:
         with open(out / "turns.jsonl", "a") as tf:
             while not agent.over():
+                if stop_f and Path(stop_f).exists():  # the loop saw this rollout's occurrence: nothing more to show
+                    agent.stop = "occurrence_seen"
+                    break
                 n += 1
                 s0, t_start, inv0 = dict(agent.prev), agent.t, inv_counts(agent.obs)
                 cmd, thought, raw = agent.ask(client, history, n)

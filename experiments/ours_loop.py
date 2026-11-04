@@ -21,7 +21,7 @@ attempt:
   5. Supported: the timeline goes on with a rollout where R followed, up to its last save, then a continuation
      episode from that save to the episode end; the failure points are listed again in the new timeline.
   Ends on task success, after loop.max_experiments hypotheses, or when no failure point is left.
-  TODO: a rollout could end right after its occurrence (the Window term says so); it plays to the window end.
+  A rollout is judged at every world save while it plays and ends at the next turn once its occurrence shows.
 Everything about the environment goes through the domain (domains/base.py; --domain, default minecraft). --world is
 Minecraft's run option.
 
@@ -35,6 +35,7 @@ import argparse
 import json
 import os
 import sys
+import threading
 import time
 from pathlib import Path
 
@@ -153,10 +154,11 @@ class Loop:
         return min(open_, key=lambda f: f["turn"]) if open_ else None
 
     # ---------------------------------------------------------------- 3. rollouts
-    def run_episode(self, name: str, ckpt: str, exp_f: Path, max_steps: int | None) -> tuple[Path, dict]:
+    def run_episode(self, name: str, ckpt: str, exp_f: Path, max_steps: int | None,
+                    stop_file: Path | None = None) -> tuple[Path, dict]:
         ep = self.dir / name
         opts = {"name": self.a.name, "world": self.a.world, "save_every": L["save_every"], "gpu": self.a.gpu,
-                "port": self.a.port, "mock": self.a.mock, "max_steps": max_steps}
+                "port": self.a.port, "mock": self.a.mock, "max_steps": max_steps, "stop_file": stop_file}
         for attempt in range(3):
             if ep.exists():
                 ep.rename(ep.with_name(f"{ep.name}.crash{int(time.time())}"))
@@ -169,6 +171,43 @@ class Loop:
             if res.get("status") in ("finished", "anomaly"):
                 return ep, res
         raise RuntimeError(f"episode {name} crashed 3 times")
+
+    def rollout(self, name: str, ckpt: str, exp_f: Path, window: int, hyp: dict) -> tuple[Path, dict, dict | None]:
+        """One rollout, judged at every world save while it plays (4.): once its occurrence shows, the loop writes
+        the stop file and the episode ends at the next turn; otherwise it ends with the window. Returns the episode,
+        its result and the occurrence (judged again on the whole log when none was seen while it played)."""
+        stop = self.dir / f"{name}.stop"
+        stop.unlink(missing_ok=True)
+        done, seen = threading.Event(), {}
+
+        def watch():
+            n_saves = 0
+            while not done.wait(30):
+                ep = self.dir / name
+                saves = self.dom.checkpoints(ep) if (ep / "ckpt").exists() else []
+                if len(saves) <= n_saves:
+                    continue
+                n_saves = len(saves)
+                try:
+                    occ = judge.occurrence(self.dom.commands(), hyp, self.dom.log([(ep, None, None)]), self.events)
+                except Exception as e:  # a log read mid-write: try again at the next save
+                    self.events.append({"ev": "occurrence_watch_error", "error": repr(e)[:200]})
+                    continue
+                if occ:
+                    seen["occ"] = occ
+                    stop.write_text(json.dumps(occ, ensure_ascii=False))
+                    return
+
+        th = threading.Thread(target=watch, daemon=True)
+        th.start()
+        try:
+            ep, res = self.run_episode(name, ckpt, exp_f, window, stop)
+        finally:
+            done.set()
+            th.join()
+        occ = seen.get("occ") or judge.occurrence(self.dom.commands(), hyp, self.dom.log([(ep, None, None)]),
+                                                  self.events)
+        return ep, res, occ
 
     def experiment(self, k: int, fp: dict) -> bool:
         """One hypothesis at fp (2.-5.); True when the task succeeded in one of its episodes."""
@@ -195,8 +234,7 @@ class Loop:
                                      "from_start": not fp["checkpoint"]}, indent=1, ensure_ascii=False))
         rollouts, success = [], False
         for i in range(L["rollouts"]):  # 3.
-            ep, res = self.run_episode(f"e{k}_r{i + 1}", fp["checkpoint"], exp_f, window)
-            occ = judge.occurrence(self.dom.commands(), hyp, self.dom.log([(ep, None, None)]), self.events)  # 4.
+            ep, res, occ = self.rollout(f"e{k}_r{i + 1}", fp["checkpoint"], exp_f, window, hyp)  # 4.
             rollouts.append({"episode": str(ep), "occurrence": occ, "success": bool(res.get("success")),
                              "steps": res.get("steps")})
             success = success or bool(res.get("success"))
