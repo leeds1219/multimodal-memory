@@ -10,6 +10,8 @@ from __future__ import annotations
 import json
 import re
 
+from hyperparams import HP
+
 PLAN_SYSTEM = """You plan a Minecraft task before playing it. Overall task: {task}
 Write the plan as an ordered list of sub-goals, from an empty inventory to the task. Each sub-goal is to have one
 item: its Minecraft item id (e.g. oak_log, crafting_table, iron_ingot; for any kind of log or planks write "log" or
@@ -23,7 +25,7 @@ FAMILIES = ("log", "planks", "wool")  # generic names: any <kind>_log counts as 
 def make(client, task: str, extra: str = "", attempts: int = 2) -> list | None:
     """[{item, count, why}] or None if no answer parses."""
     for _ in range(attempts):
-        resp = client.chat.completions.create(model="FROM_CONFIG", max_tokens=800, messages=[
+        resp = client.chat.completions.create(model="FROM_CONFIG", max_tokens=HP["executor"]["plan_max_tokens"], messages=[
             {"role": "user", "content": PLAN_SYSTEM.format(task=task, extra=extra)}])
         m = re.search(r"\{.*\}", resp.choices[0].message.content or "", re.S)
         try:

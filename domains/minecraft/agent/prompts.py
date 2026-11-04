@@ -5,6 +5,8 @@ experiment: GRAPH_NOTE (GT Recipe), ORE_HINT / ORE_RULE_CODE (GT World Rule v1 /
 (memory/mineevolve_memory.py), and what the method adds to any agent (executor/extras.py: World Knowledge and an
 experiment of Ours).
 """
+from hyperparams import HP
+
 
 SYSTEM = """You control a player in Minecraft. The game is paused while you decide; after each command
 it runs (20 game steps per second) and pauses again.
@@ -27,7 +29,7 @@ CMD_HELPERS = """  {"type": "equip", "item": "<item id>"}   puts the item in han
   {"type": "craft", "item": "<item id>", "n": <count>}         crafts it if the materials are there
   {"type": "smelt", "item": "<item id>", "n": <count>}         smelts it in a furnace if the materials are there"""
 
-N_HISTORY = 10  # earlier commands shown each turn
+N_HISTORY = HP["executor"]["history_turns"]  # earlier commands shown each turn
 TURN = "Your previous commands and how they ended (most recent last):\n{history}\n\nTurn {n}. Next command?"
 
 GRAPH_NOTE = ("\n<craft graph>: a top-down list of all the tools and materials needed to complete the task, "

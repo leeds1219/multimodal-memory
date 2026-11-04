@@ -16,10 +16,11 @@ import math
 import craft_helpers
 import keys
 import steve1_policy
+from hyperparams import HP
 from inventory import f, inv_counts
 
-MIN_STEPS_PER_CALL = 5  # VLM calls <= horizon / this
-STALL_TURNS = 30  # this many turns in a row that ran <= 1 game step and changed nothing -> "no_progress"
+MIN_STEPS_PER_CALL = HP["executor"]["min_steps_per_call"]  # VLM calls <= horizon / this
+STALL_TURNS = HP["executor"]["stall_turns"]  # this many turns in a row that ran <= 1 game step and changed nothing -> "no_progress"
 
 
 class Controller:

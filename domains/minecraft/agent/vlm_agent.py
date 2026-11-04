@@ -15,7 +15,7 @@ What an experiment adds (environment variables set from the variant tokens by ex
   OPTIMUS_EXPERIMENT          an experiment of experiments/ours_loop.py: the change to try (executor/extras.py)
   OPTIMUS_NOLAVA=1            lava near the agent becomes stone every NOLAVA_EVERY steps (domains/minecraft/world/nolava.py)
   OPTIMUS_CKPT_EVERY=N        the world is saved every N steps (domains/minecraft/world/save.py)
-  OPTIMUS_MAX_STEPS=N         tests only: the episode ends after N steps
+  OPTIMUS_MAX_STEPS=N         the episode ends N steps after its start (tests; the loop's rollouts: the window)
 An episode started from a save (domains/minecraft/world/replay.py) gets `side`: the step count, the VLM's history and start position.
 
 Game commands sent during the episode (nolava, the world save) ride on the chat field of the agent's own action,
@@ -37,6 +37,7 @@ import prompts as P
 import save
 import world_knowledge
 from controller import Controller
+from hyperparams import HP
 from images import img, jpeg
 from inventory import inv_counts
 from nolava import NOLAVA_EVERY, nolava_cmds
@@ -137,7 +138,7 @@ class VLMAgent(Controller):
         self.views = []
         self.last_view = self.obs["pov"].copy()
         msgs = [{"role": "system", "content": self.system()}, {"role": "user", "content": content}]
-        resp = client.chat.completions.create(model="FROM_CONFIG", messages=msgs, max_tokens=500)
+        resp = client.chat.completions.create(model="FROM_CONFIG", messages=msgs, max_tokens=HP["executor"]["max_tokens"])
         txt = resp.choices[0].message.content or ""
         m = re.search(r"\{.*\}", txt, re.S)
         try:
@@ -168,7 +169,7 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
              task_id: str | None = None, mcdir: Path | None = None, side: dict | None = None) -> dict:
     from client import LLMClient
     remaining = max(1, int(env.timeout) - int(env.num_steps))
-    if os.environ.get("OPTIMUS_MAX_STEPS"):  # tests only: end the episode after this many steps
+    if os.environ.get("OPTIMUS_MAX_STEPS"):  # tests; the loop's rollouts (the window)
         remaining = min(remaining, int(os.environ["OPTIMUS_MAX_STEPS"]))
     opts = {"graph": craft_graph(target), "me": None, "plan": None, "plan_reached": [],
             "ore_hint": os.environ.get("OPTIMUS_VLM_OREHINT"), "nolava": os.environ.get("OPTIMUS_NOLAVA") == "1",
