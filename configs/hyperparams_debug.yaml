@@ -1,0 +1,16 @@
+# Debug run: hyperparams.yaml with one experiment per attempt (MM_HYPERPARAMS=configs/hyperparams_debug.yaml).
+loop:  # the learning-from-failure loop (experiments/ours_loop.py)
+  rollouts: 5                  # rollouts per hypothesis from the same restart point, taken as independent trials
+  window_steps: 3000           # steps after the restart point a rollout plays to show the occurrence
+  save_every: 600              # world saves in every loop episode (the restart points)
+  max_experiments: 1           # hypotheses tested per attempt
+  tries_per_failure_point: 3   # hypotheses at one failure point before the next one
+executor:  # the agent (domains/minecraft/agent/)
+  history_turns: 10            # earlier commands shown each turn
+  max_tokens: 500              # the agent's answer per turn
+  plan_max_tokens: 800         # the initial plan (--plan)
+  stall_turns: 30              # turns in a row that ran <= 1 step and changed nothing -> the episode stops
+  min_steps_per_call: 5        # VLM calls <= horizon / this
+world:  # the nolava world (domains/minecraft/world/nolava.py)
+  nolava_every: 10             # steps between lava fills
+  nolava_radius: 12            # half size of the filled box
