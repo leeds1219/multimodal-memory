@@ -5,6 +5,7 @@ variables) and where its results go: <runs>/results/<method>/<world>/<order>/<ta
     Condition("gt_world_rule", "nolava")                 results/gt_world_rule/nolava/
     Condition("baseline", "nolava", save_every=600)      results/baseline/nolava_save600/
     Condition("ours", "nolava", knowledge="pl1")         results/ours_pl1/nolava/
+    Condition("baseline", "nolava", plan=True)           results/baseline_plan/nolava/
 """
 from __future__ import annotations
 
@@ -37,17 +38,20 @@ class Condition:
     world: str = "standard"
     save_every: int = 0  # save the world every N steps (starting points of the replay world)
     knowledge: str | None = None  # method ours: World Knowledge store memory/wk_<name>.json
+    plan: bool = False  # initial planning (domains/minecraft/agent/planner.py), on top of any VLM method
 
     def __post_init__(self):
         if self.method not in METHODS or self.world not in WORLDS:
             raise ValueError(f"unknown method {self.method!r} or world {self.world!r}")
+        if self.plan and ("OPTIMUS_VLMTASK", "1") not in METHODS[self.method]["switches"]:
+            raise ValueError("--plan needs a method run by the Baseline agent")
         if (self.method == "ours") != bool(self.knowledge):
             raise ValueError("method 'ours' needs --knowledge, and only it takes one")
 
     @property
     def name(self) -> str:
         """results/<method>/<world>"""
-        method = f"ours_{self.knowledge}" if self.method == "ours" else self.method
+        method = (f"ours_{self.knowledge}" if self.method == "ours" else self.method) + ("_plan" if self.plan else "")
         world = self.world + (f"_save{self.save_every}" if self.save_every else "")
         return f"{method}/{world}"
 
@@ -72,6 +76,8 @@ class Condition:
             out["OPTIMUS_SAVEALL_JAR"] = str(runs_root / "infra" / "mcprec-6.13-saveall.jar")
         if self.knowledge:
             out["OPTIMUS_VLM_WK"] = str(runs_root / "memory" / f"wk_{self.knowledge}.json")
+        if self.plan:
+            out["OPTIMUS_VLM_PLAN"] = "1"
         return out
 
 
@@ -80,7 +86,8 @@ def add_args(ap) -> None:
     ap.add_argument("--world", default="standard", choices=list(WORLDS))
     ap.add_argument("--save", type=int, default=0, help="save the world every N steps (replay starting points)")
     ap.add_argument("--knowledge", default=None, help="method ours: World Knowledge store memory/wk_<name>.json")
+    ap.add_argument("--plan", action="store_true", help="initial planning: sub-goals written before the first turn")
 
 
 def from_args(a) -> Condition:
-    return Condition(a.method, a.world, a.save, a.knowledge)
+    return Condition(a.method, a.world, a.save, a.knowledge, getattr(a, "plan", False))

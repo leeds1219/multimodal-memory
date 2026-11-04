@@ -9,6 +9,7 @@ respawn the agent, as in Optimus-1.
 What an experiment adds (environment variables set from the variant tokens by experiments/chain.py):
   OPTIMUS_VLM_RECIPES         the recipe graph in the prompt (GT Recipe; setup/build_craft_graphs.py)
   OPTIMUS_VLM_OREHINT=1       the hidden ore rule in the prompt (GT World Rule)
+  OPTIMUS_VLM_PLAN=1          initial planning: sub-goals written before the first turn (agent/planner.py)
   OPTIMUS_VLM_ME              MineEvolve memory (memory/mineevolve_memory.py)
   OPTIMUS_VLM_WK              verified World Knowledge in the prompt (system1/extras.py)
   OPTIMUS_EXPERIMENT          an experiment of experiments/ours_loop.py: the change to try (system1/extras.py)
@@ -31,8 +32,10 @@ from pathlib import Path
 
 import extras
 import mineevolve_memory
+import planner
 import prompts as P
 import save
+import world_knowledge
 from controller import Controller
 from images import img, jpeg
 from inventory import inv_counts
@@ -110,7 +113,11 @@ class VLMAgent(Controller):
 
     # ------------------------------------------------------------ the VLM
     def system(self):
-        out = P.SYSTEM.format(task=self.task, subgoal=P.NO_SUBGOAL, commands="\n".join([P.CMD_KEYS, P.CMD_STEVE, P.CMD_HELPERS]))
+        plan, reached = self.opts.get("plan"), self.opts.get("plan_reached", [])
+        subgoal = planner.subgoal_text(plan, reached) if plan else P.NO_SUBGOAL
+        out = P.SYSTEM.format(task=self.task, subgoal=subgoal, commands="\n".join([P.CMD_KEYS, P.CMD_STEVE, P.CMD_HELPERS]))
+        if plan:
+            out += planner.note(plan, reached)
         if self.opts.get("ore_hint"):
             out += {"1": P.ORE_HINT, "2": P.ORE_RULE_CODE}[self.opts["ore_hint"]]
         if self.opts.get("graph"):
@@ -163,7 +170,7 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
     remaining = max(1, int(env.timeout) - int(env.num_steps))
     if os.environ.get("OPTIMUS_MAX_STEPS"):  # tests only: end the episode after this many steps
         remaining = min(remaining, int(os.environ["OPTIMUS_MAX_STEPS"]))
-    opts = {"graph": craft_graph(target), "me": None,
+    opts = {"graph": craft_graph(target), "me": None, "plan": None, "plan_reached": [],
             "ore_hint": os.environ.get("OPTIMUS_VLM_OREHINT"), "nolava": os.environ.get("OPTIMUS_NOLAVA") == "1",
             **extras.load()}  # World Knowledge, the experiment's change (system1/extras.py)
     save_every = int(os.environ.get("OPTIMUS_CKPT_EVERY") or 0)
@@ -184,6 +191,15 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
     if side:
         history, n = list(side["history"]), int(side["turn"])
         agent.start = list(side["start"])
+    if side and side.get("plan"):  # from a save: the plan of the episode the save is from, as far as it was reached
+        opts["plan"], opts["plan_reached"] = side["plan"], list(side.get("plan_reached", []))
+    elif not side and os.environ.get("OPTIMUS_VLM_PLAN") == "1":
+        extra = (P.GRAPH_NOTE.format(graph=opts["graph"].strip()) if opts.get("graph") else "") + \
+            world_knowledge.prompt_text(opts.get("knowledge"))
+        opts["plan"] = planner.make(client, instruction, extra)
+        if opts["plan"]:
+            opts["plan_reached"] = planner.update(opts["plan"], [], inv_counts(agent.obs))
+        (out / "plan.json").write_text(json.dumps({"plan": opts["plan"]}, indent=1))
     next_save = (step0 // save_every + 1) * save_every if save_every else None
     try:
         with open(out / "turns.jsonl", "a") as tf:
@@ -203,10 +219,14 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
                     if "Timeout!" in repr(e):  # the release's helpers raise this when the horizon runs out
                         agent.stop = agent.stop or "env_ended"
                 inv1 = inv_counts(agent.obs)
+                if opts["plan"]:
+                    opts["plan_reached"] = planner.update(opts["plan"], opts["plan_reached"], inv1)
                 eff = agent.effect(s0, agent.prev, inv0, inv1, agent.rows[t_start:agent.t])
                 history.append(f"{n}. {json.dumps(cmd)} -> {outcome}, {agent.t - t_start} steps; {eff}")
                 tf.write(json.dumps({"turn": n, "t0": step0 + t_start, "t1": step0 + agent.t, "cmd": cmd, "thought": thought,
-                                     "outcome": outcome, "effect": eff, "raw": raw[:600]}) + "\n")
+                                     "outcome": outcome, "effect": eff, "raw": raw[:600],
+                                     **({"subgoal": planner.current(opts["plan"], opts["plan_reached"])} if opts["plan"] else {})})
+                         + "\n")
                 tf.flush()
                 if me is not None:
                     typ = cmd.get("type") if isinstance(cmd, dict) else None
@@ -218,7 +238,8 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
                 if next_save is not None and step0 + agent.t >= next_save and not agent.over():
                     sv = {"turn": n, "history": history, "start": agent.start, "pos": agent.prev["pos"],
                           "ore_map": save.ore_map_to_json(env.ORE_MAP), "spawn": mon.first_pos,
-                          "deaths": agent.deaths, "inventory": inv1}
+                          "deaths": agent.deaths, "inventory": inv1,
+                          "plan": opts["plan"], "plan_reached": opts["plan_reached"]}
                     agent.pending_save = dict(mcdir=mcdir, out=ep / "ckpt", step=step0 + agent.t, side=sv,
                                               before=save.level_mtime(mcdir))
                     agent.chat.append(save.SAVE_CMD)
@@ -239,7 +260,8 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
             "recipes": os.environ.get("OPTIMUS_VLM_RECIPES"),
             "ore_hint": opts["ore_hint"], "wall_s": round(time.time() - t0, 1), "log": lines[-5:],
             "start_step": step0, "nolava": opts["nolava"], "knowledge": len(opts["knowledge"] or []),
-            "experiment": opts["experiment"]}
+            "experiment": opts["experiment"],
+            "plan": len(opts["plan"]) if opts["plan"] else None, "plan_reached": len(opts["plan_reached"])}
     if me is not None:
         ev = me.events
         summ["mineevolve"] = {"executions": sum(e["ev"] == "feedback" for e in ev),

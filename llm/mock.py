@@ -180,7 +180,12 @@ def mock_response(kw: dict, ctx: dict):
     if ctx.get("method") in ("deps", "jarvis1"):
         content = _stageb(text, kw, ctx)
     else:
-        content = _optimus(text, ctx) if ctx.get("method", "").startswith("optimus") else _mineevolve(text, ctx)
+        if "You plan a Minecraft task" in text:  # initial planning (domains/minecraft/agent/planner.py)
+            m = re.search(r"Overall task: ([^\n]+)", text)
+            content = json.dumps({"plan": [{"item": it.replace("logs", "log"), "count": n, "why": t}
+                                           for t, it, n in _OPT_STEPS[_target(text, {"instruction": m.group(1) if m else ""})]]})
+        else:
+            content = _optimus(text, ctx) if ctx.get("method", "").startswith("optimus") else _mineevolve(text, ctx)
     if content is None:
         content = "MOCK: unrecognised prompt"
     return SimpleNamespace(
