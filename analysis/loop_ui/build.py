@@ -14,6 +14,13 @@ What is read: loop.json (the loop's own record: failure points, hypotheses, verd
 through the domain adapter (domains/<domain>/loop_ui.py, chosen with --domain), each episode's result, turns, progress and
 keyframes. Loops run before the settings were recorded (2026-11-03) are marked: they stopped at "no failure point
 left" instead of listing the failure points again in the latest retry's log.
+
+Two loop.json formats. The pt1-pt3 loops ("iterations": one episode per hypothesis) go to the interactive page
+index.html reads from data.json. The current loop ("experiments": milestones, a timeline of parts, failure points
+with their kind, S/A/R hypotheses tested by rollouts, a verdict with its frequency k/n) goes to a static page
+written here (render_attempts): per attempt the milestones, the timeline parts with their replay markers, and per
+experiment its failure point, hypothesis, change, prediction, each rollout's occurrence, the verdict and the
+rollout the timeline continued from. An experiment whose loops are all in the current format gets that page.
 """
 import argparse
 import glob
@@ -44,6 +51,93 @@ def experiments():
     return {e: ns for e, ns in groups.items() if any((LOOPS / n).glob("*/loop.json"))}
 
 
+def attempt(L: dict) -> dict:
+    """One attempt in the current format, as render_attempts shows it."""
+    src = Path(L["source"])
+    res0 = json.load(open(src / "result.json")) if (src / "result.json").exists() else {}
+    fps = {(f["episode"], f["turn"]): f for f in L.get("failure_points", [])}
+    exps = []
+    for e in L.get("experiments", []):
+        fp = fps.get((e["failure_point"]["episode"], e["failure_point"]["turn"]), {})
+        cont_from = None
+        if e.get("continuation"):  # the loop continues from the first rollout where R followed
+            cont_from = next((i for i, r in enumerate(e["rollouts"], 1)
+                              if r.get("occurrence") and r["occurrence"].get("result_followed")), None)
+        exps.append({**e, "fp": {**e["failure_point"], "decision": fp.get("decision", ""), "shown": fp.get("shown", ""),
+                                 "knowledge": fp.get("knowledge", ""), "checkpoint_step": fp.get("checkpoint_step")},
+                     "continued_from": cont_from})
+    done = L.get("done") or "running"
+    return {"id": f"{L['task']}_{L['seed']}", "task": L["task"], "seed": L["seed"],
+            "instruction": res0.get("instruction", ""), "source_steps": res0.get("steps"), "done": done,
+            "success": done.startswith("task succeeded"), "settings": L.get("settings") or {},
+            "milestones": L.get("milestones") or [], "timeline": L.get("timeline") or [], "experiments": exps}
+
+
+def render_attempts(exp: str, runs: list) -> str:
+    """The static page of the current-format loops of one experiment."""
+    e_ = html.escape
+
+    def name(ep):
+        return e_(Path(ep).name) if ep else ""
+
+    def rows(head, body):
+        return ("<table><tr>" + "".join(f"<th>{e_(h)}</th>" for h in head) + "</tr>"
+                + "".join("<tr>" + "".join(f"<td>{c}</td>" for c in r) + "</tr>" for r in body) + "</table>")
+
+    st = next((r["settings"] for r in runs if r["settings"]), {})
+    out = [f"<h1>Loop: {e_(exp)}</h1>",
+           "<p class='note'>" + e_(", ".join(f"{k} {v}" for k, v in st.items())) + "</p>" if st else ""]
+    for r in runs:
+        out.append(f"<section><h2>{e_(r['task'])} <span class='quiet'>seed {r['seed']}</span></h2>"
+                   f"<p>{e_(r['instruction'])}. Result: <b>{e_(r['done'])}</b>"
+                   + ("" if r["source_steps"] is None else f"; first episode {r['source_steps']:,} steps") + ".</p>")
+        out.append("<h3>Milestones</h3>" + (rows(["#", "item", "what for"], [[str(i), e_(m["item"]), e_(m.get("why", ""))]
+                                                                         for i, m in enumerate(r["milestones"], 1)])
+                                           if r["milestones"] else "<p class='quiet'>not decided yet</p>"))
+        out.append("<h3>Timeline</h3>" + rows(
+            ["part", "episode", "from step", "until step", "marker"],
+            [[str(i), name(p["episode"]), f"{p.get('start_step', 0):,}",
+              "end" if p.get("until") is None else f"{p['until']:,}", e_(p.get("marker") or "")]
+             for i, p in enumerate(r["timeline"], 1)]))
+        for x in r["experiments"]:
+            fp, h = x["fp"], x.get("hypothesis", {})
+            ch, pr = x.get("change", {}), x.get("prediction", {})
+            k, n = (x.get("frequency") or [0, 0])
+            ro = [[str(i), name(o["episode"]), "" if o.get("steps") is None else f"{o['steps']:,}",
+                   f"T{oc['turn']}" if (oc := o.get("occurrence")) else "none in the window",
+                   ("yes" if oc["result_followed"] else "no") if oc else "",
+                   e_(oc.get("evidence", "")) if oc else "",
+                   ("continued the timeline" if x["continued_from"] == i else "") + (" task succeeded" if o.get("success") else "")]
+                  for i, o in enumerate(x["rollouts"], 1)]
+            out.append(
+                f"<div class='exp'><h4>Experiment {x['k']}: <span class='v {e_(x['verdict'].split()[0].lower())}'>"
+                f"{e_(x['verdict'])} {k}/{n}</span></h4>"
+                f"<p><b>Failure point</b> T{fp['turn']} in {name(fp['episode'])} ({e_(fp.get('kind', ''))}), restart step "
+                f"{'' if fp.get('checkpoint_step') is None else format(fp['checkpoint_step'], ',')}: {e_(fp['decision'])}"
+                f"<br><span class='quiet'>Shown: {e_(fp['shown'])}</span></p>"
+                f"<p><b>Hypothesis</b> {e_(x.get('statement', ''))}<br>"
+                f"<span class='quiet'>S: {e_(h.get('situation', ''))} &middot; A: {e_(h.get('action', ''))} &middot; "
+                f"R: {e_(h.get('result', ''))}</span></p>"
+                f"<p><b>Change</b> when {e_(ch.get('start', ''))}: {e_(ch.get('do', ''))}; stop when {e_(ch.get('stop', ''))}"
+                + (f"<br><span class='quiet'>Plan: {e_(x.get('plan', ''))}</span>" if x.get("plan") else "") + "</p>"
+                f"<p><b>Prediction</b> when {e_(pr.get('when', ''))}: {e_(pr.get('what', ''))}</p>"
+                + rows(["rollout", "episode", "steps", "occurrence", "R followed", "evidence", ""], ro)
+                + (f"<p class='quiet'>Continuation: {name(x['continuation'])}</p>" if x.get("continuation") else "")
+                + "</div>")
+        out.append("</section>")
+    css = (":root{--bg:#fff;--fg:#262626;--quiet:#6b6b6b;--rule:#d9d9d9;--good:#1a7f37;--bad:#b42318;--mid:#9a6700}"
+           "@media (prefers-color-scheme:dark){:root{--bg:#1c1c1c;--fg:#e6e6e6;--quiet:#a0a0a0;--rule:#3a3a3a;"
+           "--good:#4ac26b;--bad:#f47067;--mid:#d4a72c}}"
+           "body{font-family:Arial,sans-serif;margin:24px;max-width:1100px;background:var(--bg);color:var(--fg)}"
+           "table{border-collapse:collapse;margin:6px 0 12px}td,th{padding:4px 10px;border-bottom:1px solid var(--rule);"
+           "text-align:left;vertical-align:top;font-size:14px}.quiet,.note{color:var(--quiet)}"
+           ".exp{border-left:3px solid var(--rule);padding-left:12px;margin:16px 0}.v.supported{color:var(--good)}"
+           ".v.refuted{color:var(--bad)}.v.not{color:var(--mid)}section{margin-bottom:40px}")
+    return (f"<!doctype html><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
+            f"<title>Loop {e_(exp)}</title><style>{css}</style>" + "".join(out)
+            + "<p><a href='../index.html'>&larr; all experiments</a></p>")
+
+
 def build(exp, names, dom, out):
     shutil.rmtree(out / "frames", ignore_errors=True)
     (out / "frames").mkdir(parents=True)
@@ -55,10 +149,19 @@ def build(exp, names, dom, out):
         shutil.copy(f, out / "frames" / name)
         return f"frames/{name}"
 
+    files = sorted(p for n in names for p in (LOOPS / n).glob("*/loop.json"))
+    current = [L for L in map(lambda f: json.load(open(f)), files) if "experiments" in L]
+    if current and len(current) == len(files):  # the current loop format: the static page
+        runs = [attempt(L) for L in current]
+        for r in runs:
+            print(f"  {r['id']}: {len(r['experiments'])} experiments, {r['done']}")
+        (out / "data.json").write_text(json.dumps(runs, ensure_ascii=False))
+        (out / "index.html").write_text(render_attempts(exp, runs))
+        return [{"its": [{"success": r["success"]}] * len(r["experiments"]) or [], "done": r["done"]} for r in runs], {}
     runs, settings, horizon = [], [], None
-    for f in sorted(p for n in names for p in (LOOPS / n).glob("*/loop.json")):
+    for f in files:
         L = json.load(open(f))
-        if not L["iterations"]:
+        if not L.get("iterations"):
             continue
         settings.append(L.get("settings"))
         src = Path(L["source"])
@@ -119,11 +222,14 @@ def build(exp, names, dom, out):
 
 
 def main():
+    global LOOPS
     ap = argparse.ArgumentParser()
     ap.add_argument("--exp", help="one experiment (default: all)")
     ap.add_argument("--domain", default="minecraft", help="adapter domains/<domain>/loop_ui.py")
     ap.add_argument("--site", default=str(SITE))
+    ap.add_argument("--loops", default=str(LOOPS), help="the loop folders (default results/ours_loop)")
     a = ap.parse_args()
+    LOOPS = Path(a.loops)
     dom = importlib.import_module(f"domains.{a.domain}.loop_ui")
     site = Path(a.site)
     exps = experiments()
