@@ -2,7 +2,10 @@
 
 For each failed episode (run with saves, `experiments/run.py --method baseline --world nolava --save 600`), one loop:
   1. System 2 lists the failure points in the compressed log (system2/failure_point.py; the log: the domain's compress());
-     the loop takes them earliest first.
+     the loop takes them earliest first. After the first experiment the log is the whole attempt from step 0 (the
+     source episode up to the save each experiment was replayed from, then that experiment, and so on), and System 2
+     also gets every experiment so far (failure point, change, verdict, observed); a failure point in an earlier part
+     restarts from a save of that part.
   2. System 2 proposes one hypothesis at the failure point, seeing the other failure points of the log: the problem
      the decision caused, the belief about avoiding it, the change that tests it, what shows the change was made, the
      moment it is checked at and the prediction then, plan (system2/hypothesis.py).
@@ -99,7 +102,8 @@ class Loop:
     def next_point(self) -> dict | None:
         """The next failure point to experiment at: the earliest candidate left from the latest log (the source
         episode, or the experiment of the last Supported hypothesis). Candidates are found once per log; when they
-        are used up, the failure points are listed again in the latest experiment's log."""
+        are used up, the failure points are listed again in the latest experiment's log. A log is read as the whole
+        attempt from step 0 (parts()), so a failure point can be in an earlier part than the latest experiment."""
         while True:
             fp = self._point_in_log()
             last = self.st["iterations"][-1]["episode"] if self.st["iterations"] else None
@@ -107,33 +111,65 @@ class Loop:
                 return fp
             self.st["log"] = last  # candidates used up: list the failure points again, in the latest experiment's log
 
+    def _fp_of(self, it: dict) -> dict:
+        return next(f for f in self.st["failure_points"]
+                    if f["turn"] == it["failure_point_turn"] and f["checkpoint_step"] == it["checkpoint_step"])
+
+    def parts(self, ep) -> list:
+        """The attempt that ends in episode ep, from step 0: [(episode, until_step, note)], each experiment replayed
+        from a save of the episode its failure point was in (domain compress(ep, parts))."""
+        if Path(ep) == self.src:
+            return [(self.src, None, None)]
+        it = next(i for i in self.st["iterations"] if i["episode"] == str(ep))
+        ck = it["checkpoint_step"]
+        turns = self.dom.turns(ep)
+        first = f"turn T{turns[0]['turn']}" if turns else "no turns"
+        note = (f"Step {ck} ({first}): replayed from a save; the turns below are from experiment {it['k']}, "
+                f"which tried: {it['hypothesis']['change']}")
+        if not ck:  # replayed from the beginning of the same world: nothing kept from before
+            return [(Path(ep), None, note)]
+        head = self.parts(it.get("from_episode") or self._fp_of(it)["episode"])
+        head[-1] = (head[-1][0], ck, head[-1][2])
+        return head + [(Path(ep), None, note)]
+
     def _point_in_log(self) -> dict | None:
         cur = Path(self.st["log"])
-        if self.st.get("searched") != str(cur):  # 2. find the failure points in the latest log
-            earlier = [{"decision": f["decision"], "reason": f["reason"]} for f in self.st["failure_points"]
-                       if f.get("closed") == "Supported"]
-            found = failure_point.find(self.dom.compress(cur), earlier, self.events, self.dom.vocabulary)
+        parts = self.parts(cur)
+        if self.st.get("searched") != str(cur):  # 2. find the failure points in the latest log, from step 0
+            earlier = [{"failure_point": f"T{it['failure_point_turn']}: {self._fp_of(it)['decision']}",
+                        "change": it["hypothesis"]["change"], "verdict": it["verdict"], "observed": it["observed"]}
+                       for it in self.st["iterations"]]
+            found = failure_point.find(self.dom.compress(cur, parts), earlier, self.events, self.dom.vocabulary)
             self.st.update(searched=str(cur), found=found or [], candidates=list(found or []), unparsable=found is None)
             log(f"  failure point candidates in {cur.name}: " + (", ".join(f"T{f['turn']}" for f in found) if found
                                                                  else "none" if found == [] else "unparsable answer"))
         while self.st["candidates"]:
             found = self.st["candidates"].pop(0)
-            ck = self.dom.save_before(cur, found["turn"])
-            if ck == ("", 0) and cur != self.src:  # before the experiment's first save: the checkpoint it started from
-                start = next(i for i in reversed(self.st["iterations"]) if i["episode"] == str(cur))
-                ck = (start["checkpoint"], start["checkpoint_step"])
-            if not ck:
+            where = None  # the part (episode, its turns kept) the turn is in
+            for e, until, _ in parts:
+                ts = [t for t in self.dom.turns(e) if until is None or t["t0"] < until]
+                if any(t["turn"] == found["turn"] for t in ts):
+                    where = (e, ts)
+            if not where:
                 log(f"  T{found['turn']} skipped: not a turn of the log")
                 continue
-            restart = next(t["turn"] for t in self.dom.turns(cur) if t["t0"] >= ck[1])  # first turn after the save
+            e, ts = where
+            if any(f["episode"] == str(e) and f["turn"] == found["turn"] for f in self.st["failure_points"]):
+                log(f"  T{found['turn']} skipped: tried before")
+                continue
+            ck = self.dom.save_before(e, found["turn"])
+            if ck == ("", 0) and e != self.src:  # before the experiment's first save: the checkpoint it started from
+                start = next(i for i in reversed(self.st["iterations"]) if i["episode"] == str(e))
+                ck = (start["checkpoint"], start["checkpoint_step"])
+            restart = next(t["turn"] for t in ts if t["t0"] >= ck[1])  # first turn after the save
             lo = min(restart, found["turn"] - RAW_BEFORE)
-            fp = {**found, "episode": str(cur), "checkpoint": str(ck[0]), "checkpoint_step": ck[1],
+            fp = {**found, "episode": str(e), "checkpoint": str(ck[0]), "checkpoint_step": ck[1],
                   "others": [f for f in self.st["found"] if f["turn"] != found["turn"]],
-                  "state": self.dom.state_at(cur, restart),
-                  "raw": self.dom.raw_window(cur, lo, found["turn"] + RAW_AFTER), "refuted": []}
+                  "state": self.dom.state_at(e, restart),
+                  "raw": self.dom.raw_window(e, lo, min(found["turn"] + RAW_AFTER, ts[-1]["turn"])), "refuted": []}
             self.st["failure_points"].append(fp)
             self.save()
-            log(f"  failure point T{fp['turn']} (checkpoint step {ck[1]}): {fp['decision'][:120]}")
+            log(f"  failure point T{fp['turn']} in {e.name} (checkpoint step {ck[1]}): {fp['decision'][:120]}")
             return fp
         return None
 
@@ -158,7 +194,7 @@ class Loop:
             res = self.dom.result(ep)
             v = judge.judge(hyp, self.dom.compress(ep), self.events, self.dom.vocabulary) or {"verdict": "Unjudged", "observed": "",
                                                                      "reason": "judge answer unparsable"}  # 5.
-            it = {"k": k, "failure_point_turn": fp["turn"], "checkpoint": fp["checkpoint"],
+            it = {"k": k, "failure_point_turn": fp["turn"], "from_episode": fp["episode"], "checkpoint": fp["checkpoint"],
                   "checkpoint_step": fp["checkpoint_step"], "hypothesis": hyp, **v, "episode": str(ep),
                   "task_success": bool(res.get("success")), "steps": res.get("steps")}
             self.st["iterations"].append(it)

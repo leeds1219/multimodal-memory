@@ -28,8 +28,8 @@ class Minecraft(Domain):
     def turns(self, ep):
         return [json.loads(l) for l in open(Path(ep) / "vlm" / "turns.jsonl")]
 
-    def compress(self, ep):
-        return episode_log.compress(Path(ep))
+    def compress(self, ep, parts=None):
+        return episode_log.compress(Path(ep), parts)
 
     def raw_window(self, ep, t_from, t_to):
         return episode_log.raw_window(Path(ep), t_from, t_to)

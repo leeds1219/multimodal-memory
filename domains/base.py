@@ -9,7 +9,9 @@ An episode is a folder. Whatever is inside is the domain's business; the method 
   result(ep)            {"task", "seed", "instruction", "success", "steps", "horizon_steps"}
   turns(ep)             one dict per agent turn: {"turn", "t0", "t1", "cmd", "thought", "outcome", "effect"};
                         t0/t1 = the domain's clock (e.g. game steps) at the turn's start/end
-  compress(ep)          the text System 2 reads: the episode as the agent played it, compressed
+  compress(ep, parts)   the text System 2 reads: the episode as the agent played it, compressed; with parts
+                        [(episode, until_clock, note)] (the last = ep, until None), the whole attempt from the start:
+                        each part up to until_clock, the next replayed from a save of it, note marking where it starts
   raw_window(ep, a, b)  turns a..b as logged, for the context around a failure point
   save_before(ep, turn) (save, clock) of the last saved state at or before the start of `turn`; ("", 0) when the
                         turn comes before the first save (restart the same world from the beginning); None when
@@ -41,7 +43,7 @@ class Domain:
     def turns(self, ep: Path) -> list[dict]:
         raise NotImplementedError
 
-    def compress(self, ep: Path) -> str:
+    def compress(self, ep: Path, parts: list | None = None) -> str:
         raise NotImplementedError
 
     def raw_window(self, ep: Path, t_from: int, t_to: int) -> list[dict]:

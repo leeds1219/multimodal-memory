@@ -77,14 +77,18 @@ def _turn_at(turns, t):
     return next((x["turn"] for x in turns if x["t0"] <= t < x["t1"]), turns[-1]["turn"] if turns else 0)
 
 
-def timeline(ep: Path, turns: list) -> list[str]:
-    """Facts already in the log, gathered: first time each item was in the inventory; repeated failures."""
+def timeline(parts: list, turns: list) -> list[str]:
+    """Facts already in the log, gathered: first time each item was in the inventory; repeated failures.
+    `parts`: [(episode, until_step or None)], the attempt from step 0."""
     first = {}
-    for line in gzip.open(ep / "trajectory.jsonl.gz", "rt"):
-        d = json.loads(line)
-        for k, v in (d.get("inv") or {}).items():
-            if v > 0 and k not in first:
-                first[k] = d["t"]
+    for ep, until in parts:
+        for line in gzip.open(ep / "trajectory.jsonl.gz", "rt"):
+            d = json.loads(line)
+            if until is not None and d["t"] >= until:
+                break
+            for k, v in (d.get("inv") or {}).items():
+                if v > 0 and k not in first:
+                    first[k] = d["t"]
     out = ["Timeline. First time each item was in the inventory (turn, step):",
            "  " + ", ".join(f"{k} T{_turn_at(turns, t)} ({t})" for k, t in sorted(first.items(), key=lambda x: x[1]))]
     fails = {}
@@ -105,21 +109,9 @@ def checkpoints(ep: Path) -> list[int]:
     return sorted(int(p.stem[1:]) for p in (ep / "ckpt").glob("s*.zip")) if (ep / "ckpt").exists() else []
 
 
-def compress(ep: Path) -> str:
-    ep = Path(ep)
-    res = json.loads((ep / "result.json").read_text())
-    turns = [json.loads(l) for l in open(ep / "vlm" / "turns.jsonl")]
+def _rows(ep: Path, turns: list) -> list:
     ts, ps, died = _positions(ep)
     ck = checkpoints(ep)
-    summ = json.loads((ep / "vlm" / "summary.json").read_text()) if (ep / "vlm" / "summary.json").exists() else {}
-    head = [f"Task: {res.get('instruction')}",
-            f"Result: {'succeeded' if res.get('success') else 'failed'} after {res.get('steps')} of {res.get('horizon_steps')} steps, "
-            f"{len(turns)} turns. Final inventory: {json.dumps(res.get('final_inventory') or {})}",
-            *([f"This attempt started from a saved moment of an earlier attempt, at step {summ['start_step']} "
-               f"(turn {turns[0]['turn'] - 1 if turns else '?'} of that attempt)."] if summ.get("start_step") else []),
-            *timeline(ep, turns),
-            "Turns. Columns: turn | steps | height y start->end | command | how it ended | changes | the agent's thought"
-            + (" | [saved] = the world was saved after this turn" if ck else "")]
     rows = []
     for t in turns:
         p0, p1 = _pos_at(ts, ps, t["t0"]), _pos_at(ts, ps, t["t1"])
@@ -134,7 +126,42 @@ def compress(ep: Path) -> str:
         d.append(ch)
         d.append(_thought(t))
         rows.append((t, d, t["t1"] in ck))
-    return "\n".join(head + _merge(rows))
+    return rows
+
+
+def compress(ep: Path, parts: list | None = None) -> str:
+    """`parts`: the whole attempt from step 0, [(episode, until_step, note)], the last being `ep` (until None): each
+    part's turns before until_step, the parts after the first replayed from a save of the one before, `note` printed
+    where the part starts. None: `ep` alone."""
+    ep = Path(ep)
+    parts = [(Path(e), u, n) for e, u, n in parts] if parts else [(ep, None, None)]
+    res = json.loads((ep / "result.json").read_text())
+    pturns = [[t for t in (json.loads(l) for l in open(e / "vlm" / "turns.jsonl")) if u is None or t["t0"] < u]
+              for e, u, _ in parts]
+    turns = [t for ts_ in pturns for t in ts_]
+    ck = any(checkpoints(e) for e, _, _ in parts)
+    summ = json.loads((ep / "vlm" / "summary.json").read_text()) if (ep / "vlm" / "summary.json").exists() else {}
+    if len(parts) > 1:
+        start = [f"This attempt is shown from step 0: the turns before step {summ.get('start_step', '?')} come from the "
+                 f"earlier attempts it was replayed from (marked below)."]
+    elif summ.get("start_step"):
+        start = [f"This attempt started from a saved moment of an earlier attempt, at step {summ['start_step']} "
+                 f"(turn {turns[0]['turn'] - 1 if turns else '?'} of that attempt)."]
+    else:
+        start = []
+    head = [f"Task: {res.get('instruction')}",
+            f"Result: {'succeeded' if res.get('success') else 'failed'} after {res.get('steps')} of {res.get('horizon_steps')} steps, "
+            f"{len(turns)} turns. Final inventory: {json.dumps(res.get('final_inventory') or {})}",
+            *start,
+            *timeline([(e, u) for e, u, _ in parts], turns),
+            "Turns. Columns: turn | steps | height y start->end | command | how it ended | changes | the agent's thought"
+            + (" | [saved] = the world was saved after this turn" if ck else "")]
+    body = []
+    for (e, _, note), ts_ in zip(parts, pturns):
+        if note:
+            body.append(f"-- {note} --")
+        body += _merge(_rows(e, ts_))
+    return "\n".join(head + body)
 
 
 def _merge(rows) -> list[str]:

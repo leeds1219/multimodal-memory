@@ -46,9 +46,11 @@ Answer with JSON only:
     "better": "<the better choice it could have made then>",
     "reason": "<how this decision led to the failure, with the turns and log lines that show it>"}}, ...]}}"""
 
-FIND_EXTRA_NEXT = """Failure points found before in this attempt, each tried with a change whose prediction was observed.
-The log you get is the attempt after those changes; find the other causes of the failure:
-{prev}"""
+FIND_EXTRA_NEXT = """This attempt was played in parts: after each failure point found before, the game was replayed from a
+save with a change. The log shows every part from step 0. The experiments so far, each with its failure point, the
+change, the verdict on its prediction and what was observed:
+{prev}
+Find the failure points in the whole log, earlier parts included. Do not list a turn already tried above."""
 
 
 def find_system(vocab, extra: str = "") -> str:
@@ -56,8 +58,8 @@ def find_system(vocab, extra: str = "") -> str:
 
 
 def find(compressed: str, earlier: list, log: list, vocab) -> list | None:
-    """[{turn, decision, reason}], earliest turn first, or None for an unparsable answer. `earlier`: failure points
-    whose change was supported earlier in this loop."""
+    """[{turn, decision, reason}], earliest turn first, or None for an unparsable answer. `earlier`: the experiments
+    so far in this loop (failure point, change, verdict, observed); `compressed`: the whole attempt from step 0."""
     extra = FIND_EXTRA_NEXT.format(prev="\n".join(json.dumps(e, ensure_ascii=False) for e in earlier)) if earlier else ""
     out = ask_json(find_system(vocab, extra), compressed, log, "find_failure_point")
     if not out or not isinstance(out.get("failure_points"), list):
