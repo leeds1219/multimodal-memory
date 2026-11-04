@@ -32,8 +32,8 @@ Work in this order:
    them or leave one out because it looks small; each will be tested.
 3. For each failure point, write what the agent believed or did, and what the log shows instead (for
    judgment: the better choice).
-4. A turn a marker line says was tried already: list it only if the log after the marker shows a
-   different cause, and say what is different.
+4. A turn a marker line says was tried already: list it only if turn rows after that marker show a
+   different cause; cite those rows in evidence and say what is different in differs.
 5. Order the list by turn, earliest first.
 
 Answer with JSON only:
@@ -41,7 +41,8 @@ Answer with JSON only:
   "decision": "<what the agent decided, and what it believed then>",
   "shown": "<what the log shows instead; for judgment, the better choice>",
   "knowledge": "<the Supported item of <knowledge> it went against, or empty>",
-  "evidence": "<the turn rows that show it>"}}, ...]}}"""
+  "evidence": "<the turn rows that show it>",
+  "differs": "<for a turn tried already: what the rows after its marker show differently, or empty>"}}, ...]}}"""
 
 
 def find_system(vocab, plan: bool) -> str:
@@ -51,7 +52,7 @@ def find_system(vocab, plan: bool) -> str:
 
 def find(task: str, commands: str, milestones: str, log_text: str, knowledge: str, plan: str | None, events: list,
          vocab) -> list | None:
-    """[{turn, kind, decision, shown, knowledge, evidence}] by turn, or None for an unparsable answer."""
+    """[{turn, kind, decision, shown, knowledge, evidence, differs}] by turn, or None for an unparsable answer."""
     out = ask_json(find_system(vocab, bool(plan)), tagged(task=task, commands=commands, milestones=milestones,
                                                           log=log_text, knowledge=knowledge, plan=plan),
                    events, "find_failure_point")
@@ -61,5 +62,5 @@ def find(task: str, commands: str, milestones: str, log_text: str, knowledge: st
     for f in out["failure_points"]:
         if isinstance(f, dict) and isinstance(f.get("turn"), int) and f["turn"] not in found:
             found[f["turn"]] = {"turn": f["turn"], **{k: str(f.get(k, "")) for k in
-                                                      ("kind", "decision", "shown", "knowledge", "evidence")}}
+                                                      ("kind", "decision", "shown", "knowledge", "evidence", "differs")}}
     return [found[t] for t in sorted(found)]

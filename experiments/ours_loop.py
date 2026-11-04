@@ -34,6 +34,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import threading
 import time
@@ -120,6 +121,24 @@ class Loop:
         return None
 
     # ---------------------------------------------------------------- 1. failure points
+    def reopen(self, old: dict, f: dict, sig: str):
+        """A failure point listed again. It is tried again, with its experiment record, only if its evidence cites a
+        turn of a timeline part added after its last try (the log shows something new there; the stated reason
+        alone is not enough) and it has tries left; its hypotheses count against loop.tries_per_failure_point in
+        total. Every relisting is kept in old["relisted"]."""
+        cited = [int(t) for t in re.findall(r"T(\d+)", f.get("evidence", ""))]
+        seen = set(old.get("episodes_at_try", []))
+        new = [t for t in cited if (w := self.part_of(t)) and w[1]["episode"] not in seen]
+        ok = bool(new) and old["closed"] != "Supported" and len(old["record"]) < L["tries_per_failure_point"]
+        old.setdefault("relisted", []).append({"timeline": [x["episode"] for x in self.st["timeline"]], "kind": f["kind"],
+                                               "differs": f.get("differs", ""), "evidence": f.get("evidence", ""),
+                                               "new_turns_cited": new, "reopened": ok})
+        if ok:
+            old.update(closed=None, search=sig, kind=f["kind"], decision=f["decision"], shown=f["shown"],
+                       knowledge=f["knowledge"], evidence=f["evidence"])
+        log(f"  T{f['turn']} tried before: " + (f"reopened (new turns cited: {new})" if ok else
+                                               "skipped (no turn of a later part cited, or no tries left)"))
+
     def search(self) -> bool:
         """List the failure points of the current timeline once; False when the answer was unparsable."""
         sig = json.dumps(self.st["timeline"])
@@ -137,8 +156,10 @@ class Loop:
                 log(f"  T{f['turn']} skipped: not a turn of the timeline")
                 continue
             i, p, ts = where
-            if any(x["episode"] == p["episode"] and x["turn"] == f["turn"] for x in self.st["failure_points"]):
-                log(f"  T{f['turn']} skipped: tried before")
+            old = next((x for x in self.st["failure_points"] if x["episode"] == p["episode"] and x["turn"] == f["turn"]),
+                       None)
+            if old:  # tried before: reopened only on evidence from timeline parts added since its last try
+                self.reopen(old, f, sig)
                 continue
             ck = self.dom.save_before(Path(p["episode"]), f["turn"])
             if ck == ("", 0) or (ck and ck[1] < p["start_step"]):  # before the part's first save: where it started
@@ -246,6 +267,7 @@ class Loop:
              "verdict": verdict, "frequency": [kk, n], "observed": observed, "continuation": None}
         self.st["experiments"].append(e)
         fp["record"].append({x: e[x] for x in ("statement", "change", "prediction", "verdict", "observed")})
+        fp["episodes_at_try"] = [x["episode"] for x in self.st["timeline"]]  # episodes played after this try are new
         log(f"  e{k} {verdict} {kk}/{n}" + ("; task succeeded in a rollout" if success else ""))
         if verdict in ("Supported", "Refuted"):
             wk.add(self.store, {"statement": hyp["statement"], **hyp["hypothesis"], "verdict": verdict, "k": kk, "n": n,
