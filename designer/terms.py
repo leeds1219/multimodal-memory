@@ -26,20 +26,20 @@ TERMS = {  # each term as the prompts list it, line breaks included
   is tested by an experiment.""",
     'Kinds of failure point': """\
 - Kinds of failure point:
-  - mismatch: the result contradicts what the agent's thought said it expected: the decision rested on a
-    wrong belief about the world.
-  - missed response: after a mismatch, the agent goes on as if the result had been what it expected.
-  - ignored knowledge: the agent acts against a Supported item of World Knowledge it was given.
+  - mismatch: what the command did contradicts what the agent's thought said it expected: the decision
+    rested on a wrong belief about the world.
+  - missed response: after a mismatch, the agent goes on as if the command had done what it expected.
+  - ignored knowledge: the agent acts against a Supported entry of World Knowledge it was given.
   - judgment: none of the above; only the Designer's own knowledge says a better choice was available
     then.""",
     'Rollout': """\
-- Rollout: one play from the restart point with the change. Each hypothesis gets {rollouts} rollouts from the
-  same restart point, taken as independent trials.""",
+- Rollout: one play from the restart point with the change. Each hypothesis gets {rollouts} rollouts from
+  the same restart point, taken as independent trials.""",
     'World Knowledge': """\
 - World Knowledge: what experiments in any attempt found out about this world, as summaries only: each
   hypothesis that was Supported (it holds) or Refuted (it does not hold), with its verdict, its frequency
-  (R followed in k of its n rollouts) and no log. Hypotheses Not reached are not in it. The agent is
-  given the Supported ones.""",
+  (the result followed in k of its n rollouts) and no log. Hypotheses Not reached are not in it. The
+  agent is given the Supported ones.""",
     'Restart point': """\
 - Restart point: the last save before the failure point; the experiment plays on from there, and
   everything after it is played again.""",
@@ -50,29 +50,32 @@ TERMS = {  # each term as the prompts list it, line breaks included
     'Hypothesis': """\
 - Hypothesis: a rule of this world in three parts, each written in the words the log uses and true
   beyond this attempt.
-  S (situation): a condition turn rows can show: what the inventory holds, what is held or placed, the
-  height, how the last command ended. The agent must be able to bring S about with its commands within
-  the window; a situation it can only wait for by chance is not an S.
-  A (action): a command, or a short sequence of commands, from the commands list.
-  R (result): what the turn rows of A record: how the command ends and what changes in that turn (an
-  inventory change, a change of height, a death). Not a later goal that needs more actions after A. R
-  may depend on chance.
-  The rule says R can follow when S holds and the agent does A; how often is measured by the rollouts.
-  No turn numbers, steps, positions or anything only this attempt had; a number only when the rule is
-  about that number. If Supported, it becomes World Knowledge.""",
+  situation: a condition turn rows can show: what the inventory holds, what is held or placed, the
+  height, how the last command ended. The agent must be able to bring the situation about with its
+  commands within the window; a situation it can only wait for by chance does not count.
+  action: a command, or a short sequence of commands, from the commands list.
+  result: what the turn rows of the action record: how the command ends and what changes in that turn
+  (an inventory change, a change of height, a death). Not a later goal that needs more actions after
+  the action. The result may depend on chance.
+  The rule says the result can follow when the agent does the action while the situation holds; how
+  often is measured by the rollouts. No turn numbers, steps, positions or anything only this attempt
+  had; a number only when the rule is about that number. If Supported, it becomes World Knowledge.""",
     'Change': """\
 - Change: what the agent does to test the hypothesis, with its commands: when it starts (a situation,
-  not a turn number), what it does, and when it stops. It brings the agent to S and has it do A.""",
+  not a turn number), what it does, and when it stops. It brings the agent to the situation and has it
+  do the action.""",
     'Prediction': """\
 - Prediction: what the log will show if the hypothesis is right.
-  When: in each rollout, the first time within the window that the agent does A while S holds.
-  What: whether R follows; it must be the game's response, never only that the agent did A.""",
+  When: in each rollout, the first time within the window that the agent does the action while the
+  situation holds.
+  What: whether the result follows; it must be the game's response, never only that the agent did the
+  action.""",
     'Experiment record': """\
 - Experiment record: every experiment at one failure point: its hypothesis, change, prediction, verdict
   (Supported, Refuted or Not reached), frequency, and what the log of each rollout showed.""",
     'Occurrence': """\
-- Occurrence: the first time in a rollout that the agent does A while S holds. It is marked with whether
-  R followed.""",
+- Occurrence: the first time in a rollout that the agent does the action while the situation holds. It
+  is marked with whether the result followed.""",
 }
 
 # The layouts of the inputs, shared by the prompts that get them.
@@ -103,13 +106,12 @@ TIMELINE_LOG = """\
     -- Step <step>: replayed from a save. Failure point tried: T<turn> (<what happened>). Change given to the agent from here: "<change>". Verdict: <verdict> --
 """ + THOUGHT_NOTE
 KNOWLEDGE_LINES = """\
-    verdict: <Supported | Refuted>
-    frequency: R followed in <k> of <n> rollouts
-    situation: <S>
-    action: <A>
-    result: <R>
-    statement: <in S, doing A leads to R>
-    from: <the task and experiment it was tested in>
+    hypothesis: <in this situation, doing this action leads to this result>
+      situation: <...>
+      action: <...>
+      result: <...>
+    verdict: <Supported | Refuted> (the result followed in <k> of <n> rollouts)
+    from: <the experiments it was tested in>
   Entries are separated by a blank line."""
 PLAN_INPUT = """\
 - <plan>: the sub-goals the agent wrote before its first turn, one per line, in order:

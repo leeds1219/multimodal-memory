@@ -9,8 +9,8 @@ from terms import COMMANDS_INPUT, KNOWLEDGE_LINES, MILESTONES_INPUT, PLAN_INPUT,
 
 KINDS = ("mismatch", "missed response", "ignored knowledge", "judgment")
 
-HEAD = """You are the Designer. You review one timeline of a failed attempt at a {domain} task, played by an agent that sends one
-command per turn, and find its failure points.
+HEAD = """You are the Designer. You review one timeline of a failed attempt at a {domain} task, played by an
+agent that sends one command per turn, and find its failure points.
 
 """ + terms("Episode", "Attempt", "Timeline", "Milestone", "Turn row", "Segment", "Failure point",
             "Kinds of failure point", "Rollout", "World Knowledge") + """
@@ -36,13 +36,19 @@ Work in this order:
    different cause; cite those rows in evidence and say what is different in differs.
 5. Order the list by turn, earliest first.
 
+Output:
+- failure_points: list, by turn, earliest first, or [] when there is none; each entry:
+  - turn: integer, the turn number without "T"
+  - kind: one of "mismatch", "missed response", "ignored knowledge", "judgment"
+  - decision: string, what the agent decided, and what it believed then
+  - shown: string, what the log shows instead; for judgment, the better choice
+  - knowledge: string, the hypothesis of the Supported <knowledge> entry it went against, or "" when none
+  - evidence: string, the turn rows that show it
+  - differs: string, for a turn tried already, what the rows after its marker show differently, or ""
+
 Answer with JSON only:
-{{"failure_points": [{{"turn": <n>, "kind": "mismatch" | "missed response" | "ignored knowledge" | "judgment",
-  "decision": "<what the agent decided, and what it believed then>",
-  "shown": "<what the log shows instead; for judgment, the better choice>",
-  "knowledge": "<the Supported item of <knowledge> it went against, or empty>",
-  "evidence": "<the turn rows that show it>",
-  "differs": "<for a turn tried already: what the rows after its marker show differently, or empty>"}}, ...]}}"""
+{{"failure_points": [{{"turn": <integer>, "kind": "...", "decision": "...", "shown": "...", "knowledge": "...",
+  "evidence": "...", "differs": "..."}}, ...]}}"""
 
 
 def find_system(vocab, plan: bool) -> str:
@@ -56,11 +62,20 @@ def find(task: str, commands: str, milestones: str, log_text: str, knowledge: st
     out = ask_json(find_system(vocab, bool(plan)), tagged(task=task, commands=commands, milestones=milestones,
                                                           log=log_text, knowledge=knowledge, plan=plan),
                    events, "find_failure_point")
-    if not out or not isinstance(out.get("failure_points"), list):
+    if not valid(out):
         return None
     found = {}
     for f in out["failure_points"]:
-        if isinstance(f, dict) and isinstance(f.get("turn"), int) and f["turn"] not in found:
-            found[f["turn"]] = {"turn": f["turn"], **{k: str(f.get(k, "")) for k in
-                                                      ("kind", "decision", "shown", "knowledge", "evidence", "differs")}}
+        found.setdefault(f["turn"], {"turn": f["turn"], **{k: f.get(k, "") for k in FIELDS}})
     return [found[t] for t in sorted(found)]
+
+
+FIELDS = ("kind", "decision", "shown", "knowledge", "evidence", "differs")
+
+
+def valid(out) -> bool:
+    """The answer as Output specifies it: every entry with an integer turn, a known kind and string fields."""
+    fps = out.get("failure_points") if isinstance(out, dict) else None
+    return isinstance(fps, list) and all(
+        isinstance(f, dict) and isinstance(f.get("turn"), int) and not isinstance(f["turn"], bool)
+        and f.get("kind") in KINDS and all(isinstance(f.get(k, ""), str) for k in FIELDS) for f in fps)

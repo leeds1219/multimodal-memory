@@ -1,4 +1,5 @@
 # Planner backbone for chains whose variant carries the token "g38" (scripts/chain.py);
+json_mode: false               # response_format json_object for the Designer's calls; only for endpoints that take it
 # identical to llm.yaml except the model and its price.
 provider: gemini              # llm/providers.py: gemini, openai (any OpenAI-compatible server, incl. local vLLM/Ollama), mock
 model: gemini-3.8-flash

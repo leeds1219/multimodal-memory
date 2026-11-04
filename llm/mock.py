@@ -161,7 +161,11 @@ def _designer(text: str, system: str) -> dict | None:
     """The Designer roles (designer/): fixed answers built from the input, so the learning loop runs end to end at $0.
     Test cases of the loop: MOCK_FP_TURN=<n> picks that turn as the failure point (default: the last turn of the
     log); MOCK_JUDGE=followed (default) | not_followed | none answers each rollout with an occurrence whose R
-    followed, one whose R did not, or no occurrence."""
+    followed, one whose R did not, or no occurrence; MOCK_MALFORMED=1 answers every role with a wrong type (the
+    parsers must reject it)."""
+    if os.environ.get("MOCK_MALFORMED") == "1":
+        return {"milestones": "log", "failure_points": [{"turn": "T30", "kind": "bad"}], "hypothesis": 3,
+                "occurrence": {"turn": "T1", "result_followed": "yes"}}
     turns = [int(t) for t in re.findall(r"^T(\d+)", text, re.M)]
     if system.startswith("You are the Designer. You decide the milestones"):
         return {"milestones": [{"item": "log", "why": "mock", "evidence": "usual way"},
@@ -171,9 +175,8 @@ def _designer(text: str, system: str) -> dict | None:
         return {"failure_points": [{"turn": want if want in turns else max(turns, default=1), "kind": "judgment", "decision": "mock decision",
                                     "shown": "mock better choice", "knowledge": "", "evidence": "mock"}]}
     if system.startswith("You are the Designer. You propose one hypothesis"):
-        return {"hypothesis": {"situation": "standing on stone", "action": "steve 'dig down'",
-                               "result": "inv cobblestone +1"},
-                "statement": "When standing on stone, steve 'dig down' adds cobblestone.",
+        return {"hypothesis": "When standing on stone, steve 'dig down' adds cobblestone.",
+                "situation": "standing on stone", "action": "steve 'dig down'", "result": "inv cobblestone +1",
                 "change": {"start": "now", "do": "dig straight down", "stop": "after one block"},
                 "plan": "look down and attack", "prediction": {"when": "the first dig down", "what": "cobblestone +1"},
                 "differs_from": ""}

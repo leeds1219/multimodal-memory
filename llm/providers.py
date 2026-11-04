@@ -32,6 +32,7 @@ def response(content: str, finish_reason: str = "stop", n_in: int = 0, n_out: in
 class Provider:
     name = "base"
     retryable: tuple = ()  # exceptions retried with backoff
+    json_mode = False  # the backend takes response_format {"type": "json_object"} (asked for by json=True callers)
 
     def __init__(self, cfg: dict):
         self.cfg = cfg
@@ -61,6 +62,7 @@ class OpenAICompat(Provider):
 
     def __init__(self, cfg: dict):
         super().__init__(cfg)
+        self.json_mode = bool(cfg.get("json_mode"))  # off unless the config says the endpoint accepts it
         import openai
         self.retryable = (openai.RateLimitError, openai.APIConnectionError, openai.APITimeoutError,
                           openai.InternalServerError)

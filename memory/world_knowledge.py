@@ -2,11 +2,12 @@
 Refuted, as summaries only, kept for later episodes and attempts.
 
 Store: <runs>/memory/wk_<name>.json, a list of {"statement", "situation", "action", "result", "verdict", "k", "n",
-"source", "sources"} (verdict Supported or Refuted; R followed in k of n rollouts). It is one pool shared by every
+"source", "sources"} (verdict Supported or Refuted; the result followed in k of n rollouts; "statement" is the
+hypothesis sentence, shown to the Designer as "hypothesis"). It is one pool shared by every
 attempt and task of the store, read and written without waiting for each other: add() takes a file lock, merges and
 replaces the file in one rename, so readers never see a half-written file. The same rule tested again (same
 situation, action and result) is merged into its item: k and n add up, the verdict follows the summed frequency
-(Supported if R ever followed), and the experiment joins "sources". The Designer gets every item (lines()); the agent
+(Supported if the result ever followed), and the experiment joins "sources". The Designer gets every item (lines()); the agent
 gets the Supported ones in its system prompt (prompt_text(); items written before verdicts were stored count as
 Supported).
 """
@@ -56,12 +57,12 @@ def supported(items) -> list:
 
 
 def lines(items) -> str:
-    """The Designer's view: every item as a block of its fields (designer/terms.py KNOWLEDGE_LINES)."""
+    """The Designer's view: every item as a block, the hypothesis first (designer/terms.py KNOWLEDGE_LINES)."""
     return "\n\n".join(
-        f"verdict: {k.get('verdict', 'Supported')}\n"
-        f"frequency: R followed in {k.get('k', '?')} of {k.get('n', '?')} rollouts\n"
-        f"situation: {k.get('situation', '')}\naction: {k.get('action', '')}\nresult: {k.get('result', '')}\n"
-        f"statement: {k['statement']}\nfrom: {', '.join(x for x in k.get('sources') or [k.get('source', '')] if x)}"
+        f"hypothesis: {k.get('statement') or k.get('hypothesis', '')}\n"
+        f"  situation: {k.get('situation', '')}\n  action: {k.get('action', '')}\n  result: {k.get('result', '')}\n"
+        f"verdict: {k.get('verdict', 'Supported')} (the result followed in {k.get('k', '?')} of {k.get('n', '?')} rollouts)\n"
+        f"from: {', '.join(x for x in k.get('sources') or [k.get('source', '')] if x)}"
         for k in items or [])
 
 

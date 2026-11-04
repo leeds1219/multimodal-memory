@@ -1,4 +1,6 @@
-"""One LLM call that must answer a JSON object (the Designer roles)."""
+"""One LLM call that must answer a JSON object (the Designer roles). The prompts specify the object themselves (their
+"Output" sections), so any model can answer them; where the config's json_mode is on, the provider is also asked for
+a JSON-only response (llm/providers.py)."""
 from __future__ import annotations
 
 import json
@@ -10,7 +12,7 @@ def ask_json(system: str, user: str, log: list, kind: str, max_tokens: int = 400
     from client import LLMClient
     try:
         resp = LLMClient().chat.completions.create(
-            model="FROM_CONFIG", max_tokens=max_tokens,
+            model="FROM_CONFIG", max_tokens=max_tokens, json=True,
             messages=[{"role": "system", "content": system}, {"role": "user", "content": user}])
         txt = resp.choices[0].message.content or ""
     except Exception as e:

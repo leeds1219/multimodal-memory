@@ -229,9 +229,12 @@ class _Completions:
             kw["temperature"] = CFG["default_temperature"]
         if kw.get("max_tokens") is None and CFG.get("default_max_tokens") is not None:
             kw["max_tokens"] = CFG["default_max_tokens"]
+        want_json = kw.pop("json", False)  # the caller wants a JSON object: response_format where the provider takes it
         kw = {k: v for k, v in kw.items() if v is not None}
         method_max_tokens = kw.get("max_tokens")
         kw = self._p.prepare(kw)
+        if want_json and self._p.json_mode:
+            kw["response_format"] = {"type": "json_object"}
 
         with _LOCK:
             spent = _global_spent()
