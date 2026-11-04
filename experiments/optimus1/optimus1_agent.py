@@ -1,8 +1,8 @@
 """Optimus-1 reproduction (EXPERIMENTS.md 1): labelled fixes and diagnostics applied to the released code.
 
 Each block is switched on by one variant token (experiments/chain.py -> OPTIMUS_* environment variable) and patches
-the released module in memory; the authors' files are not edited. Called by world/episode.py before the episode runs.
-The Baseline agent and everything after it use none of these except `isoworld` (world/private_world.py).
+the released module in memory; the authors' files are not edited. Called by domains/minecraft/world/episode.py before the episode runs.
+The Baseline agent and everything after it use none of these except `isoworld` (domains/minecraft/world/private_world.py).
 """
 from __future__ import annotations
 

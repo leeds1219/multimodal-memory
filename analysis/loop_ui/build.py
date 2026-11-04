@@ -11,7 +11,7 @@ are. Look at it next to the episode browser (analysis/browse.py links loop/ from
 or publish one experiment folder as an artifact: page = index.html, files = data.json, meta.json, frames/*.
 
 What is read: loop.json (the loop's own record: failure points, hypotheses, verdicts, restart steps, settings) and,
-through the domain adapter (domains/<domain>.py, chosen with --domain), each episode's result, turns, progress and
+through the domain adapter (domains/<domain>/loop_ui.py, chosen with --domain), each episode's result, turns, progress and
 keyframes. Loops run before the settings were recorded (2026-11-03) are marked: they stopped at "no failure point
 left" instead of listing the failure points again in the latest retry's log.
 """
@@ -22,9 +22,11 @@ import importlib
 import json
 import re
 import shutil
+import sys
 from pathlib import Path
 
 REPRO = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPRO))  # the domain packages, domains/<name>/
 HERE = Path(__file__).parent
 LOOPS = REPRO / "results" / "ours_loop"
 SITE = REPRO / "run_data" / "site" / "loop"
@@ -119,10 +121,10 @@ def build(exp, names, dom, out):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--exp", help="one experiment (default: all)")
-    ap.add_argument("--domain", default="minecraft", help="adapter in analysis/loop_ui/domains/")
+    ap.add_argument("--domain", default="minecraft", help="adapter domains/<domain>/loop_ui.py")
     ap.add_argument("--site", default=str(SITE))
     a = ap.parse_args()
-    dom = importlib.import_module(f"domains.{a.domain}")
+    dom = importlib.import_module(f"domains.{a.domain}.loop_ui")
     site = Path(a.site)
     exps = experiments()
     if a.exp:

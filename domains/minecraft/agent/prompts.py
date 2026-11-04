@@ -1,9 +1,12 @@
 """Every text the Baseline agent's VLM gets, in one place.
 
 The system prompt is SYSTEM with the command list (CMD_KEYS, CMD_STEVE, CMD_HELPERS), plus the additions of the
-experiment: GRAPH_NOTE (GT Recipe), ORE_HINT / ORE_RULE_CODE (GT World Rule v1 / v2), EXP_NOTE / EXP_NOTE_START (an experiment of Ours, from a save / from the start), World Knowledge
-(memory/world_knowledge.py) and MineEvolve's own text (memory/mineevolve_memory.py).
+experiment: GRAPH_NOTE (GT Recipe), ORE_HINT / ORE_RULE_CODE (GT World Rule v1 / v2), MineEvolve's own text
+(memory/mineevolve_memory.py), and what the method adds to any agent (executor/extras.py: World Knowledge and an
+experiment of Ours).
 """
+from hyperparams import HP
+
 
 SYSTEM = """You control a player in Minecraft. The game is paused while you decide; after each command
 it runs (20 game steps per second) and pauses again.
@@ -26,7 +29,7 @@ CMD_HELPERS = """  {"type": "equip", "item": "<item id>"}   puts the item in han
   {"type": "craft", "item": "<item id>", "n": <count>}         crafts it if the materials are there
   {"type": "smelt", "item": "<item id>", "n": <count>}         smelts it in a furnace if the materials are there"""
 
-N_HISTORY = 10  # earlier commands shown each turn
+N_HISTORY = HP["executor"]["history_turns"]  # earlier commands shown each turn
 TURN = "Your previous commands and how they ended (most recent last):\n{history}\n\nTurn {n}. Next command?"
 
 GRAPH_NOTE = ("\n<craft graph>: a top-down list of all the tools and materials needed to complete the task, "
@@ -58,9 +61,3 @@ ORE_RULE_CODE = (
     "- y 14 or lower: diamond, only if L is 1 or higher\n"
     "- any other y: nothing\n"
     "Ore generated with the world also exists, but you have to find it.")
-EXP_NOTE = ("\n\nThis attempt starts from a saved moment of an earlier attempt at this task: the world, your position, "
-            "inventory and your last commands are as they were then. In the earlier attempt the task failed. "
-            "From here, try this change:\n{change}\nHow to try it: {plan}\n"
-            "Keep working on the overall task after trying it.")
-EXP_NOTE_START = ("\n\nThis attempt starts from the beginning, in the same world as an earlier attempt at this task. In the "
-                  "earlier attempt the task failed. This time, try this change:\n{change}\nHow to try it: {plan}\nKeep working on the overall task after trying it.")

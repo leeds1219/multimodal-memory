@@ -18,7 +18,7 @@ def run(name, overrides, body, extra_env=None):
     cfgf = TMP / name / "llm.yaml"; cfgf.write_text(yaml.safe_dump(cfg))
     ctxf = TMP / name / "ctx.json"
     ctxf.write_text(json.dumps({"method": "llmtest", "run_id": name, "episode_dir": str(TMP / name / "ep")}))
-    code = "import sys; sys.path.insert(0, %r)\nfrom gemini_client import *\nc = GeminiClient()\n" % str(HERE) + textwrap.dedent(body)
+    code = "import sys; sys.path.insert(0, %r)\nfrom client import *\nc = LLMClient()\n" % str(HERE) + textwrap.dedent(body)
     env = {**os.environ, "LLM_CONFIG": str(cfgf), "LLM_CTX_FILE": str(ctxf), **(extra_env or {})}
     t = time.time()
     r = subprocess.run([sys.executable, "-c", code], env=env, capture_output=True, text=True)
@@ -58,7 +58,7 @@ print("backoff logged attempts:", rec["attempts"], "error:", rec.get("error", ""
 run("global_cap", {"global_cap_usd": 1e-9}, """
 c.chat.completions.create(model="x", messages=[{"role":"user","content":"Say OK."}])
 print("first call ok (ledger now > cap)")
-import gemini_client; gemini_client._TOTAL_CACHE["t"] = 0
+import client; client._TOTAL_CACHE["t"] = 0
 try:
     c.chat.completions.create(model="x", messages=[{"role":"user","content":"Say OK."}])
     print("ERROR: cap not enforced")

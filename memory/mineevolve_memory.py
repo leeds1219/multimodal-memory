@@ -514,13 +514,13 @@ class MineEvolve:
 
     def _llm(self, system, payload, frames, kind):
         from images import img
-        from gemini_client import GeminiClient
+        from client import LLMClient
         pick = frames if len(frames) <= N_FRAMES else [frames[round(i * (len(frames) - 1) / (N_FRAMES - 1))] for i in range(N_FRAMES)]
         content = [{"type": "text", "text": json.dumps(payload, ensure_ascii=False, indent=1)}]
         for i, f in enumerate(pick):
             content += [{"type": "text", "text": f"Frame {i + 1} of {len(pick)} (in time order):"}, img(f)]
         try:
-            resp = GeminiClient().chat.completions.create(model="FROM_CONFIG", max_tokens=1200,
+            resp = LLMClient().chat.completions.create(model="FROM_CONFIG", max_tokens=1200,
                                                           messages=[{"role": "system", "content": system},
                                                                     {"role": "user", "content": content}])
             txt = resp.choices[0].message.content or ""

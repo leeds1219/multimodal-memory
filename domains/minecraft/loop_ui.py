@@ -1,4 +1,4 @@
-"""Minecraft adapter for the loop results page: everything build.py needs that depends on the simulator and agent.
+"""Minecraft adapter for the loop results page (analysis/loop_ui/build.py): everything build.py needs that depends on the simulator and agent.
 
 An adapter module has: goal(result) -> dict, episode(path, goal) -> dict, turns(path) -> {turn: record},
 frame(path, step) -> keyframe file or None, world(source path) -> int or None.
@@ -11,7 +11,7 @@ from pathlib import Path
 
 import yaml
 
-REPRO = Path(__file__).resolve().parents[3]
+REPRO = Path(__file__).resolve().parents[2]
 SUITE = REPRO / "configs" / "suites" / "optimus1"
 TARGETS = yaml.safe_load(open(SUITE / "task_targets.yaml"))["targets"]
 GRAPHS = json.load(open(SUITE / "craft_graphs.json"))

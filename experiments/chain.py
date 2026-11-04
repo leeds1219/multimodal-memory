@@ -180,7 +180,7 @@ class Chain:
                                   "instruction": TASKS[task]["instruction"], "episode_dir": str(ep),
                                   "run_id": f"{self.chain_id}/{self.a.order}/{task}"})
         server = self.start_server(ep)
-        cmd = ["xvfb-run", "-a", PY, str(REPRO / "world" / "episode.py"), "--task", task,
+        cmd = ["xvfb-run", "-a", PY, str(REPRO / "domains" / "minecraft" / "world" / "episode.py"), "--task", task,
                "--seed", str(seed), "--order-id", self.a.order, "--episode-dir", str(ep), "--port", str(self.a.port),
                "--workdir", str(self.wd)]
         t0 = time.time()
@@ -209,7 +209,7 @@ class Chain:
 
     # ------------------------------------------------------------------ main
     def run(self, tasks: list[str]) -> int:
-        from gemini_client import CFG, ledger_total
+        from client import CFG, ledger_total
         # The episodes run with the condition's LLM config (e.g. llm_g38mon.yaml): check that config's cap,
         # not the default llm.yaml one this process loaded.
         if self.env_vars.get("LLM_CONFIG"):

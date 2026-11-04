@@ -1,11 +1,11 @@
-"""Run ONE episode in Optimus-1's Minecraft env (the "real world"), with the Baseline agent (system1/) or, for the
+"""Run ONE episode in Optimus-1's Minecraft env (the "real world"), with the Baseline agent (executor/) or, for the
 Optimus-1 reproduction, the released Optimus-1 planner.
 
 The Optimus-1 server (app.py: STEVE-1, and for the reproduction the Gemini planner/reflector) is started by
 experiments/chain.py with the same per-chain working directory, because Optimus-1 resolves memory, recipes,
 checkpoints and step images relative to the cwd.
 
-    python world/episode.py --task o1_gold_00 --seed S --episode-dir D --port P --workdir WD   (via experiments/chain.py)
+    python domains/minecraft/world/episode.py --task o1_gold_00 --seed S --episode-dir D --port P --workdir WD   (via experiments/chain.py)
 
 Glue applied here:
   * one task per process, task text injected through Hydra (``all_task`` /
@@ -35,7 +35,7 @@ import time
 import traceback
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 import paths  # noqa: E402,F401
 
 from benchmark import EpisodeMonitor, SEEDS, TASKS, disk_free_gb, env_o_group, is_method_exception, llm_summary, write_result  # noqa: E402
@@ -138,7 +138,7 @@ def main() -> int:
     om.agent_do = agent_do
 
     if os.environ.get("OPTIMUS_VLMTASK") == "1":
-        # Token vlmtask: the Baseline agent (system1/vlm_agent.py) does the whole task; the released Optimus-1
+        # Token vlmtask: the Baseline agent (domains/minecraft/agent/vlm_agent.py) does the whole task; the released Optimus-1
         # planner and memory are not run. Same env, world seed, success monitor and horizon; the Optimus-1 server
         # is used only for STEVE-1 actions.
         import types

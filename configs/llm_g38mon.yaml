@@ -1,14 +1,16 @@
 # Same as llm_g38.yaml (token "g38mon") with runaway guards raised (runs with frequent reflection or long horizons).
 # identical to llm.yaml except the model and its price.
+provider: gemini              # llm/providers.py: gemini, openai (any OpenAI-compatible server, incl. local vLLM/Ollama), mock
 model: gemini-3.8-flash
 base_url: https://generativelanguage.googleapis.com/v1beta/openai/
-api_key_file: env.yaml        # GOOGLE_API_KEY="..." (git-ignored); the GOOGLE_API_KEY environment variable wins
+api_key_env: GOOGLE_API_KEY   # read from this environment variable, else from api_key_file (git-ignored)
+api_key_file: env.yaml
 request_timeout_s: 300
 
 # Retries: exponential backoff 2^k s (capped at 60 s), then raise.
 max_retries: 6
 
-# Gemini counts thinking tokens against max_tokens. Methods' max_tokens were
+# provider gemini: Gemini counts thinking tokens against max_tokens. Methods' max_tokens were
 # set for non-thinking models (GPT-4o / Qwen) and bound the visible answer, so
 # the layer sends method_max_tokens + thinking_headroom.
 thinking_headroom_tokens: 32768

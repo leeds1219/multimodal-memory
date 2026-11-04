@@ -157,24 +157,44 @@ def _stageb(text: str, kw: dict, ctx: dict) -> str | None:
     return _stageb_plan(ctx, False)
 
 
-_SYSTEM2 = {  # System 2 roles (system2/): fixed answers, so the learning loop runs end to end at $0
-    "Find the failure point": {"turn": 8, "decision": "mock decision", "reason": "mock reason"},
-    "Propose one hypothesis": {"change": "dig straight down from here", "prediction": "a new ore appears in the inventory",
-                               "plan": "look down and attack", "statement": "mock statement"},
-    "You judge an experiment": {"verdict": "Refuted", "observed": "mock observed", "reason": "mock reason"},
-}
+def _designer(text: str, system: str) -> dict | None:
+    """The Designer roles (designer/): fixed answers built from the input, so the learning loop runs end to end at $0."""
+    turns = [int(t) for t in re.findall(r"^T(\d+)", text, re.M)]
+    if system.startswith("You are the Designer. You decide the milestones"):
+        return {"milestones": [{"item": "log", "why": "mock", "evidence": "usual way"},
+                               {"item": "planks", "why": "mock", "evidence": "usual way"}], "unsure": []}
+    if system.startswith("You are the Designer. You review one timeline"):  # the last turn of the log given
+        return {"failure_points": [{"turn": max(turns, default=1), "kind": "judgment", "decision": "mock decision",
+                                    "shown": "mock better choice", "knowledge": "", "evidence": "mock"}]}
+    if system.startswith("You are the Designer. You propose one hypothesis"):
+        return {"hypothesis": {"situation": "standing on stone", "action": "steve 'dig down'",
+                               "result": "inv cobblestone +1"},
+                "statement": "When standing on stone, steve 'dig down' adds cobblestone.",
+                "change": {"start": "now", "do": "dig straight down", "stop": "after one block"},
+                "plan": "look down and attack", "prediction": {"when": "the first dig down", "what": "cobblestone +1"},
+                "differs_from": ""}
+    if system.startswith("You are the Designer. You read the log of one rollout"):  # the first turn: R followed
+        return {"occurrence": {"turn": min(turns), "situation_shown_by": "mock", "result_followed": True,
+                               "evidence": "mock"} if turns else None}
+    return None
 
 
 def mock_response(kw: dict, ctx: dict):
     text = _text(kw)
-    for key, answer in _SYSTEM2.items():
-        if key in text:
-            return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=json.dumps(answer)),
-                                                            finish_reason="stop")], usage=None)
+    system = kw["messages"][0].get("content") if kw["messages"][0].get("role") == "system" else ""
+    answer = _designer(text, system if isinstance(system, str) else "")
+    if answer is not None:
+        return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=json.dumps(answer)),
+                                                        finish_reason="stop")], usage=None)
     if ctx.get("method") in ("deps", "jarvis1"):
         content = _stageb(text, kw, ctx)
     else:
-        content = _optimus(text, ctx) if ctx.get("method", "").startswith("optimus") else _mineevolve(text, ctx)
+        if "You plan a Minecraft task" in text:  # initial planning (domains/minecraft/agent/planner.py)
+            m = re.search(r"Overall task: ([^\n]+)", text)
+            content = json.dumps({"plan": [{"item": it.replace("logs", "log"), "count": n, "why": t}
+                                           for t, it, n in _OPT_STEPS[_target(text, {"instruction": m.group(1) if m else ""})]]})
+        else:
+            content = _optimus(text, ctx) if ctx.get("method", "").startswith("optimus") else _mineevolve(text, ctx)
     if content is None:
         content = "MOCK: unrecognised prompt"
     return SimpleNamespace(

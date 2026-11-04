@@ -1,21 +1,23 @@
-"""System 1: the Baseline agent. A VLM does the whole benchmark task, pausing the game every turn.
+"""The Executor: the Baseline agent. A VLM does the whole benchmark task, pausing the game every turn.
 
 Each turn gemini gets the overall task, the screen, the game-reported height, position relative to the start,
-facing, health and inventory, and how its last 10 commands ended (system1/prompts.py). It sends one command that
-runs for the number of steps it chose (system1/controller.py). No memory, no recipes, no reflection. The episode
-ends when the paper's success check (world/benchmark.py EpisodeMonitor) is met or the horizon runs out; deaths
+facing, health and inventory, and how its last 10 commands ended (domains/minecraft/agent/prompts.py). It sends one command that
+runs for the number of steps it chose (domains/minecraft/agent/controller.py). No memory, no recipes, no reflection. The episode
+ends when the paper's success check (domains/minecraft/world/benchmark.py EpisodeMonitor) is met or the horizon runs out; deaths
 respawn the agent, as in Optimus-1.
 
 What an experiment adds (environment variables set from the variant tokens by experiments/chain.py):
   OPTIMUS_VLM_RECIPES         the recipe graph in the prompt (GT Recipe; setup/build_craft_graphs.py)
   OPTIMUS_VLM_OREHINT=1       the hidden ore rule in the prompt (GT World Rule)
+  OPTIMUS_VLM_PLAN=1          initial planning: sub-goals written before the first turn (agent/planner.py)
   OPTIMUS_VLM_ME              MineEvolve memory (memory/mineevolve_memory.py)
-  OPTIMUS_VLM_WK              verified World Knowledge in the prompt (memory/world_knowledge.py)
-  OPTIMUS_EXPERIMENT          an experiment of experiments/ours_loop.py: the change to try, in the prompt
-  OPTIMUS_NOLAVA=1            lava near the agent becomes stone every NOLAVA_EVERY steps (world change)
-  OPTIMUS_CKPT_EVERY=N        the world is saved every N steps (world/save.py)
-  OPTIMUS_MAX_STEPS=N         tests only: the episode ends after N steps
-An episode started from a save (world/replay.py) gets `side`: the step count, the VLM's history and start position.
+  OPTIMUS_VLM_WK              verified World Knowledge in the prompt (executor/extras.py)
+  OPTIMUS_EXPERIMENT          an experiment of experiments/ours_loop.py: the change to try (executor/extras.py)
+  OPTIMUS_NOLAVA=1            lava near the agent becomes stone every NOLAVA_EVERY steps (domains/minecraft/world/nolava.py)
+  OPTIMUS_CKPT_EVERY=N        the world is saved every N steps (domains/minecraft/world/save.py)
+  OPTIMUS_MAX_STEPS=N         the episode ends N steps after its start (tests; the loop's rollouts: the window)
+  OPTIMUS_STOP_FILE           the episode ends at the next turn once this file exists (a rollout whose occurrence came)
+An episode started from a save (domains/minecraft/world/replay.py) gets `side`: the step count, the VLM's history and start position.
 
 Game commands sent during the episode (nolava, the world save) ride on the chat field of the agent's own action,
 one per step: an extra no-op tick would release held keys (Minecraft resets block breaking when attack is released)
@@ -29,30 +31,20 @@ import re
 import time
 from pathlib import Path
 
+import extras
 import mineevolve_memory
+import planner
 import prompts as P
 import save
 import world_knowledge
 from controller import Controller
+from hyperparams import HP
 from images import img, jpeg
 from inventory import inv_counts
+from nolava import NOLAVA_EVERY, nolava_cmds
+from paths import ROOT
 
-GRAPHS = Path(__file__).resolve().parents[1] / "configs/suites/optimus1/craft_graphs.json"
-NOLAVA_EVERY, NOLAVA_R = 10, 12  # (2R+1)^3 = 15625 blocks, under /fill's 32768
-# The fill is run by an invisible marker armor stand at the agent: a /fill that finds no lava fails, and a failure
-# run by the player prints a red "No blocks were filled" on its screen; run by the stand it prints nothing.
-# /fill refuses the whole box when a corner is below y 0, so the box is centred at max(y, R): near the bottom it is
-# y 0 to 2R, which still holds the agent.
-
-
-def nolava_cmds(y: float) -> tuple[str, str, str]:
-    r = NOLAVA_R
-    return ('/execute at @p run summon minecraft:armor_stand ~ ~ ~ {Invisible:1b,Marker:1b,NoGravity:1b,Silent:1b,Tags:["nolava"]}',
-            f"/execute as @e[tag=nolava] at @s positioned ~ {max(int(y), r)} ~ run fill ~-{r} ~-{r} ~-{r} ~{r} ~{r} ~{r} "
-            "minecraft:stone replace minecraft:lava",
-            "/kill @e[tag=nolava]")
-
-
+GRAPHS = ROOT / "configs/suites/optimus1/craft_graphs.json"
 class EnvBroken(RuntimeError):
     """Minecraft stopped answering (MineRL step timeout -> random observation, then done=True on every step).
     Raised out of the episode so the chain records a crash and retries it, instead of scoring an agent failure."""
@@ -123,19 +115,18 @@ class VLMAgent(Controller):
 
     # ------------------------------------------------------------ the VLM
     def system(self):
-        out = P.SYSTEM.format(task=self.task, subgoal=P.NO_SUBGOAL, commands="\n".join([P.CMD_KEYS, P.CMD_STEVE, P.CMD_HELPERS]))
+        plan, reached = self.opts.get("plan"), self.opts.get("plan_reached", [])
+        subgoal = planner.subgoal_text(plan, reached) if plan else P.NO_SUBGOAL
+        out = P.SYSTEM.format(task=self.task, subgoal=subgoal, commands="\n".join([P.CMD_KEYS, P.CMD_STEVE, P.CMD_HELPERS]))
+        if plan:
+            out += planner.note(plan, reached)
         if self.opts.get("ore_hint"):
             out += {"1": P.ORE_HINT, "2": P.ORE_RULE_CODE}[self.opts["ore_hint"]]
         if self.opts.get("graph"):
             out += P.GRAPH_NOTE.format(graph=self.opts["graph"].strip())
         if self.opts.get("me") is not None:
             out = out.replace(mineevolve_memory.ANSWER_LINE, mineevolve_memory.SUBGOAL_FORMAT) + self.opts["me"].prompt_text()
-        out += world_knowledge.prompt_text(self.opts.get("knowledge"))
-        if self.opts.get("experiment"):
-            h = self.opts["experiment"]
-            note = P.EXP_NOTE_START if self.opts.get("from_start") else P.EXP_NOTE
-            out += note.format(change=h["change"], plan=h["plan"])  # not the prediction: the agent must not aim at it
-        return out
+        return out + extras.prompt_text(self.opts)
 
     def ask(self, client, history, n_turn):
         hist = "\n".join(history[-P.N_HISTORY:]) or "(none yet)"
@@ -148,7 +139,7 @@ class VLMAgent(Controller):
         self.views = []
         self.last_view = self.obs["pov"].copy()
         msgs = [{"role": "system", "content": self.system()}, {"role": "user", "content": content}]
-        resp = client.chat.completions.create(model="FROM_CONFIG", messages=msgs, max_tokens=500)
+        resp = client.chat.completions.create(model="FROM_CONFIG", messages=msgs, max_tokens=HP["executor"]["max_tokens"])
         txt = resp.choices[0].message.content or ""
         m = re.search(r"\{.*\}", txt, re.S)
         try:
@@ -177,15 +168,13 @@ def craft_graph(target: str | None) -> str | None:
 
 def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | None = None,
              task_id: str | None = None, mcdir: Path | None = None, side: dict | None = None) -> dict:
-    from gemini_client import GeminiClient
+    from client import LLMClient
     remaining = max(1, int(env.timeout) - int(env.num_steps))
-    if os.environ.get("OPTIMUS_MAX_STEPS"):  # tests only: end the episode after this many steps
+    if os.environ.get("OPTIMUS_MAX_STEPS"):  # tests; the loop's rollouts (the window)
         remaining = min(remaining, int(os.environ["OPTIMUS_MAX_STEPS"]))
-    exp = json.loads(Path(os.environ["OPTIMUS_EXPERIMENT"]).read_text()) if os.environ.get("OPTIMUS_EXPERIMENT") else {}
-    opts = {"graph": craft_graph(target), "me": None,
+    opts = {"graph": craft_graph(target), "me": None, "plan": None, "plan_reached": [],
             "ore_hint": os.environ.get("OPTIMUS_VLM_OREHINT"), "nolava": os.environ.get("OPTIMUS_NOLAVA") == "1",
-            "knowledge": exp.get("knowledge") if exp else world_knowledge.load(os.environ.get("OPTIMUS_VLM_WK")),
-            "experiment": exp.get("hypothesis"), "from_start": exp.get("from_start")}
+            **extras.load()}  # World Knowledge, the experiment's change (executor/extras.py)
     save_every = int(os.environ.get("OPTIMUS_CKPT_EVERY") or 0)
     out = ep / "vlm"
     (out / "frames").mkdir(parents=True, exist_ok=True)
@@ -193,21 +182,34 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
     agent = VLMAgent(_Env(env), cfg, remaining, lambda m: lines.append(m), obs, mon, instruction, opts)
     me = None
     if os.environ.get("OPTIMUS_VLM_ME"):
-        from gemini_client import context
+        from client import context
         ctx = context()
         me = opts["me"] = mineevolve_memory.MineEvolve(os.environ["OPTIMUS_VLM_ME"], instruction, task_id, ctx.get("seed"),
                                                        ctx.get("order_id", ""))
         me.start(agent.prev, inv_counts(agent.obs))
-    client = GeminiClient()
+    client = LLMClient()
     history, n, t0 = [], 0, time.time()
     step0 = int(side["step"]) if side else 0  # episode step of the save this episode starts from
     if side:
         history, n = list(side["history"]), int(side["turn"])
         agent.start = list(side["start"])
+    if side and side.get("plan"):  # from a save: the plan of the episode the save is from, as far as it was reached
+        opts["plan"], opts["plan_reached"] = side["plan"], list(side.get("plan_reached", []))
+    elif not side and os.environ.get("OPTIMUS_VLM_PLAN") == "1":
+        extra = (P.GRAPH_NOTE.format(graph=opts["graph"].strip()) if opts.get("graph") else "") + \
+            world_knowledge.prompt_text(opts.get("knowledge"))
+        opts["plan"] = planner.make(client, instruction, extra)
+        if opts["plan"]:
+            opts["plan_reached"] = planner.update(opts["plan"], [], inv_counts(agent.obs))
+        (out / "plan.json").write_text(json.dumps({"plan": opts["plan"]}, indent=1))
     next_save = (step0 // save_every + 1) * save_every if save_every else None
+    stop_f = os.environ.get("OPTIMUS_STOP_FILE")
     try:
         with open(out / "turns.jsonl", "a") as tf:
             while not agent.over():
+                if stop_f and Path(stop_f).exists():  # the loop saw this rollout's occurrence: nothing more to show
+                    agent.stop = "occurrence_seen"
+                    break
                 n += 1
                 s0, t_start, inv0 = dict(agent.prev), agent.t, inv_counts(agent.obs)
                 cmd, thought, raw = agent.ask(client, history, n)
@@ -223,10 +225,14 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
                     if "Timeout!" in repr(e):  # the release's helpers raise this when the horizon runs out
                         agent.stop = agent.stop or "env_ended"
                 inv1 = inv_counts(agent.obs)
+                if opts["plan"]:
+                    opts["plan_reached"] = planner.update(opts["plan"], opts["plan_reached"], inv1)
                 eff = agent.effect(s0, agent.prev, inv0, inv1, agent.rows[t_start:agent.t])
                 history.append(f"{n}. {json.dumps(cmd)} -> {outcome}, {agent.t - t_start} steps; {eff}")
                 tf.write(json.dumps({"turn": n, "t0": step0 + t_start, "t1": step0 + agent.t, "cmd": cmd, "thought": thought,
-                                     "outcome": outcome, "effect": eff, "raw": raw[:600]}) + "\n")
+                                     "outcome": outcome, "effect": eff, "raw": raw[:600],
+                                     **({"subgoal": planner.current(opts["plan"], opts["plan_reached"])} if opts["plan"] else {})})
+                         + "\n")
                 tf.flush()
                 if me is not None:
                     typ = cmd.get("type") if isinstance(cmd, dict) else None
@@ -238,7 +244,8 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
                 if next_save is not None and step0 + agent.t >= next_save and not agent.over():
                     sv = {"turn": n, "history": history, "start": agent.start, "pos": agent.prev["pos"],
                           "ore_map": save.ore_map_to_json(env.ORE_MAP), "spawn": mon.first_pos,
-                          "deaths": agent.deaths, "inventory": inv1}
+                          "deaths": agent.deaths, "inventory": inv1,
+                          "plan": opts["plan"], "plan_reached": opts["plan_reached"]}
                     agent.pending_save = dict(mcdir=mcdir, out=ep / "ckpt", step=step0 + agent.t, side=sv,
                                               before=save.level_mtime(mcdir))
                     agent.chat.append(save.SAVE_CMD)
@@ -259,7 +266,8 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
             "recipes": os.environ.get("OPTIMUS_VLM_RECIPES"),
             "ore_hint": opts["ore_hint"], "wall_s": round(time.time() - t0, 1), "log": lines[-5:],
             "start_step": step0, "nolava": opts["nolava"], "knowledge": len(opts["knowledge"] or []),
-            "experiment": opts["experiment"]}
+            "experiment": opts["experiment"],
+            "plan": len(opts["plan"]) if opts["plan"] else None, "plan_reached": len(opts["plan_reached"])}
     if me is not None:
         ev = me.events
         summ["mineevolve"] = {"executions": sum(e["ev"] == "feedback" for e in ev),

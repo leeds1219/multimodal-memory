@@ -1,6 +1,6 @@
 """Runs the agent's commands in the game, one MineRL step at a time, and keeps the state the agent is told about.
 
-A command is run by a tool (system1/tools/): raw keys held for N steps, a STEVE-1 instruction run for N steps, or one
+A command is run by a tool (domains/minecraft/agent/tools/): raw keys held for N steps, a STEVE-1 instruction run for N steps, or one
 of Optimus-1's own helpers (equip / craft / smelt). Every step of every tool goes through Controller.step, which records position, facing, health and
 deaths. No code stop on health or falls: the VLM decides (the released wrapper's "Stuck" /kill after 8000 steps at
 one height is switched off as well).
@@ -16,10 +16,11 @@ import math
 import craft_helpers
 import keys
 import steve1_policy
+from hyperparams import HP
 from inventory import f, inv_counts
 
-MIN_STEPS_PER_CALL = 5  # VLM calls <= horizon / this
-STALL_TURNS = 30  # this many turns in a row that ran <= 1 game step and changed nothing -> "no_progress"
+MIN_STEPS_PER_CALL = HP["executor"]["min_steps_per_call"]  # VLM calls <= horizon / this
+STALL_TURNS = HP["executor"]["stall_turns"]  # this many turns in a row that ran <= 1 game step and changed nothing -> "no_progress"
 
 
 class Controller:
@@ -91,7 +92,7 @@ class Controller:
         return self.env.noop_action()
 
     def execute(self, cmd, tag):
-        """Run one command with its tool (system1/tools/)."""
+        """Run one command with its tool (domains/minecraft/agent/tools/)."""
         typ = cmd.get("type")
         if typ == "steve":
             return steve1_policy.run(self, cmd.get("prompt"), cmd.get("steps"), tag)

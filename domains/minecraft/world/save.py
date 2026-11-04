@@ -1,4 +1,4 @@
-"""World saves during an episode (token ckpt<N>), the starting points of the replay world (world/replay.py).
+"""World saves during an episode (token ckpt<N>), the starting points of the replay world (domains/minecraft/world/replay.py).
 
 After the first VLM turn that ends at or past every N steps, "/save-all flush" rides on the chat field of the next
 step's action (no extra tick). The integrated server writes the world and the player (position, facing, inventory,
@@ -9,7 +9,7 @@ episode step, the ore rule's used heights (ORE_MAP), the spawn point, the start 
 from, and the VLM's command history.
 
 /save-all is not available to the player in the released client; ckpt<N> runs use the jar built by
-setup/build_saveall_jar.py (world/private_world.py links it in).
+setup/build_saveall_jar.py (domains/minecraft/world/private_world.py links it in).
 """
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ def entry(name: str, rel: str) -> zipfile.ZipInfo:
 
 def world_dir(mcdir: Path | None) -> Path:
     """The folder of the world this instance is running: the loaded copy if the episode started from a save
-    (world/replay.py), else the one world of the episode's private MCP-Reborn/saves (world/private_world.py)."""
+    (domains/minecraft/world/replay.py), else the one world of the episode's private MCP-Reborn/saves (domains/minecraft/world/private_world.py)."""
     name = os.environ.get("OPTIMUS_CKPT_WORLD")
     if name:
         hits = glob.glob(os.path.join(JAVA_TMP, "*", "saves", name))
