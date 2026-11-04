@@ -1,4 +1,4 @@
-"""What the method adds to a System 1 agent of any domain: the World Knowledge verified so far and, in an experiment
+"""What the method adds to a Executor agent of any domain: the World Knowledge verified so far and, in an experiment
 of the learning-from-failure loop (experiments/ours_loop.py), the change to try. The agent appends prompt_text() to
 its system prompt; the prediction is never shown (the agent must not aim at it).
 

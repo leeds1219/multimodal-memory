@@ -1,6 +1,6 @@
-"""System 2, step 1: find the failure points in a compressed episode log (the domain's compress(), e.g.
+"""The Designer, step 1: find the failure points in a compressed episode log (the domain's compress(), e.g.
 domains/minecraft/episode_log.py): the turns whose decision was a mistake from what the agent could know then, and
-caused the failure. System 2 never sees the game, only the logs and the knowledge verified earlier. The domain's words (domains/base.py Vocabulary) fill the prompt.
+caused the failure. The Designer never sees the game, only the logs and the knowledge verified earlier. The domain's words (domains/base.py Vocabulary) fill the prompt.
 """
 from __future__ import annotations
 

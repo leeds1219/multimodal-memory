@@ -2,7 +2,7 @@
 
 The system prompt is SYSTEM with the command list (CMD_KEYS, CMD_STEVE, CMD_HELPERS), plus the additions of the
 experiment: GRAPH_NOTE (GT Recipe), ORE_HINT / ORE_RULE_CODE (GT World Rule v1 / v2), MineEvolve's own text
-(memory/mineevolve_memory.py), and what the method adds to any agent (system1/extras.py: World Knowledge and an
+(memory/mineevolve_memory.py), and what the method adds to any agent (executor/extras.py: World Knowledge and an
 experiment of Ours).
 """
 

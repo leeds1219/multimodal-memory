@@ -1,4 +1,4 @@
-"""World Knowledge (EXPERIMENTS.md 6): statements System 2 judged Supported, kept for later episodes.
+"""World Knowledge (EXPERIMENTS.md 6): statements the Designer judged Supported, kept for later episodes.
 
 Store: <runs>/memory/wk_<name>.json, a list of {"statement", "source", "prediction", "observed"}. The Baseline agent
 gets the statements in its system prompt (token wk<name>, or the knowledge of the current loop in an experiment).

@@ -1,7 +1,7 @@
 """The Minecraft domain (Optimus-1 benchmark on MineRL) as the method sees it (domains/base.py).
 
 Episodes are the folders experiments/chain.py writes: result.json, vlm/turns.jsonl, trajectory.jsonl.gz and the
-world saves ckpt/s<step>.zip (world/save.py). The log System 2 reads is episode_log.py; nothing from client.log (the
+world saves ckpt/s<step>.zip (world/save.py). The log the Designer reads is episode_log.py; nothing from client.log (the
 ore placements) reaches it.
 """
 from __future__ import annotations

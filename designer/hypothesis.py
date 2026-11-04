@@ -1,4 +1,4 @@
-"""System 2, step 2: propose one hypothesis at a failure point: the problem the decision there caused later, the
+"""The Designer, step 2: propose one hypothesis at a failure point: the problem the decision there caused later, the
 belief about how to avoid it, the change that tests the belief there, the moment
 the belief is checked at (the next time the agent needs what the problem was about) and what it predicts then, and
 how to make the change. The statement kept as World Knowledge if Supported is the problem and the belief, said

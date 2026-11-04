@@ -30,7 +30,7 @@ At each turn the game pauses. The VLM (gemini-3.8-flash) sees the screen and its
 start, facing, health and inventory. It also sees its last 10 commands and what they did. It sends one command,
 which runs for the number of steps it chose: raw keys, a STEVE-1 instruction, or an equip / craft / smelt helper.
 The helpers are Optimus-1's own and are kept as released, quirks included: coping with an imperfect tool is part of
-what a method should learn. Code: `domains/minecraft/agent/` (with `system1/extras.py`).
+what a method should learn. Code: `domains/minecraft/agent/` (with `executor/extras.py`).
 
 ## 3. Baseline + MineEvolve
 
@@ -69,16 +69,16 @@ In the nolava world, lava near the agent becomes stone, so that deaths in lava d
 | Evaluation with the knowledge | `run.py --method ours --knowledge <name> --world nolava` | `results/ours_<name>/nolava/` |
 
 The learning loop runs on each failed episode:
-1. System 2 lists the failure points (`system2/failure_point.py`): turns whose decision was a mistake from what the
+1. The Designer lists the failure points (`designer/failure_point.py`): turns whose decision was a mistake from what the
    agent could know then (or its response to an effect it did not decide, such as an item lost) and that likely
    caused the failure. The loop takes them earliest first.
-2. It proposes a hypothesis (`system2/hypothesis.py`), seeing the other failure points of the list as well as the
+2. It proposes a hypothesis (`designer/hypothesis.py`), seeing the other failure points of the list as well as the
    agent's own turns around this one (8 before, 3 after): the problem the decision caused later, the belief about
    how to avoid it, the change that tests the belief there, the moment the belief is checked at (the next time the
    agent needs what the problem was about) and what it predicts then.
 3. The game restarts from the last save before that turn (saves are 600 steps apart), and the agent tries the
    change. It is told the change and how to make it, not the prediction (`domains/minecraft/world/replay.py`).
-4. System 2 judges the experiment (`system2/judge.py`) from what the game recorded, not the agent's thoughts:
+4. The Designer judges the experiment (`designer/judge.py`) from what the game recorded, not the agent's thoughts:
    Not reached (the check moment never came), Supported or Refuted (what the log shows at the first check
    moment). Task success does not decide it. A Supported problem and belief go to World Knowledge.
 5. Otherwise the loop proposes again at the same failure point, with the hypotheses tested there and what their

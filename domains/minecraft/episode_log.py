@@ -1,4 +1,4 @@
-"""Compressed view of one vlmtask episode for System 2.
+"""Compressed view of one vlmtask episode for the Designer.
 
 A timeline first: the turn each item was first obtained, and commands that failed more than once. Then one line per
 VLM turn: step range, height y before -> after (from the trajectory's positions), what the command was, how it

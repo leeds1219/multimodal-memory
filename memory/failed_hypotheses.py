@@ -1,8 +1,8 @@
-"""Failed hypotheses: hypotheses System 2 judged Refuted or Not reached, kept for later proposals.
+"""Failed hypotheses: hypotheses the Designer judged Refuted or Not reached, kept for later proposals.
 
 Store: <runs>/memory/fh_<name>.json (next to World Knowledge, memory/world_knowledge.py), a list of {"statement",
 "change", "plan", "check_when", "prediction", "verdict", "observed", "reason", "source"}. A proposal at any failure
-point of any episode gets the latest of them (system2/hypothesis.py), so it can avoid repeating what did not work.
+point of any episode gets the latest of them (designer/hypothesis.py), so it can avoid repeating what did not work.
 """
 from __future__ import annotations
 

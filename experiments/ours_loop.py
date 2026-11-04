@@ -1,19 +1,19 @@
 """Ours (EXPERIMENTS.md 6): the learning-from-failure loop.
 
 For each failed episode (run with saves, `experiments/run.py --method baseline --world nolava --save 600`), one loop:
-  1. System 2 lists the failure points in the compressed log (system2/failure_point.py; the log: the domain's compress());
+  1. The Designer lists the failure points in the compressed log (designer/failure_point.py; the log: the domain's compress());
      the loop takes them earliest first. After the first experiment the log is the whole attempt from step 0 (the
-     source episode up to the save each experiment was replayed from, then that experiment, and so on), and System 2
+     source episode up to the save each experiment was replayed from, then that experiment, and so on), and the Designer
      also gets every experiment so far (failure point, change, verdict, observed); a failure point in an earlier part
      restarts from a save of that part.
-  2. System 2 proposes one hypothesis at the failure point, seeing the other failure points of the log: the problem
+  2. The Designer proposes one hypothesis at the failure point, seeing the other failure points of the log: the problem
      the decision caused, the belief about avoiding it, the change that tests it, what shows the change was made, the
-     moment it is checked at and the prediction then, plan (system2/hypothesis.py).
+     moment it is checked at and the prediction then, plan (designer/hypothesis.py).
   3. Replay world: an episode starts from the last save at or before the failure point, or from the beginning of
-     the same world (same seed) when the failure point comes before the first save; System 1 gets the hypothesis
-     and the knowledge verified so far in this loop (system1/extras.py), and plays on with the same task, horizon
+     the same world (same seed) when the failure point comes before the first save; The Executor gets the hypothesis
+     and the knowledge verified so far in this loop (executor/extras.py), and plays on with the same task, horizon
      and world rules.
-  4. System 2 judges the hypothesis from the experiment's log (system2/judge.py): Supported -> its statement (problem
+  4. The Designer judges the hypothesis from the experiment's log (designer/judge.py): Supported -> its statement (problem
      and belief) goes to World Knowledge (memory/world_knowledge.py, <runs>/memory/wk_<store>.json); Refuted / Not
      reached -> kept at the failure point, and the next proposal there sees it with what its experiment showed; it
      also goes to the failed-hypothesis memory (memory/failed_hypotheses.py, <runs>/memory/fh_<store>.json), which
@@ -241,7 +241,7 @@ def main() -> int:
     ap.add_argument("--port", type=int, required=True)
     ap.add_argument("--max-iter", type=int, default=10, help="experiments per episode; 0: no limit")
     ap.add_argument("--tries", type=int, default=3, help="experiments at one failure point before the next candidate")
-    ap.add_argument("--mock", action="store_true", help="LLM_MOCK: no API calls (System 2 and the agent)")
+    ap.add_argument("--mock", action="store_true", help="LLM_MOCK: no API calls (the Designer and the agent)")
     a = ap.parse_args()
     if a.mock:
         os.environ["LLM_MOCK"] = "1"

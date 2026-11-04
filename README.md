@@ -1,7 +1,7 @@
 # multimodal-memory
 
-Can a VLM agent in Minecraft learn a hidden rule of its world from its own failures? The agent (System 1) plays a
-task. When it fails, System 2 reads the episode log, finds the decision that caused the failure, and proposes a
+Can a VLM agent in Minecraft learn a hidden rule of its world from its own failures? The agent (the Executor) plays a
+task. When it fails, the Designer reads the episode log, finds the decision that caused the failure, and proposes a
 hypothesis. The agent then tests the hypothesis by replaying the world from a save, and verified statements become
 World Knowledge for later episodes. The hidden rule is how ore appears (ENVIRONMENT.md).
 
@@ -11,14 +11,14 @@ World Knowledge for later episodes. The hidden rule is how ore appears (ENVIRONM
 ## Layout
 
 ```
-system1/        what the method adds to any agent: World Knowledge and the experiment's change (extras.py)
-system2/        reasoning over episode logs: failure_point.py, hypothesis.py, judge.py (domain-free prompts)
+executor/       what the method adds to any agent: World Knowledge and the experiment's change (extras.py)
+designer/       reasoning over episode logs: failure_point.py, hypothesis.py, judge.py (domain-free prompts)
 memory/         World Knowledge store, MineEvolve memory
 experiments/    conditions.py (method x world), run.py (start a condition), chain.py (episodes on one GPU),
                 ours_loop.py (the learning loop), optimus1/ (the Optimus-1 reproduction)
 domains/        everything specific to one environment; base.py = what a domain gives the method
-  minecraft/    domain.py (that interface), episode_log.py (the log System 2 reads), loop_ui.py (results page)
-    agent/      System 1: VLM turn loop (vlm_agent.py), prompts, controller, tools/ (keys, STEVE-1, helpers)
+  minecraft/    domain.py (that interface), episode_log.py (the log the Designer reads), loop_ui.py (results page)
+    agent/      the Executor: VLM turn loop (vlm_agent.py), prompts, controller, tools/ (keys, STEVE-1, helpers)
     world/      one episode (episode.py), world saves and replay, tasks / seeds / success check (benchmark.py),
                 world rules (nolava.py), private world folder per episode
 analysis/       results: summary tables, episode browser pages, loop results page (loop_ui/)
@@ -33,8 +33,8 @@ scripts/        server start, status, cleanup, the replay-world test
 - **Another model:** a config in `configs/` with `provider:` (`llm/providers.py`); a local model runs behind vLLM or
   Ollama (`configs/llm_local_example.yaml`).
 - **Another environment:** a folder `domains/<name>/` with `domain.py` implementing `domains/base.py` (read
-  episodes, saves and states; run an episode), its own System 1 agent that appends `system1/extras.py`'s text to its
-  prompt, and a `Vocabulary` (the words System 2's prompts use). Select it with `MM_DOMAIN=<name>`. System 2, the
+  episodes, saves and states; run an episode), its own Executor agent that appends `executor/extras.py`'s text to its
+  prompt, and a `Vocabulary` (the words the Designer's prompts use). Select it with `MM_DOMAIN=<name>`. The Designer, the
   loop and the LLM layer stay as they are.
 
 ## Quick start

@@ -1,4 +1,4 @@
-"""One LLM call that must answer a JSON object (System 2 roles)."""
+"""One LLM call that must answer a JSON object (the Designer roles)."""
 from __future__ import annotations
 
 import json

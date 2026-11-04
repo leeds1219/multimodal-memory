@@ -1,1 +1,1 @@
-"""Minecraft (Optimus-1 benchmark on MineRL): world/ (episodes, saves, replay, tasks), agent/ (System 1), episode_log.py (what System 2 reads), domain.py (domains/base.py interface), loop_ui.py (results page adapter)."""
+"""Minecraft (Optimus-1 benchmark on MineRL): world/ (episodes, saves, replay, tasks), agent/ (the Executor), episode_log.py (what the Designer reads), domain.py (domains/base.py interface), loop_ui.py (results page adapter)."""

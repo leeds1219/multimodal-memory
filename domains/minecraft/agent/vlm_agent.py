@@ -1,4 +1,4 @@
-"""System 1: the Baseline agent. A VLM does the whole benchmark task, pausing the game every turn.
+"""The Executor: the Baseline agent. A VLM does the whole benchmark task, pausing the game every turn.
 
 Each turn gemini gets the overall task, the screen, the game-reported height, position relative to the start,
 facing, health and inventory, and how its last 10 commands ended (domains/minecraft/agent/prompts.py). It sends one command that
@@ -11,8 +11,8 @@ What an experiment adds (environment variables set from the variant tokens by ex
   OPTIMUS_VLM_OREHINT=1       the hidden ore rule in the prompt (GT World Rule)
   OPTIMUS_VLM_PLAN=1          initial planning: sub-goals written before the first turn (agent/planner.py)
   OPTIMUS_VLM_ME              MineEvolve memory (memory/mineevolve_memory.py)
-  OPTIMUS_VLM_WK              verified World Knowledge in the prompt (system1/extras.py)
-  OPTIMUS_EXPERIMENT          an experiment of experiments/ours_loop.py: the change to try (system1/extras.py)
+  OPTIMUS_VLM_WK              verified World Knowledge in the prompt (executor/extras.py)
+  OPTIMUS_EXPERIMENT          an experiment of experiments/ours_loop.py: the change to try (executor/extras.py)
   OPTIMUS_NOLAVA=1            lava near the agent becomes stone every NOLAVA_EVERY steps (domains/minecraft/world/nolava.py)
   OPTIMUS_CKPT_EVERY=N        the world is saved every N steps (domains/minecraft/world/save.py)
   OPTIMUS_MAX_STEPS=N         tests only: the episode ends after N steps
@@ -172,7 +172,7 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
         remaining = min(remaining, int(os.environ["OPTIMUS_MAX_STEPS"]))
     opts = {"graph": craft_graph(target), "me": None, "plan": None, "plan_reached": [],
             "ore_hint": os.environ.get("OPTIMUS_VLM_OREHINT"), "nolava": os.environ.get("OPTIMUS_NOLAVA") == "1",
-            **extras.load()}  # World Knowledge, the experiment's change (system1/extras.py)
+            **extras.load()}  # World Knowledge, the experiment's change (executor/extras.py)
     save_every = int(os.environ.get("OPTIMUS_CKPT_EVERY") or 0)
     out = ep / "vlm"
     (out / "frames").mkdir(parents=True, exist_ok=True)

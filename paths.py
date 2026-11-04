@@ -19,7 +19,7 @@ OFFICIAL = DATA / "official"
 DOMAIN = os.environ.get("MM_DOMAIN", "minecraft")
 RESULTS = ROOT / "results"  # results/<method>/<world>/... and results/ours_loop/ (git-ignored)
 RUN_DATA = ROOT / "run_data"  # memory stores, chain state, logs, LLM ledger (git-ignored)
-CODE_DIRS = ("system1", "system2", "memory", "experiments", "experiments/optimus1", "analysis", "llm", "scripts", "setup",
+CODE_DIRS = ("executor", "designer", "memory", "experiments", "experiments/optimus1", "analysis", "llm", "scripts", "setup",
              f"domains/{DOMAIN}", f"domains/{DOMAIN}/world", f"domains/{DOMAIN}/agent", f"domains/{DOMAIN}/agent/tools")
 OPTIMUS1 = OFFICIAL / "NeurIPS24-Optimus-1"  # the authors' code, patched by setup/setup_env.sh
 

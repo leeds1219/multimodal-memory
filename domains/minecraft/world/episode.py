@@ -1,4 +1,4 @@
-"""Run ONE episode in Optimus-1's Minecraft env (the "real world"), with the Baseline agent (system1/) or, for the
+"""Run ONE episode in Optimus-1's Minecraft env (the "real world"), with the Baseline agent (executor/) or, for the
 Optimus-1 reproduction, the released Optimus-1 planner.
 
 The Optimus-1 server (app.py: STEVE-1, and for the reproduction the Gemini planner/reflector) is started by

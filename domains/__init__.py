@@ -1,4 +1,4 @@
-"""Domains: everything specific to one environment (world, System 1 agent, log reader); domains/base.py says what
+"""Domains: everything specific to one environment (world, the Executor agent, log reader); domains/base.py says what
 each provides to the method. load() returns the domain object of domains/<name>/domain.py."""
 from __future__ import annotations
 

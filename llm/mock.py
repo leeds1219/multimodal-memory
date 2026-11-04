@@ -157,7 +157,7 @@ def _stageb(text: str, kw: dict, ctx: dict) -> str | None:
     return _stageb_plan(ctx, False)
 
 
-_SYSTEM2 = {  # System 2 roles (system2/): fixed answers, so the learning loop runs end to end at $0
+_SYSTEM2 = {  # the Designer roles (designer/): fixed answers, so the learning loop runs end to end at $0
     "Find the failure points.": {"blocked": "mock blocked", "failure_points": [
         {"turn": 30, "decision": "mock decision", "known_then": "mock", "better": "mock better", "reason": "mock reason"}]},
     "Propose a hypothesis and the change": {"blocked": {"turn": 30, "what": "mock"}, "evidence": "mock evidence",

@@ -1,4 +1,4 @@
-"""System 2, step 3: judge an experiment. Did the moment the hypothesis is checked at come, and did the prediction
+"""The Designer, step 3: judge an experiment. Did the moment the hypothesis is checked at come, and did the prediction
 show then, in the experiment's log? Task success does not decide the verdict.
 """
 from __future__ import annotations
