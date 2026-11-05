@@ -32,6 +32,9 @@ class Minecraft(Domain):
     def log(self, parts, milestones=None, markers=None):
         return episode_log.render(parts, milestones, markers)
 
+    def milestones_reached(self, parts, milestones):
+        return episode_log.milestones_reached(parts, milestones)
+
     def checkpoints(self, ep):
         return episode_log.checkpoints(Path(ep))
 

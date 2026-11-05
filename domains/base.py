@@ -50,6 +50,10 @@ class Domain:
     def log(self, parts: list, milestones: list | None = None, markers: dict | None = None) -> str:
         raise NotImplementedError
 
+    def milestones_reached(self, parts: list, milestones: list) -> int:
+        """How far the parts (as in log) got: 1 + the order of the furthest milestone reached, 0 when none."""
+        raise NotImplementedError
+
     def checkpoints(self, ep: Path) -> list[int]:
         raise NotImplementedError
 

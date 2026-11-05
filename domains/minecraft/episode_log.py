@@ -167,6 +167,14 @@ def segments(turns: list, milestones: list) -> list:
     return segs
 
 
+def milestones_reached(parts: list, milestones: list) -> int:
+    """How far the turns of the parts [(episode dir, until_step, marker)] got: 1 + the order of the furthest milestone
+    gained (a later milestone counts the ones before it as reached), 0 when none."""
+    got = [i for ep, until, _ in parts for t in turns_of(Path(ep), until) for i, m in enumerate(milestones)
+           if any(_is(k, m) for k in _gains(t))]
+    return max(got) + 1 if got else 0
+
+
 def render(parts: list, milestones: list | None = None, markers: dict | None = None) -> str:
     """The log of a timeline: `parts` [(episode, until_step or None, marker line or None)], each part's turns before
     until_step, the marker printed where the part starts. `milestones` (item names, in order): rows grouped by

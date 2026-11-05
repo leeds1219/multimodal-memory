@@ -18,7 +18,8 @@ attempt:
      if occurrences came and R never followed, Not reached if none came) and the frequency k/n. Supported and
      Refuted go to World Knowledge (memory/world_knowledge.py, <runs>/memory/wk_<store>.json); every experiment goes
      to the failure point's experiment record.
-  5. Supported: the timeline goes on with a rollout where R followed, up to its last save, then a continuation
+  5. Supported: the timeline goes on with a rollout where R followed (the one furthest along the milestones at its
+     last save; fewer steps on a tie), up to its last save, then a continuation
      episode from that save to the episode end, whose agent is also given the hypothesis just Supported; the
      failure points are listed again in the new timeline.
   Ends on task success, after loop.max_experiments hypotheses, or when no failure point is left.
@@ -275,9 +276,8 @@ class Loop:
                                 "source": f"{self.task}_{self.seed}/e{k}"})
         if verdict == "Supported" and not success:  # 5.
             fp["closed"] = "Supported"
-            r = next(x for x in rollouts if x["occurrence"] and x["occurrence"]["result_followed"])
-            saves = self.dom.checkpoints(Path(r["episode"]))
-            last = saves[-1] if saves else None
+            r, last = self.best_rollout(fp, rollouts)
+            e["continued_from"] = r["episode"]
             cont_ckpt = str(Path(r["episode"]) / "ckpt" / f"s{last:06d}.zip") if last is not None else fp["checkpoint"]
             cont_f = self.dir / f"e{k}_cont_experiment.json"  # the change, and the knowledge with this hypothesis in it
             cont_f.write_text(json.dumps({**json.loads(exp_f.read_text()), "knowledge": wk.supported(self.knowledge()),
@@ -291,11 +291,34 @@ class Loop:
             fp["closed"] = f"{len(fp['record'])} hypotheses without support"
         return success
 
-    def extend_timeline(self, fp: dict, rollout: str, last: int | None, cont: Path, hyp: dict):
-        """The timeline up to the restart point, then the rollout up to its last save, then the continuation."""
+    def head(self, fp: dict) -> list:
+        """The timeline parts up to fp's restart point."""
         i, p, _ = self.part_of(fp["turn"])
         ck = fp["checkpoint_step"]
-        head = self.st["timeline"][:i] + ([{**p, "until": ck}] if ck > p["start_step"] else [])
+        return self.st["timeline"][:i] + ([{**p, "until": ck}] if ck > p["start_step"] else [])
+
+    def best_rollout(self, fp: dict, rollouts: list) -> tuple[dict, int | None]:
+        """(rollout, its last save) the timeline goes on with: of the rollouts where the result followed, the one whose
+        last save is furthest along the milestones; on a tie, the one that got there in fewer steps."""
+        head = [(Path(p["episode"]), p["until"], p["marker"]) for p in self.head(fp)]
+        best = None
+        for r in rollouts:
+            if not (r["occurrence"] and r["occurrence"]["result_followed"]):
+                continue
+            saves = self.dom.checkpoints(Path(r["episode"]))
+            last = saves[-1] if saves else None
+            reached = self.dom.milestones_reached(head + ([(Path(r["episode"]), last, None)] if last else []),
+                                                  self.items())
+            key = (reached, -(last if last is not None else fp["checkpoint_step"]))
+            r["milestones_reached"] = reached
+            if best is None or key > best[0]:
+                best = (key, r, last)
+        return best[1], best[2]
+
+    def extend_timeline(self, fp: dict, rollout: str, last: int | None, cont: Path, hyp: dict):
+        """The timeline up to the restart point, then the rollout up to its last save, then the continuation."""
+        ck = fp["checkpoint_step"]
+        head = self.head(fp)
         marker = (f"-- Step {ck}: replayed from a save. Failure point tried: T{fp['turn']} ({fp['shown'][:150]}). "
                   f"Change given to the agent from here: \"{change_text(hyp['change'])}\". Verdict: Supported --")
         if last is None:  # no save in the rollout: the continuation replays from the restart point itself
