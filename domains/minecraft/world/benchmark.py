@@ -223,6 +223,7 @@ class EpisodeMonitor:
             rec["done"] = self.end_reason
         self._traj.write(json.dumps(rec) + "\n")
         if self.steps % 100 == 0 or done:
+            self._traj.flush()  # so a reader mid-episode (the loop's log) sees the records so far
             (self.dir / "heartbeat").write_text(f"{self.steps} {_time.time():.0f}\n")
 
     def close(self) -> None:
