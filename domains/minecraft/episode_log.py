@@ -5,7 +5,7 @@ thought; turns in a row that changed nothing are one line. With milestones, the 
 heading line. Reads only turns.jsonl, trajectory.jsonl.gz and the saves: client.log, which names the ore
 placements, is never read.
 
-    python domains/minecraft/episode_log.py <episode dir> [--milestones log,planks,...]
+    python domains/minecraft/episode_log.py <episode dir> [--milestones log,planks:4,...]
 """
 from __future__ import annotations
 
@@ -121,6 +121,23 @@ def _is(item_id: str, milestone: str) -> bool:
     return item_id == milestone or (milestone in FAMILIES and item_id.endswith("_" + milestone))
 
 
+def _held(ep: Path, turns: list) -> list:
+    """The inventory {item: n} at the end of each turn, from the trajectory."""
+    out, inv, recs = [], {}, iter(_trajectory(ep))
+    nxt = next(recs, None)
+    for t in turns:
+        while nxt is not None and nxt["t"] <= t["t1"]:
+            inv = nxt.get("inv", inv)
+            nxt = next(recs, None)
+        out.append(inv)
+    return out
+
+
+def _has(inv: dict, milestone: tuple) -> bool:
+    item, n = milestone
+    return sum(v for k, v in inv.items() if _is(k, item)) >= n
+
+
 def _merge(rows, keep: set) -> list[str]:
     """Runs of 3+ turns that changed nothing (same height, no change listed, same command type) -> one line. A turn
     in `keep` (a marker goes before it) starts a new run."""
@@ -151,12 +168,13 @@ def _merge(rows, keep: set) -> list[str]:
     return out
 
 
-def segments(turns: list, milestones: list) -> list:
-    """The turns cut at each milestone's first gain: [(turns, milestone item or None at the timeline end)]."""
+def segments(turns: list, held: list, milestones: list) -> list:
+    """The turns cut where each milestone (item, count) is first held, `held` the inventory after each turn:
+    [(turns, milestone or None at the timeline end)]."""
     left, segs, cur = list(milestones), [], []
-    for t in turns:
+    for t, inv in zip(turns, held):
         cur.append(t)
-        got = [m for m in left if any(_is(k, m) for k in _gains(t))]
+        got = [m for m in left if _has(inv, m)]
         if got:
             for m in got:
                 left.remove(m)
@@ -170,23 +188,24 @@ def segments(turns: list, milestones: list) -> list:
 def milestones_reached(parts: list, milestones: list) -> int:
     """How far the turns of the parts [(episode dir, until_step, marker)] got: 1 + the order of the furthest milestone
     gained (a later milestone counts the ones before it as reached), 0 when none."""
-    got = [i for ep, until, _ in parts for t in turns_of(Path(ep), until) for i, m in enumerate(milestones)
-           if any(_is(k, m) for k in _gains(t))]
+    got = [i for ep, until, _ in parts for inv in _held(Path(ep), turns_of(Path(ep), until))
+           for i, m in enumerate(milestones) if _has(inv, m)]
     return max(got) + 1 if got else 0
 
 
 def render(parts: list, milestones: list | None = None, markers: dict | None = None) -> str:
     """The log of a timeline: `parts` [(episode, until_step or None, marker line or None)], each part's turns before
-    until_step, the marker printed where the part starts. `milestones` (item names, in order): rows grouped by
+    until_step, the marker printed where the part starts. `milestones` ((item, count), in order): rows grouped by
     segment under heading lines; None: rows only. `markers` {turn: [lines]}: printed just before that turn."""
     markers = {k: list(v) for k, v in (markers or {}).items()}
-    rows, turns = [], []
+    rows, turns, held = [], [], []
     for ep, until, mark in parts:
         ts_ = turns_of(Path(ep), until)
         if mark and ts_:
             markers.setdefault(ts_[0]["turn"], []).insert(0, mark)
         rows += _rows(Path(ep), ts_)
         turns += ts_
+        held += _held(Path(ep), ts_) if milestones is not None else []
     by_turn = {t["turn"]: (t, d) for t, d in rows}
 
     def lines(ts_):
@@ -202,8 +221,8 @@ def render(parts: list, milestones: list | None = None, markers: dict | None = N
     if milestones is None:
         return "\n".join(lines(turns))
     out = []
-    for n, (ts_, m) in enumerate(segments(turns, milestones), 1):
-        ended = f"ended with milestone {m}" if m else "ended at the timeline end"
+    for n, (ts_, m) in enumerate(segments(turns, held, milestones), 1):
+        ended = f"ended with milestone {m[0]} {m[1]}" if m else "ended at the timeline end"
         out.append(f"== Segment {n}: T{ts_[0]['turn']}-T{ts_[-1]['turn']}, steps {ts_[0]['t0']}-{ts_[-1]['t1']} "
                    f"({ts_[-1]['t1'] - ts_[0]['t0']} steps), {ended} ==")
         out += lines(ts_)
@@ -228,9 +247,11 @@ def state_line(ep: Path, step: int, window: int) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("ep")
-    ap.add_argument("--milestones", default=None, help="comma list: group the rows by segment")
+    ap.add_argument("--milestones", default=None, help="comma list of item[:count]: group the rows by segment")
     a = ap.parse_args()
-    print(render([(Path(a.ep), None, None)], a.milestones.split(",") if a.milestones else None))
+    ms = [(m.split(":")[0], int(m.split(":")[1]) if ":" in m else 1) for m in a.milestones.split(",")] \
+        if a.milestones else None
+    print(render([(Path(a.ep), None, None)], ms))
     return 0
 
 

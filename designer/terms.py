@@ -15,7 +15,8 @@ TERMS = {  # each term as the prompts list it, line breaks included
 - Timeline: one path through an attempt from step 0: an episode up to a save, then the episode replayed
   from that save, and so on; each step appears once.""",
     'Milestone': """\
-- Milestone: getting an item the task needs, or a tool for one, for the first time.""",
+- Milestone: holding, for the first time, a count of an item the task needs, or of a tool for one; the
+  count is how many the step that uses the item needs at once.""",
     'Turn row': """\
 - Turn row: one command of the agent: its steps, height, command, how it ended (with the game's message
   when it failed), changes, and the agent's whole thought.""",
@@ -94,11 +95,11 @@ COMMANDS_INPUT = """\
   This is what the agent knew about its commands; the game may not do exactly this."""
 MILESTONES_INPUT = """\
 - <milestones>: the milestones of the task, one per line, in order:
-    <n>. <item>: <what it is for>"""
+    <n>. <item> <count>: <what it is for>"""
 TIMELINE_LOG = """\
 - <log>: one timeline of this attempt, grouped by segment, with three kinds of lines.
   A segment heading:
-    == Segment <n>: T<first>-T<last>, steps <first>-<last> (<count> steps), ended with milestone <item> ==
+    == Segment <n>: T<first>-T<last>, steps <first>-<last> (<count> steps), ended with milestone <item> <count> ==
     (the last segment says "ended at the timeline end" when its milestone never came)
   A turn row:
 """ + TURN_ROW_LAYOUT + """

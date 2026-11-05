@@ -91,7 +91,7 @@ def render_attempts(exp: str, runs: list) -> str:
         out.append(f"<section><h2>{e_(r['task'])} <span class='quiet'>seed {r['seed']}</span></h2>"
                    f"<p>{e_(r['instruction'])}. Result: <b>{e_(r['done'])}</b>"
                    + ("" if r["source_steps"] is None else f"; first episode {r['source_steps']:,} steps") + ".</p>")
-        out.append("<h3>Milestones</h3>" + (rows(["#", "item", "what for"], [[str(i), e_(m["item"]), e_(m.get("why", ""))]
+        out.append("<h3>Milestones</h3>" + (rows(["#", "item", "count", "what for"], [[str(i), e_(m["item"]), str(m.get("count", 1)), e_(m.get("why", ""))]
                                                                          for i, m in enumerate(r["milestones"], 1)])
                                            if r["milestones"] else "<p class='quiet'>not decided yet</p>"))
         out.append("<h3>Timeline</h3>" + rows(

@@ -93,10 +93,10 @@ class Loop:
         return [(Path(p["episode"]), p["until"], p["marker"]) for p in self.st["timeline"]]
 
     def items(self) -> list:
-        return [m["item"] for m in self.st["milestones"] or []]
+        return [(m["item"], m.get("count", 1)) for m in self.st["milestones"] or []]
 
     def milestone_lines(self) -> str:
-        return "\n".join(f"{i}. {m['item']}: {m['why']}" for i, m in enumerate(self.st["milestones"] or [], 1))
+        return "\n".join(f"{i}. {m['item']} {m.get('count', 1)}: {m['why']}" for i, m in enumerate(self.st["milestones"] or [], 1))
 
     def knowledge(self) -> list:
         return wk.load(self.store) or []
@@ -111,7 +111,7 @@ class Loop:
         if ms is None:
             return False
         self.st.update(milestones=ms, milestones_wk=n)
-        log("  milestones: " + ", ".join(self.items()))
+        log("  milestones: " + ", ".join(f"{i} {n}" for i, n in self.items()))
         return True
 
     def part_of(self, turn: int):
