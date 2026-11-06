@@ -51,10 +51,13 @@ TERMS = {  # each term as the prompts list it, line breaks included
     'Hypothesis': """\
 - Hypothesis: a rule of this world in three parts, each written in the words the log uses and true
   beyond this attempt.
-  situation: a condition turn rows can show: what the inventory holds, what is held or placed, the
-  height, how the last command ended. The agent must be able to bring the situation about with its
-  commands within the window; a situation it can only wait for by chance does not count.
-  action: a command, or a short sequence of commands, from the commands list.
+  situation: only the conditions the result depends on, each one turn rows can show: what the
+  inventory holds, what is held or placed, the height, how the last command ended. An amount is written
+  by what it is enough or short for, not as this attempt's number. The agent must be able to bring the
+  situation about with its commands within the window; a situation it can only wait for by chance does
+  not count.
+  action: a command, or a short sequence of commands, from the commands list, written short: the
+  command's type and its main argument, not its full form.
   result: one of two kinds.
     turn result: what the turn rows of the action record: how the command ends and what changes in that
     turn (an inventory change, a change of height, a death).
@@ -63,7 +66,8 @@ TERMS = {  # each term as the prompts list it, line breaks included
   The result may depend on chance.
   The rule says the result can follow when the agent does the action while the situation holds; how
   often is measured by the rollouts. No turn numbers, steps, positions or anything only this attempt
-  had; a number only when the rule is about that number. If Supported, it becomes World Knowledge.""",
+  had; a number only when the rule is about that number. Each part must read true, word for word, in
+  another attempt that meets the situation. If Supported, it becomes World Knowledge.""",
     'Change': """\
 - Change: what the agent does to test the hypothesis, with its commands: when it starts (a situation,
   not a turn number), what it does, and when it stops. It brings the agent to the situation and has it

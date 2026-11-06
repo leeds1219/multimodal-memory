@@ -66,8 +66,8 @@ Write, in this order:
 
 Output:
 - hypothesis: string, one sentence: in this situation, doing this action leads to this result
-- situation: string, the situation, in the words of the log
-- action: string, the command or short sequence of commands, as <commands> writes them
+- situation: string, only the conditions the result depends on, in the words of the log
+- action: string, the command or short sequence of commands, each as its type and main argument
 - result: string, what the turn rows of the action record, or "reach <item> <count>" for judgment
 - milestone: string, for judgment the milestone of the result as "<item> <count>", written as in
   <milestones>; "" for the other kinds
