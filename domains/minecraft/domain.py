@@ -35,6 +35,9 @@ class Minecraft(Domain):
     def milestones_reached(self, parts, milestones):
         return episode_log.milestones_reached(parts, milestones)
 
+    def milestone_held(self, ep, from_turn, milestone):
+        return episode_log.milestone_held(Path(ep), from_turn, milestone)
+
     def checkpoints(self, ep):
         return episode_log.checkpoints(Path(ep))
 

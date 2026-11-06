@@ -172,11 +172,17 @@ def _designer(text: str, system: str) -> dict | None:
                                {"item": "planks", "count": 4, "why": "mock", "evidence": "usual way"}], "unsure": []}
     if system.startswith("You are the Designer. You review one timeline"):  # the last turn of the log given
         want = int(os.environ.get("MOCK_FP_TURN") or 0)
-        return {"failure_points": [{"turn": want if want in turns else max(turns, default=1), "kind": "judgment", "decision": "mock decision",
+        return {"failure_points": [{"turn": want if want in turns else max(turns, default=1), "kind": os.environ.get("MOCK_FP_KIND", "mismatch"), "decision": "mock decision",
                                     "shown": "mock better choice", "knowledge": "", "evidence": "mock"}]}
     if system.startswith("You are the Designer. You propose one hypothesis"):
+        if "kind: judgment" in text:  # a milestone result: the second mock milestone
+            return {"hypothesis": "With logs, crafting planks first reaches planks 4.", "situation": "holding a log",
+                    "action": "craft planks", "result": "reach planks 4", "milestone": "planks 4",
+                    "change": {"start": "now", "do": "craft planks", "stop": "after one craft"},
+                    "plan": "craft planks", "prediction": {"when": "the first craft", "what": "planks 4 held"},
+                    "differs_from": ""}
         return {"hypothesis": "When standing on stone, steve 'dig down' adds cobblestone.",
-                "situation": "standing on stone", "action": "steve 'dig down'", "result": "inv cobblestone +1",
+                "situation": "standing on stone", "action": "steve 'dig down'", "result": "inv cobblestone +1", "milestone": "",
                 "change": {"start": "now", "do": "dig straight down", "stop": "after one block"},
                 "plan": "look down and attack", "prediction": {"when": "the first dig down", "what": "cobblestone +1"},
                 "differs_from": ""}

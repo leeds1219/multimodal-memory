@@ -54,6 +54,10 @@ class Domain:
         """How far the parts (as in log) got: 1 + the order of the furthest milestone reached, 0 when none."""
         raise NotImplementedError
 
+    def milestone_held(self, ep: Path, from_turn: int, milestone: tuple) -> bool:
+        """Whether, at the end of turn `from_turn` of ep or a later one, the agent held the milestone (item, count)."""
+        raise NotImplementedError
+
     def checkpoints(self, ep: Path) -> list[int]:
         raise NotImplementedError
 

@@ -193,6 +193,12 @@ def milestones_reached(parts: list, milestones: list) -> int:
     return max(got) + 1 if got else 0
 
 
+def milestone_held(ep: Path, from_turn: int, milestone: tuple) -> bool:
+    """Whether the agent held the milestone (item, count) at the end of turn `from_turn` or a later one."""
+    ts = [t for t in turns_of(ep) if t["turn"] >= from_turn]
+    return any(_has(inv, milestone) for inv in _held(ep, ts))
+
+
 def render(parts: list, milestones: list | None = None, markers: dict | None = None) -> str:
     """The log of a timeline: `parts` [(episode, until_step or None, marker line or None)], each part's turns before
     until_step, the marker printed where the part starts. `milestones` ((item, count), in order): rows grouped by

@@ -195,10 +195,20 @@ class Loop:
                 return ep, res
         raise RuntimeError(f"episode {name} crashed 3 times")
 
+    def occurrence(self, ep: Path, hyp: dict, occ: dict | None = None) -> dict | None:
+        """The occurrence in rollout ep (judged by the Designer unless given); for a milestone result, whether it
+        followed is code's check that the milestone was held at the occurrence or after it."""
+        occ = occ or judge.occurrence(self.dom.commands(), hyp, self.dom.log([(ep, None, None)]), self.events)
+        if occ and hyp.get("milestone"):
+            occ = {**occ, "result_followed_designer": occ.get("result_followed_designer", occ["result_followed"]),
+                   "result_followed": self.dom.milestone_held(ep, occ["turn"], tuple(hyp["milestone"]))}
+        return occ
+
     def rollout(self, name: str, ckpt: str, exp_f: Path, window: int, hyp: dict) -> tuple[Path, dict, dict | None]:
-        """One rollout, judged at every world save while it plays (4.): once its occurrence shows, the loop writes
-        the stop file and the episode ends at the next turn; otherwise it ends with the window. Returns the episode,
-        its result and the occurrence (judged again on the whole log when none was seen while it played)."""
+        """One rollout, judged at every world save while it plays (4.): once its occurrence shows (for a milestone
+        result, and the milestone is held), the loop writes the stop file and the episode ends at the next turn;
+        otherwise it ends with the window. Returns the episode, its result and the occurrence (judged again on the
+        whole log when none was seen while it played)."""
         stop = self.dir / f"{name}.stop"
         stop.unlink(missing_ok=True)
         done, seen = threading.Event(), {}
@@ -212,9 +222,12 @@ class Loop:
                     continue
                 n_saves = len(saves)
                 try:
-                    occ = judge.occurrence(self.dom.commands(), hyp, self.dom.log([(ep, None, None)]), self.events)
+                    occ = self.occurrence(ep, hyp, seen.get("occ"))
                 except Exception as e:  # a log read mid-write: try again at the next save
                     self.events.append({"ev": "occurrence_watch_error", "error": repr(e)[:200]})
+                    continue
+                if occ and hyp.get("milestone") and not occ["result_followed"]:
+                    seen["occ"] = occ  # the action came; play on until the milestone or the window end
                     continue
                 if occ:
                     seen["occ"] = occ
@@ -228,8 +241,7 @@ class Loop:
         finally:
             done.set()
             th.join()
-        occ = seen.get("occ") or judge.occurrence(self.dom.commands(), hyp, self.dom.log([(ep, None, None)]),
-                                                  self.events)
+        occ = self.occurrence(ep, hyp, seen.get("occ"))
         return ep, res, occ
 
     def experiment(self, k: int, fp: dict) -> bool:
@@ -246,7 +258,8 @@ class Loop:
         state = self.dom.state_line(Path(fp["episode"]), fp["checkpoint_step"], window)
         hyp = hypothesis.propose(self.instruction, self.dom.commands(), self.milestone_lines(), fp, state,
                                  self.dom.log(self.parts(), self.items(), markers), wk.lines(self.knowledge()),
-                                 fp["record"], self.dom.plan(self.src), self.events, self.dom.vocabulary)
+                                 fp["record"], self.dom.plan(self.src), self.events, self.dom.vocabulary,
+                                 self.items())
         if not hyp:
             self.st["done"] = "proposal unparsable"
             return False

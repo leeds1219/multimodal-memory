@@ -52,7 +52,8 @@ Write, in this order:
    - ignored knowledge: the situation is the state at the failure point, the action what the knowledge
      says to do, the result what doing it in this situation gives;
    - judgment: the situation is the state at the failure point, the action the better choice, the result
-     what it should give.
+     a milestone result: the first milestone in <milestones> that the agent's own choice delayed and the
+     better choice reaches within the window, as "reach <item> <count>".
    Within the window, the agent must be able to meet the situation and do the action. A hypothesis whose
    test needs longer than the window is the wrong hypothesis: pick a situation and action that come
    sooner. It must not be in <knowledge> or <record>, unless an observation there shows what is
@@ -67,14 +68,16 @@ Output:
 - hypothesis: string, one sentence: in this situation, doing this action leads to this result
 - situation: string, the situation, in the words of the log
 - action: string, the command or short sequence of commands, as <commands> writes them
-- result: string, what the turn rows of the action record
+- result: string, what the turn rows of the action record, or "reach <item> <count>" for judgment
+- milestone: string, for judgment the milestone of the result as "<item> <count>", written as in
+  <milestones>; "" for the other kinds
 - change: object with start (string, a situation, not a turn number), do (string), stop (string)
 - plan: string, the few steps of the change
 - prediction: object with when (string) and what (string)
 - differs_from: string, the <knowledge> entry or <record> experiment it revises and how, or "" when none
 
 Answer with JSON only:
-{{"hypothesis": "...", "situation": "...", "action": "...", "result": "...",
+{{"hypothesis": "...", "situation": "...", "action": "...", "result": "...", "milestone": "...",
  "change": {{"start": "...", "do": "...", "stop": "..."}}, "plan": "...",
  "prediction": {{"when": "...", "what": "..."}}, "differs_from": "..."}}"""
 
@@ -100,27 +103,39 @@ def record_lines(record: list) -> str:
 
 
 def propose(task: str, commands: str, milestones: str, fp: dict, restart: str, log_text: str, knowledge: str,
-            record: list, plan: str | None, events: list, vocab, attempts: int = 3) -> dict | None:
-    """{hypothesis {situation, action, result}, statement (the hypothesis sentence), change {start, do, stop}, plan,
-    prediction {when, what}, differs_from}; an answer not as Output specifies is asked again, up to `attempts`
-    calls; None if none is."""
+            record: list, plan: str | None, events: list, vocab, items: list, attempts: int = 3) -> dict | None:
+    """{hypothesis {situation, action, result}, statement (the hypothesis sentence), milestone ((item, count) of a
+    milestone result, else None), change {start, do, stop}, plan, prediction {when, what}, differs_from}; `items`
+    the milestones [(item, count)]. An answer not as Output specifies is asked again, up to `attempts` calls; None
+    if none is."""
     user = tagged(task=task, commands=commands, milestones=milestones, failure_point=fp_lines(fp), restart=restart,
                   log=log_text, knowledge=knowledge, record=record_lines(record), plan=plan)
     for _ in range(attempts):
         out = ask_json(propose_system(vocab, bool(plan)), user, events, "propose")
-        if valid(out):
+        if valid(out, fp["kind"], items):
             return {"hypothesis": {k: out[k].strip() for k in ("situation", "action", "result")},
-                    "statement": out["hypothesis"].strip(),
+                    "statement": out["hypothesis"].strip(), "milestone": milestone_of(out["milestone"], items),
                     "change": {k: out["change"][k].strip() for k in ("start", "do", "stop")},
                     "plan": out["plan"], "prediction": {k: out["prediction"][k].strip() for k in ("when", "what")},
                     "differs_from": out.get("differs_from", "")}
     return None
 
 
-def valid(out) -> bool:
-    """The answer as Output specifies it: non-empty strings, change and prediction objects with all their fields."""
+def milestone_of(text, items: list):
+    """(item, count) of the milestone written "<item> <count>", if it is one of `items`; else None."""
+    parts = str(text).strip().lower().split()
+    m = (parts[0], int(parts[1])) if len(parts) == 2 and parts[1].isdigit() else None
+    return m if m in items else None
+
+
+def valid(out, kind: str, items: list) -> bool:
+    """The answer as Output specifies it: non-empty strings, change and prediction objects with all their fields,
+    and a milestone of `items` exactly when the kind is judgment."""
     def strs(d, keys):
         return isinstance(d, dict) and all(isinstance(d.get(k), str) and d[k].strip() for k in keys)
-    return (strs(out, ("hypothesis", "situation", "action", "result")) and isinstance(out.get("plan"), str)
+    ms = out.get("milestone", "") if isinstance(out, dict) else None
+    return (strs(out, ("hypothesis", "situation", "action", "result")) and isinstance(ms, str)
+            and (milestone_of(ms, items) is not None if kind == "judgment" else not ms.strip())
+            and isinstance(out.get("plan"), str)
             and isinstance(out.get("differs_from", ""), str) and strs(out.get("change"), ("start", "do", "stop"))
             and strs(out.get("prediction"), ("when", "what")))

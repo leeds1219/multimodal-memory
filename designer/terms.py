@@ -46,8 +46,8 @@ TERMS = {  # each term as the prompts list it, line breaks included
   everything after it is played again.""",
     'Window': """\
 - Window: the first {window_steps} steps after the restart point, or fewer if the episode ends first. A
-  rollout ends right after its occurrence, or at the end of the window if none comes; the one rollout
-  that continues the timeline plays on to the end.""",
+  rollout ends right after its occurrence (for a milestone result, once the milestone is also reached),
+  or at the end of the window; the one rollout that continues the timeline plays on to the end.""",
     'Hypothesis': """\
 - Hypothesis: a rule of this world in three parts, each written in the words the log uses and true
   beyond this attempt.
@@ -55,9 +55,12 @@ TERMS = {  # each term as the prompts list it, line breaks included
   height, how the last command ended. The agent must be able to bring the situation about with its
   commands within the window; a situation it can only wait for by chance does not count.
   action: a command, or a short sequence of commands, from the commands list.
-  result: what the turn rows of the action record: how the command ends and what changes in that turn
-  (an inventory change, a change of height, a death). Not a later goal that needs more actions after
-  the action. The result may depend on chance.
+  result: one of two kinds.
+    turn result: what the turn rows of the action record: how the command ends and what changes in that
+    turn (an inventory change, a change of height, a death).
+    milestone result, for a failure point of kind judgment only: reaching, within the window, a milestone
+    the agent's own choice delayed, written "reach <item> <count>".
+  The result may depend on chance.
   The rule says the result can follow when the agent does the action while the situation holds; how
   often is measured by the rollouts. No turn numbers, steps, positions or anything only this attempt
   had; a number only when the rule is about that number. If Supported, it becomes World Knowledge.""",
@@ -69,14 +72,15 @@ TERMS = {  # each term as the prompts list it, line breaks included
 - Prediction: what the log will show if the hypothesis is right.
   When: in each rollout, the first time within the window that the agent does the action while the
   situation holds.
-  What: whether the result follows; it must be the game's response, never only that the agent did the
-  action.""",
+  What: whether the result follows: a turn result in the action's turn rows, a milestone result by the
+  end of the window. It must be the game's response, never only that the agent did the action.""",
     'Experiment record': """\
 - Experiment record: every experiment at one failure point: its hypothesis, change, prediction, verdict
   (Supported, Refuted or Not reached), frequency, and what the log of each rollout showed.""",
     'Occurrence': """\
 - Occurrence: the first time in a rollout that the agent does the action while the situation holds. It
-  is marked with whether the result followed.""",
+  is marked with whether the result followed; for a milestone result, code checks whether the agent held
+  the milestone's count of the item at the occurrence or after it, within the window.""",
 }
 
 # The layouts of the inputs, shared by the prompts that get them.
