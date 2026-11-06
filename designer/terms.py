@@ -1,6 +1,6 @@
 """The terms the Designer's prompts use, each sentence written once (the "Prompt Definitions" doc, word for word).
-Every prompt assembles its "Terms used below" from these, so a term means the same in every prompt. {rollouts} and
-{window_steps} are filled from configs/hyperparams.yaml.
+Every prompt assembles its "Terms used below" from these, so a term means the same in every prompt. {rollouts},
+{window_steps} and {stall_steps} are filled from configs/hyperparams.yaml.
 """
 from __future__ import annotations
 
@@ -47,7 +47,8 @@ TERMS = {  # each term as the prompts list it, line breaks included
     'Window': """\
 - Window: the first {window_steps} steps after the restart point, or fewer if the episode ends first. A
   rollout ends right after its occurrence (for a milestone result, once the milestone is also reached),
-  or at the end of the window; the one rollout that continues the timeline plays on to the end.""",
+  or at the end of the window. The continuation, which goes on with the timeline from a rollout, plays on
+  to the end, or until {stall_steps} steps pass without a new milestone.""",
     'Hypothesis': """\
 - Hypothesis: a rule of this world in three parts, each written in the words the log uses and true
   beyond this attempt.
@@ -128,8 +129,9 @@ PLAN_INPUT = """\
 
 
 def fill(text: str) -> str:
-    return text.replace("{rollouts}", str(HP["loop"]["rollouts"])).replace("{window_steps}",
-                                                                           str(HP["loop"]["window_steps"]))
+    for k in ("rollouts", "window_steps", "stall_steps"):
+        text = text.replace("{" + k + "}", str(HP["loop"][k]))
+    return text
 
 
 def term(name: str) -> str:

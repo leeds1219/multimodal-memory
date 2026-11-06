@@ -20,8 +20,9 @@ attempt:
      to the failure point's experiment record.
   5. Supported: the timeline goes on with a rollout where R followed (the one furthest along the milestones at its
      last save; fewer steps on a tie), up to its last save, then a continuation
-     episode from that save to the episode end, whose agent is also given the hypothesis just Supported; the
-     failure points are listed again in the new timeline.
+     episode from that save, whose agent is also given the hypothesis just Supported. It plays to the episode end,
+     or stops once loop.stall_steps have passed without a new milestone; the failure points are listed again in
+     the new timeline.
   Ends on task success, after loop.max_experiments hypotheses, or when no failure point is left.
   A rollout is judged at every world save while it plays and ends at the next turn once its occurrence shows.
 Everything about the environment goes through the domain (domains/base.py; --domain, default minecraft). --world is
@@ -209,9 +210,26 @@ class Loop:
         result, and the milestone is held), the loop writes the stop file and the episode ends at the next turn;
         otherwise it ends with the window. Returns the episode, its result and the occurrence (judged again on the
         whole log when none was seen while it played)."""
+        seen = {}
+
+        def check(ep, saves):
+            occ = self.occurrence(ep, hyp, seen.get("occ"))
+            if occ:
+                seen["occ"] = occ
+            if occ and hyp.get("milestone") and not occ["result_followed"]:
+                return None  # the action came; play on until the milestone or the window end
+            return occ
+
+        ep, res = self.watched_episode(name, ckpt, exp_f, window, check)
+        occ = self.occurrence(ep, hyp, seen.get("occ"))
+        return ep, res, occ
+
+    def watched_episode(self, name: str, ckpt: str, exp_f: Path, max_steps: int | None, check) -> tuple[Path, dict]:
+        """run_episode, with `check(episode, saves)` called at every new world save while it plays: once it returns
+        something, the loop writes it to the stop file and the episode ends at the next turn."""
         stop = self.dir / f"{name}.stop"
         stop.unlink(missing_ok=True)
-        done, seen = threading.Event(), {}
+        done = threading.Event()
 
         def watch():
             n_saves = 0
@@ -222,27 +240,36 @@ class Loop:
                     continue
                 n_saves = len(saves)
                 try:
-                    occ = self.occurrence(ep, hyp, seen.get("occ"))
+                    why = check(ep, saves)
                 except Exception as e:  # a log read mid-write: try again at the next save
-                    self.events.append({"ev": "occurrence_watch_error", "error": repr(e)[:200]})
+                    self.events.append({"ev": f"{name}_watch_error", "error": repr(e)[:200]})
                     continue
-                if occ and hyp.get("milestone") and not occ["result_followed"]:
-                    seen["occ"] = occ  # the action came; play on until the milestone or the window end
-                    continue
-                if occ:
-                    seen["occ"] = occ
-                    stop.write_text(json.dumps(occ, ensure_ascii=False))
+                if why:
+                    stop.write_text(json.dumps(why, ensure_ascii=False))
                     return
 
         th = threading.Thread(target=watch, daemon=True)
         th.start()
         try:
-            ep, res = self.run_episode(name, ckpt, exp_f, window, stop)
+            return self.run_episode(name, ckpt, exp_f, max_steps, stop)
         finally:
             done.set()
             th.join()
-        occ = self.occurrence(ep, hyp, seen.get("occ"))
-        return ep, res, occ
+
+    def continuation(self, name: str, ckpt: str, exp_f: Path, before: list, start: int) -> tuple[Path, dict]:
+        """The continuation from step `start`, after the timeline parts `before` [(episode, until, marker)]: it plays
+        to the episode end, or stops once loop.stall_steps have passed since the last new milestone (or its start)."""
+        best = {"reached": self.dom.milestones_reached(before, self.items()), "step": start}
+
+        def check(ep, saves):
+            reached = self.dom.milestones_reached(before + [(ep, saves[-1], None)], self.items())
+            if reached > best["reached"]:
+                best.update(reached=reached, step=saves[-1])
+            elif saves[-1] - best["step"] >= L["stall_steps"]:
+                return {"stalled": f"no new milestone since step {best['step']}", "milestones_reached": reached}
+            return None
+
+        return self.watched_episode(name, ckpt, exp_f, None, check)
 
     def experiment(self, k: int, fp: dict) -> bool:
         """One hypothesis at fp (2.-5.); True when the task succeeded in one of its episodes."""
@@ -296,8 +323,13 @@ class Loop:
             cont_f.write_text(json.dumps({**json.loads(exp_f.read_text()), "knowledge": wk.supported(self.knowledge()),
                                           "knowledge_live": str(self.store), "from_start": not cont_ckpt},
                                          indent=1, ensure_ascii=False))
-            cont, res = self.run_episode(f"e{k}_cont", cont_ckpt, cont_f, None)
+            before = [(Path(p["episode"]), p["until"], p["marker"]) for p in self.head(fp)] + \
+                ([(Path(r["episode"]), last, None)] if last is not None else [])
+            cont, res = self.continuation(f"e{k}_cont", cont_ckpt, cont_f, before,
+                                          last if last is not None else fp["checkpoint_step"])
             e["continuation"] = str(cont)
+            stop = self.dir / f"e{k}_cont.stop"
+            e["continuation_stalled"] = json.loads(stop.read_text()) if stop.exists() else None
             success = bool(res.get("success"))
             self.extend_timeline(fp, r["episode"], last, cont, hyp)
         elif len(fp["record"]) >= L["tries_per_failure_point"]:

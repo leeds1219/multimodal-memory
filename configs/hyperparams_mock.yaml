@@ -3,6 +3,7 @@ loop:  # the learning-from-failure loop (experiments/ours_loop.py)
   rollouts: 2                  # rollouts per hypothesis from the same restart point, taken as independent trials
   window_steps: 3000           # steps after the restart point a rollout plays to show the occurrence
   save_every: 600              # world saves in every loop episode (the restart points)
+  stall_steps: 3000            # a continuation stops after this many steps without a new milestone
   max_experiments: 1           # hypotheses tested per attempt
   tries_per_failure_point: 3   # hypotheses at one failure point before the next one
 executor:  # the agent (domains/minecraft/agent/)
