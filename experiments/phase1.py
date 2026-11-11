@@ -93,13 +93,34 @@ class Phase1:
         st = json.loads(self.state_f.read_text()) if self.state_f.exists() else {}
         self.saved = set(st.get("snapshots_saved", []))
 
+    def measures(self) -> dict:
+        """Every compute measure per level, summed over the run's finished episodes (result.json): the budget is
+        played steps, the rest is reported beside it."""
+        level_of = {t: L["name"] for L in self.levels for t in L["train"]}
+        keys = ("steps", "llm_calls", "tokens_in", "tokens_out_billed", "cost_usd", "wall_time_s")
+        out = {L["name"]: dict.fromkeys(("episodes", "successes") + keys, 0) for L in self.levels}
+        root = RESULTS / self.cond.name
+        for res in root.glob(f"{self.prefix}*-k*/*/*/result.json") if root.exists() else []:
+            r = json.loads(res.read_text())
+            t = res.parent.parent.name
+            if t not in level_of or r.get("status") not in DONE:
+                continue
+            m = out[level_of[t]]
+            m["episodes"] += 1
+            m["successes"] += bool(r.get("success"))
+            for k in keys:
+                m[k] += r.get(k) or 0
+        out["total"] = {k: sum(m[k] for m in out.values()) for k in out[self.levels[0]["name"]]}
+        return out
+
     def _write_state(self) -> None:
         self.state_f.parent.mkdir(parents=True, exist_ok=True)
         self.state_f.write_text(json.dumps({
             "condition": self.cond.name, "store": str(self.store), "steps_per_train_task": self.per_task,
             "budget": self.budget, "steps": self.steps, "episodes": self.episodes,
             "played_total": sum(self.steps.values()), "budget_total": self.total,
-            "snapshots_saved": sorted(self.saved), "updated": time.strftime("%Y-%m-%d %H:%M:%S")}, indent=1))
+            "snapshots_saved": sorted(self.saved), "measures": self.measures(),
+            "updated": time.strftime("%Y-%m-%d %H:%M:%S")}, indent=1))
 
     def _snapshot(self) -> None:  # call with self.lock held
         played = sum(self.steps.values())
@@ -204,12 +225,16 @@ def main() -> int:
     ap.add_argument("--port", type=int, required=True, help="first port; worker i uses port + 10 i (and + 1000)")
     ap.add_argument("--mock", action="store_true", help="LLM_MOCK: no API calls")
     ap.add_argument("--levels", default="", help="comma list of levels to play (tests); default: all, in order")
+    ap.add_argument("--report", action="store_true", help="print the run's measures per level and exit")
     a = ap.parse_args()
     if a.method not in STORES or not (a.store or a.o1m) or a.frozen:
         ap.error(f"phase1 needs a method with a memory store ({', '.join(STORES)}), its store name and no --frozen")
     a.store = a.store or a.o1m  # the run's store name, also used for the orders and the state file
     cond = Condition(a.method, a.world, a.save, a.knowledge, a.plan,
                      a.store if a.method == "mineevolve" else None, a.o1m)
+    if a.report:
+        print(json.dumps(Phase1(a, cond).measures(), indent=1))
+        return 0
     return Phase1(a, cond).run()
 
 
