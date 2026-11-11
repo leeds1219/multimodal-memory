@@ -5,6 +5,8 @@ task chunk, spread over the given GPUs. Each chain is experiments/chain.py.
     python experiments/run.py --method gt_world_rule --world nolava --prefix ub --gpus 0 --port 29000
     python experiments/run.py --method baseline --world nolava --save 600 --rule-ore-only --prefix nb --gpus 4 --port 29200
     python experiments/run.py --method ours --world nolava --knowledge pl1 --prefix ev --gpus 0 --port 29400
+    python experiments/run.py --method optimus1_memory --o1m tr1 --tasks <train tasks> --prefix om --gpus 0 --port 29600
+    python experiments/run.py --method optimus1_memory --o1m tr1 --frozen --prefix ot --gpus 0 --port 29800
 
 Results: <runs>/results/<method>/<world>/<order>/...; orders are <prefix><offset>_<chunk> (e.g. vt0_3);
 logs go to <runs>/logs/<order>.log. Record the launch in
@@ -47,12 +49,18 @@ def main() -> int:
     ap.add_argument("--port", type=int, required=True, help="first port; each chain uses port and port+1000")
     ap.add_argument("--rule-ore-only", action="store_true",
                     help="leave out the tasks that need natural ore (analysis/ore_supply.py)")
+    ap.add_argument("--tasks", default="", help="comma list instead of the 32 hard tasks, one chain per --chunks entry")
     ap.add_argument("--mock", action="store_true", help="LLM_MOCK: no API calls")
     ap.add_argument("--dry-run", action="store_true")
     a = ap.parse_args()
     cond = from_args(a)
     cond_args = ["--method", a.method, "--world", a.world] + (["--save", str(a.save)] if a.save else []) + \
-        (["--knowledge", a.knowledge] if a.knowledge else [])
+        (["--knowledge", a.knowledge] if a.knowledge else []) + (["--o1m", a.o1m] if a.o1m else []) + \
+        (["--frozen"] if a.frozen else [])
+    chunks = HARD_CHUNKS
+    if a.tasks:  # other tasks (e.g. the train or test tasks of optimus1_memory), dealt round-robin to the chunks
+        ts = a.tasks.split(",")
+        chunks = [",".join(ts[i::len(a.chunks.split(","))]) for i in range(len(a.chunks.split(",")))]
     gpus = [int(g) for g in a.gpus.split(",")]
     logs = RUN_DATA / "logs"
     logs.mkdir(parents=True, exist_ok=True)
@@ -61,9 +69,12 @@ def main() -> int:
     n = 0
     for w in a.worlds.split(","):
         off = WORLD_OFFSETS[w]
-        for k in (int(c) for c in a.chunks.split(",")):
+        for i, k in enumerate(int(c) for c in a.chunks.split(",")):
             order = f"{a.prefix}{off}_{k}"
-            tasks = ",".join(t for t in HARD_CHUNKS[k].split(",") if not (a.rule_ore_only and needs_natural_ore(t)))
+            chunk = chunks[i] if a.tasks else chunks[k]
+            tasks = ",".join(t for t in chunk.split(",") if t and not (a.rule_ore_only and needs_natural_ore(t)))
+            if not tasks:
+                continue
             cmd = [PY, str(REPO / "experiments" / "chain.py"), *cond_args, "--order", order, "--tasks", tasks,
                    "--gpu", str(gpus[n % len(gpus)]), "--port", str(port), "--seed-offset", str(off)] + (["--mock"] if a.mock else [])
             print(" ".join(cmd))

@@ -6,6 +6,8 @@ variables) and where its results go: <runs>/results/<method>/<world>/<order>/<ta
     Condition("baseline", "nolava", save_every=600)      results/baseline/nolava_save600/
     Condition("ours", "nolava", knowledge="pl1")         results/ours_pl1/nolava/
     Condition("baseline", "nolava", plan=True)           results/baseline_plan/nolava/
+    Condition("optimus1_memory", o1m="tr1")              results/optimus1_memory_tr1/standard/  (Phase 1: learns)
+    Condition("optimus1_memory", o1m="tr1", frozen=True) results/optimus1_memory_tr1_frozen/standard/  (Phase 2)
 """
 from __future__ import annotations
 
@@ -20,6 +22,7 @@ METHODS = {
         ("OPTIMUS_REPLANFIX", "1"), ("OPTIMUS_ESCAPEFIX", "1")], "memfix": True},
     "baseline": {"switches": VLM},
     "mineevolve": {"switches": VLM, "mineevolve": "mineevolve"},  # store run_data/memory/me_mineevolve.json
+    "optimus1_memory": {"switches": VLM},  # + the store run_data/memory/o1m_<name>/, Condition(o1m=..., frozen=...)
     "gt_recipe": {"switches": VLM + [("OPTIMUS_VLM_RECIPES", "fixed")]},
     "gt_world_rule": {"switches": VLM + [("OPTIMUS_VLM_OREHINT", "1")]},  # the rule in short
     "gt_world_rule_v2": {"switches": VLM + [("OPTIMUS_VLM_OREHINT", "2")]},  # what the placing code does, step by step
@@ -39,6 +42,8 @@ class Condition:
     save_every: int = 0  # save the world every N steps (starting points of the replay world)
     knowledge: str | None = None  # method ours: World Knowledge store memory/wk_<name>.json
     plan: bool = False  # initial planning (domains/minecraft/agent/planner.py), on top of any VLM method
+    o1m: str | None = None  # method optimus1_memory: its store run_data/memory/o1m_<name>/, one per run
+    frozen: bool = False  # method optimus1_memory: the store is read only (Phase 2, unseen tasks)
 
     def __post_init__(self):
         if self.method not in METHODS or self.world not in WORLDS:
@@ -47,11 +52,15 @@ class Condition:
             raise ValueError("--plan needs a method run by the Baseline agent")
         if (self.method == "ours") != bool(self.knowledge):
             raise ValueError("method 'ours' needs --knowledge, and only it takes one")
+        if (self.method == "optimus1_memory") != bool(self.o1m) or (self.frozen and not self.o1m):
+            raise ValueError("method 'optimus1_memory' needs --o1m, and only it takes --o1m / --frozen")
 
     @property
     def name(self) -> str:
         """results/<method>/<world>"""
-        method = (f"ours_{self.knowledge}" if self.method == "ours" else self.method) + ("_plan" if self.plan else "")
+        method = (f"ours_{self.knowledge}" if self.method == "ours" else
+                  f"optimus1_memory_{self.o1m}" + ("_frozen" if self.frozen else "") if self.o1m else
+                  self.method) + ("_plan" if self.plan else "")
         world = self.world + (f"_save{self.save_every}" if self.save_every else "")
         return f"{method}/{world}"
 
@@ -78,6 +87,10 @@ class Condition:
             out["OPTIMUS_VLM_WK"] = str(runs_root / "memory" / f"wk_{self.knowledge}.json")
         if self.plan:
             out["OPTIMUS_VLM_PLAN"] = "1"
+        if self.o1m:
+            out["OPTIMUS_VLM_O1M"] = str(runs_root / "memory" / f"o1m_{self.o1m}")
+            if self.frozen:
+                out["OPTIMUS_VLM_O1M_FROZEN"] = "1"
         return out
 
 
@@ -87,7 +100,10 @@ def add_args(ap) -> None:
     ap.add_argument("--save", type=int, default=0, help="save the world every N steps (replay starting points)")
     ap.add_argument("--knowledge", default=None, help="method ours: World Knowledge store memory/wk_<name>.json")
     ap.add_argument("--plan", action="store_true", help="initial planning: sub-goals written before the first turn")
+    ap.add_argument("--o1m", default=None, help="method optimus1_memory: store run_data/memory/o1m_<name>/")
+    ap.add_argument("--frozen", action="store_true", help="method optimus1_memory: read the store, never write it")
 
 
 def from_args(a) -> Condition:
-    return Condition(a.method, a.world, a.save, a.knowledge, getattr(a, "plan", False))
+    return Condition(a.method, a.world, a.save, a.knowledge, getattr(a, "plan", False), getattr(a, "o1m", None),
+                     getattr(a, "frozen", False))
