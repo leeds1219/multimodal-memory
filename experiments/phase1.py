@@ -1,13 +1,15 @@
 """Phase 1 (plan 2026-11-11): collect a method's memory on the train tasks of configs/suites/optimus1/phase_split.yaml,
-level by level, under one budget of played game steps per level (phase1.steps_per_train_task x the level's train
-tasks; configs/hyperparams.yaml). Phase 2 then plays the test tasks with a snapshot of the memory, frozen.
+level by level, under one budget of played game steps per level (phase1.horizons_per_train_task x the level's
+horizon x its train tasks; configs/hyperparams.yaml). Phase 2 then plays the test tasks with a snapshot of the
+memory, frozen.
 
 A method without a loop (mineevolve, optimus1_memory) replays the level's train tasks round-robin, one episode per GPU at a time, every
 task with its one seed (seeds.yaml), until the level's played steps reach its budget. An episode is launched only while
 the steps played plus the horizons of the episodes in flight stay within the budget, or when none is in flight; so the
 last episode of a level may go over by less than one horizon (the actual steps are reported). Memory carries over: one
-store for the whole run. The store is copied when the run's played steps first reach each phase1.snapshots fraction of
-the whole budget: run_data/memory/snapshots/<store stem>_<percent>.<suffix>.
+store for the whole run. After every finished episode the store is copied (frames hard-linked) to
+run_data/memory/snapshots/<store stem>/<n>_<order>/, and the state lists the episodes in the order they finished with
+the run's measures so far: Phase 2 can take the memory at any episode, i.e. at any budget in steps, tokens or $.
 
     python experiments/phase1.py --method mineevolve --store p1me --world nolava --plan --gpus 0,1,2,3,4,5,6,7 --port 29100
     python experiments/phase1.py --method optimus1_memory --o1m p1om --world nolava --plan --gpus 0,1,2,3,4,5,6,7 --port 29200
@@ -22,6 +24,7 @@ from __future__ import annotations
 import argparse
 import fcntl
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -60,18 +63,18 @@ class Phase1:
         import yaml
         self.a, self.cond = a, cond
         self.levels = yaml.safe_load(SPLIT.read_text())["levels"]
-        self.per_task = int(HP["phase1"]["steps_per_train_task"])
-        self.budget = {L["name"]: self.per_task * len(L["train"]) for L in self.levels}
+        self.k_hz = HP["phase1"]["horizons_per_train_task"]
+        self.budget = {L["name"]: int(self.k_hz * horizon(L["train"][0])) * len(L["train"]) for L in self.levels}
         self.total = sum(self.budget.values())
         self.store = Path(cond.env_vars(RUN_DATA, REPRO)[STORES[cond.method][1]])
-        self.snaps = RUN_DATA / "memory" / "snapshots"
+        self.snaps = RUN_DATA / "memory" / "snapshots" / self.store.stem
         self.state_f = RUN_DATA / "state" / f"phase1_{a.store}.json"
         self.prefix = f"p1-{a.store}-"
         self.lock = threading.Condition()
         self.steps = {L["name"]: 0 for L in self.levels}  # played steps of finished episodes, per level
         self.episodes = {L["name"]: 0 for L in self.levels}
         self.k = {}  # task -> episodes started so far
-        self.saved = set()  # snapshot fractions already copied
+        self.ledger = []  # finished episodes in order, each with the run's measures so far and its snapshot
         self._resume()
 
     # ----------------------------------------------------------------- state
@@ -91,7 +94,7 @@ class Phase1:
                     self.steps[level_of[t]] += int(r.get("steps") or 0)
                     self.episodes[level_of[t]] += 1
         st = json.loads(self.state_f.read_text()) if self.state_f.exists() else {}
-        self.saved = set(st.get("snapshots_saved", []))
+        self.ledger = st.get("ledger", [])
 
     def measures(self) -> dict:
         """Every compute measure per level, summed over the run's finished episodes (result.json): the budget is
@@ -116,29 +119,32 @@ class Phase1:
     def _write_state(self) -> None:
         self.state_f.parent.mkdir(parents=True, exist_ok=True)
         self.state_f.write_text(json.dumps({
-            "condition": self.cond.name, "store": str(self.store), "steps_per_train_task": self.per_task,
+            "condition": self.cond.name, "store": str(self.store), "horizons_per_train_task": self.k_hz,
             "budget": self.budget, "steps": self.steps, "episodes": self.episodes,
             "played_total": sum(self.steps.values()), "budget_total": self.total,
-            "snapshots_saved": sorted(self.saved), "measures": self.measures(),
+            "measures": self.measures(), "ledger": self.ledger,
             "updated": time.strftime("%Y-%m-%d %H:%M:%S")}, indent=1))
 
-    def _snapshot(self) -> None:  # call with self.lock held
-        played = sum(self.steps.values())
-        for f in HP["phase1"]["snapshots"]:
-            if f in self.saved or played < f * self.total or not self.store.exists():
-                continue
-            self.snaps.mkdir(parents=True, exist_ok=True)
-            dst = self.snaps / f"{self.store.stem}_{round(f * 100)}{self.store.suffix}"
+    def _snapshot(self, label: str, r: dict | None) -> None:  # call with self.lock held
+        """Copy the store as it is after this episode; frames are hard-linked (they never change once written)."""
+        dst = self.snaps / f"{len(self.ledger) + 1:05d}_{label}"
+        if self.store.exists():
+            dst.parent.mkdir(parents=True, exist_ok=True)
             is_dir = self.store.is_dir()  # optimus1_memory: a directory; mineevolve: one file
-            with open(self.store / "store.lock" if is_dir else str(self.store) + ".lock", "a") as lf:  # the store's own lock
+            with open(self.store / "store.lock" if is_dir else str(self.store) + ".lock", "a") as lf:  # the store's lock
                 fcntl.flock(lf, fcntl.LOCK_EX)
                 if is_dir:
-                    shutil.copytree(self.store, dst, dirs_exist_ok=True, ignore=shutil.ignore_patterns("store.lock"))
+                    shutil.copytree(self.store, dst, ignore=shutil.ignore_patterns("store.lock"),
+                                    copy_function=lambda a, b: os.link(a, b) if a.endswith((".jpg", ".png"))
+                                    else shutil.copy2(a, b))
                 else:
-                    shutil.copy2(self.store, dst)
+                    dst.mkdir()
+                    shutil.copy2(self.store, dst / self.store.name)
                 fcntl.flock(lf, fcntl.LOCK_UN)
-            self.saved.add(f)
-            log(f"snapshot {round(f * 100)}% at {played} steps -> {dst}")
+        tot = self.measures()["total"]
+        self.ledger.append({"n": len(self.ledger) + 1, "episode": label, "status": (r or {}).get("status"),
+                            "success": (r or {}).get("success"), "snapshot": str(dst) if self.store.exists() else None,
+                            "after": tot})
 
     # --------------------------------------------------------------- episode
     def _episode(self, task: str, k: int, gpu: int, port: int) -> dict:
@@ -182,16 +188,19 @@ class Phase1:
                 elif r.get("status") == "missing":  # chain.py ran no episode: disk, LLM cap, STOP_BUDGET or an error
                     log(f"STOP: chain.py ran no episode (exit {r.get('chain_rc')}); see run_data/logs/phase1_{self.a.store}/")
                     self.stop = True
-                self._snapshot()
+                self._snapshot(f"{task}-k{k}", r)
                 self._write_state()
                 self.lock.notify_all()
 
     # ------------------------------------------------------------------ main
     def run(self) -> int:
         self.stop = False
+        if not self.ledger and sum(self.episodes.values()):  # resumed from a run without a ledger: one entry for it
+            with self.lock:
+                self._snapshot("resume", None)
         gpus = [int(g) for g in self.a.gpus.split(",")]
         log(f"{self.cond.name}: store {self.store}, budget {self.total} steps "
-            f"({self.per_task} per train task), {len(gpus)} GPUs")
+            f"({self.k_hz} horizons per train task), {len(gpus)} GPUs")
         for L in self.levels:
             name, tasks = L["name"], L["train"]
             if self.a.levels and name not in self.a.levels.split(","):
@@ -212,7 +221,6 @@ class Phase1:
             if self.stop:
                 return 2
         with self.lock:
-            self._snapshot()
             self._write_state()
         log(f"done: {sum(self.steps.values())} steps played, budget {self.total}")
         return 0
