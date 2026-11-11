@@ -11,6 +11,7 @@ in worlds A, B and C: 96 episodes each.
 | 4 | Baseline + GT Recipe | the recipe graph in the prompt | standard | `--method gt_recipe` |
 | 5 | Baseline + GT World Rule | the hidden ore rule in the prompt | standard | `--method gt_world_rule` |
 | 6 | Ours | World Knowledge learned from its own failures | nolava | see below |
+| 7 | Baseline + Optimus-1 memory | Optimus-1's knowledge graph and experience pool, learned online on train tasks | standard | `--method optimus1_memory --o1m <name>` (see below) |
 
 Every run also takes `--prefix <name> --gpus <list> --port <first port>`. Results are in
 `results/<method>/<world>/`.
@@ -86,6 +87,26 @@ The learning loop runs on each failed episode:
    If it was supported, the loop lists the failure points again, in the experiment's log. When the failure points
    of a list are used up, it lists them again in the latest experiment's log. The loop stops on task success or
    after 10 experiments (or when the latest experiment's log has no failure point).
+
+## 7. Baseline + Optimus-1 memory
+
+Optimus-1's Hybrid Multimodal Memory (Li et al., NeurIPS 2024) on the Baseline agent, implemented from the paper:
+the Hierarchical Directed Knowledge Graph (HDKG) and the Abstracted Multimodal Experience Pool (AMEP). Memory is the
+only difference from the Baseline. The agent also names the sub-goal of each command and judges its previous one
+(COMPLETE, CONTINUE or REPLAN, the verdicts of Optimus-1's reflector), so experiences can be stored per sub-goal.
+- HDKG: only what the agent's own episodes showed (crafts and smelts that worked, materials a failed one named,
+  items gathered); never the recipe files. The target's subgraph, with amounts, is in the system prompt.
+- AMEP: per sub-goal window, up to 16 frames, the start and end state and the verdict. Every 1200 steps on one
+  sub-goal, the closest past case for each verdict is shown.
+
+| Phase | Command | Store |
+|---|---|---|
+| 1. Learn on the train tasks | `run.py --method optimus1_memory --o1m <name> --tasks <train tasks>` | starts empty, written after each episode |
+| 2. Test on unseen tasks | `run.py --method optimus1_memory --o1m <name> --frozen` | read only |
+
+The store is `run_data/memory/o1m_<name>/`, shared by the chains of a run. Results are in
+`results/optimus1_memory_<name>[_frozen]/<world>/`. Code: `memory/optimus1_memory.py`; offline test:
+`scripts/test_optimus1_memory.py`.
 
 ## Episode folder
 
