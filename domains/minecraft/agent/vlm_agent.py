@@ -302,7 +302,7 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
     if o1m is not None:
         ev = o1m.events
         summ["optimus1_memory"] = {"experiences": sum(e["ev"] == "experience" for e in ev),
-                                   "graph_events": sum(e["ev"] == "graph_event" for e in ev),
+                                   "graph_events": sum(e["ev"] in ("made", "missing", "gathered") for e in ev),  # _learn logs the event's own name
                                    "case_retrievals": sum(e["ev"] == "reflect_retrieval" and bool(e["ids"]) for e in ev),
                                    "target_known": ev[0]["target_known"], "frozen": o1m.frozen}
     (out / "summary.json").write_text(json.dumps(summ, indent=1))
