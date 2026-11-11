@@ -12,8 +12,9 @@ the whole budget: run_data/memory/snapshots/<store stem>_<percent>.<suffix>.
     python experiments/phase1.py --method mineevolve --store p1me --world nolava --gpus 0,1,2,3,4,5,6,7 --port 29100
     python experiments/phase1.py --method optimus1_memory --o1m p1om --world nolava --gpus 0,1,2,3,4,5,6,7 --port 29200
 
-Each episode is one chain.py call (--order p1-<store>-k<k> --tasks <task>, k = that task's k-th episode), so results
-are results/<condition>/p1-<store>-k<k>/<task>/<seed>/ and a restarted run resumes from them.
+Each episode is one chain.py call (--order p1-<store>-<task>-k<k> --tasks <task>, k = that task's k-th episode; one
+order per episode, since chain.py refuses a second live chain on the same order), so results are
+results/<condition>/p1-<store>-<task>-k<k>/<task>/<seed>/ and a restarted run resumes from them.
 Progress: run_data/state/phase1_<store>.json.
 """
 from __future__ import annotations
@@ -65,7 +66,7 @@ class Phase1:
         self.store = Path(cond.env_vars(RUN_DATA, REPRO)[STORES[cond.method][1]])
         self.snaps = RUN_DATA / "memory" / "snapshots"
         self.state_f = RUN_DATA / "state" / f"phase1_{a.store}.json"
-        self.prefix = f"p1-{a.store}-k"
+        self.prefix = f"p1-{a.store}-"
         self.lock = threading.Condition()
         self.steps = {L["name"]: 0 for L in self.levels}  # played steps of finished episodes, per level
         self.episodes = {L["name"]: 0 for L in self.levels}
@@ -77,19 +78,18 @@ class Phase1:
     def _resume(self) -> None:
         level_of = {t: L["name"] for L in self.levels for t in L["train"]}
         root = RESULTS / self.cond.name
-        for d in sorted(root.glob(f"{self.prefix}*")) if root.exists() else []:
-            k = int(re.sub(r"\D", "", d.name[len(self.prefix):]) or 0)
-            for t_dir in d.iterdir():
-                t = t_dir.name
-                res = t_dir / str(SEEDS.get(t, "")) / "result.json"
-                if t not in level_of or not res.exists():
-                    continue
+        for d in sorted(root.glob(f"{self.prefix}*-k*")) if root.exists() else []:
+            m = re.fullmatch(re.escape(self.prefix) + r"(.+)-k(\d+)", d.name)
+            if not m or m.group(1) not in level_of:
+                continue
+            t, k = m.group(1), int(m.group(2))
+            self.k[t] = max(self.k.get(t, 0), k)
+            res = d / t / str(SEEDS[t]) / "result.json"
+            if res.exists():
                 r = json.loads(res.read_text())
-                if r.get("status") not in DONE:
-                    continue
-                self.steps[level_of[t]] += int(r.get("steps") or 0)
-                self.episodes[level_of[t]] += 1
-                self.k[t] = max(self.k.get(t, 0), k)
+                if r.get("status") in DONE:
+                    self.steps[level_of[t]] += int(r.get("steps") or 0)
+                    self.episodes[level_of[t]] += 1
         st = json.loads(self.state_f.read_text()) if self.state_f.exists() else {}
         self.saved = set(st.get("snapshots_saved", []))
 
@@ -121,13 +121,16 @@ class Phase1:
 
     # --------------------------------------------------------------- episode
     def _episode(self, task: str, k: int, gpu: int, port: int) -> dict:
-        order = f"{self.prefix}{k}"
+        order = f"{self.prefix}{task}-k{k}"
         cmd = [PY, str(REPRO / "experiments" / "chain.py"), "--method", self.cond.method, "--world", self.cond.world,
                STORES[self.cond.method][0], self.a.store, "--order", order, "--tasks", task, "--gpu", str(gpu), "--port", str(port)]
         if self.a.mock:
             cmd.append("--mock")
         log(f"[gpu {gpu}] {task} k{k} start")
-        rc = subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode
+        out = RUN_DATA / "logs" / f"phase1_{self.a.store}" / f"{order}_{task}.log"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        with open(out, "w") as f:
+            rc = subprocess.run(cmd, stdout=f, stderr=subprocess.STDOUT).returncode
         res = RESULTS / self.cond.name / order / task / str(SEEDS[task]) / "result.json"
         r = json.loads(res.read_text()) if res.exists() else {"status": "missing", "chain_rc": rc}
         log(f"[gpu {gpu}] {task} k{k} -> {r.get('status')} success={r.get('success')} steps={r.get('steps')} "
@@ -153,8 +156,8 @@ class Phase1:
                 if r.get("status") in DONE:
                     self.steps[level] += int(r.get("steps") or 0)
                     self.episodes[level] += 1
-                elif r.get("status") == "missing" and r.get("chain_rc") == 2:  # chain.py stopped: disk, cap or STOP_BUDGET
-                    log("STOP: chain.py stopped the run (disk, LLM cap or STOP_BUDGET)")
+                elif r.get("status") == "missing":  # chain.py ran no episode: disk, LLM cap, STOP_BUDGET or an error
+                    log(f"STOP: chain.py ran no episode (exit {r.get('chain_rc')}); see run_data/logs/phase1_{self.a.store}/")
                     self.stop = True
                 self._snapshot()
                 self._write_state()
