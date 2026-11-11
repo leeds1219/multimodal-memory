@@ -211,7 +211,8 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
         opts["plan"], opts["plan_reached"] = side["plan"], list(side.get("plan_reached", []))
     elif not side and os.environ.get("OPTIMUS_VLM_PLAN") == "1":
         extra = (P.GRAPH_NOTE.format(graph=opts["graph"].strip()) if opts.get("graph") else "") + \
-            world_knowledge.prompt_text(opts.get("knowledge"))
+            world_knowledge.prompt_text(opts.get("knowledge")) + \
+            (me.prompt_text() if me else "") + (o1m.prompt_text() if o1m else "")  # each memory feeds the plan too
         opts["plan"] = planner.make(client, instruction, extra)
         if opts["plan"]:
             opts["plan_reached"] = planner.update(opts["plan"], [], inv_counts(agent.obs))

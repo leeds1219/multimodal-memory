@@ -9,8 +9,8 @@ last episode of a level may go over by less than one horizon (the actual steps a
 store for the whole run. The store is copied when the run's played steps first reach each phase1.snapshots fraction of
 the whole budget: run_data/memory/snapshots/<store stem>_<percent>.<suffix>.
 
-    python experiments/phase1.py --method mineevolve --store p1me --world nolava --gpus 0,1,2,3,4,5,6,7 --port 29100
-    python experiments/phase1.py --method optimus1_memory --o1m p1om --world nolava --gpus 0,1,2,3,4,5,6,7 --port 29200
+    python experiments/phase1.py --method mineevolve --store p1me --world nolava --plan --gpus 0,1,2,3,4,5,6,7 --port 29100
+    python experiments/phase1.py --method optimus1_memory --o1m p1om --world nolava --plan --gpus 0,1,2,3,4,5,6,7 --port 29200
 
 Each episode is one chain.py call (--order p1-<store>-<task>-k<k> --tasks <task>, k = that task's k-th episode; one
 order per episode, since chain.py refuses a second live chain on the same order), so results are
@@ -124,6 +124,8 @@ class Phase1:
         order = f"{self.prefix}{task}-k{k}"
         cmd = [PY, str(REPRO / "experiments" / "chain.py"), "--method", self.cond.method, "--world", self.cond.world,
                STORES[self.cond.method][0], self.a.store, "--order", order, "--tasks", task, "--gpu", str(gpu), "--port", str(port)]
+        if self.cond.plan:
+            cmd.append("--plan")
         if self.a.mock:
             cmd.append("--mock")
         log(f"[gpu {gpu}] {task} k{k} start")
@@ -206,7 +208,7 @@ def main() -> int:
     if a.method not in STORES or not (a.store or a.o1m) or a.frozen:
         ap.error(f"phase1 needs a method with a memory store ({', '.join(STORES)}), its store name and no --frozen")
     a.store = a.store or a.o1m  # the run's store name, also used for the orders and the state file
-    cond = Condition(a.method, a.world, a.save, a.knowledge, False,
+    cond = Condition(a.method, a.world, a.save, a.knowledge, a.plan,
                      a.store if a.method == "mineevolve" else None, a.o1m)
     return Phase1(a, cond).run()
 
