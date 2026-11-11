@@ -57,6 +57,9 @@ def _optimus(text: str, ctx: dict) -> str | None:
         cmds = json.loads(Path(os.environ["LLM_MOCK_CMDS"]).read_text())
         _MOCK_TURN[0] += 1
         return json.dumps({"thought": "mock", "command": cmds[min(_MOCK_TURN[0], len(cmds)) - 1]})
+    if "Next command?" in text and '"reflection": "COMPLETE"' in text:  # + Optimus-1 memory: verdict and sub-goal
+        return ('{"thought": "mock", "reflection": "CONTINUE", "subgoal": "get oak_log", '
+                '"command": {"type": "steve", "prompt": "chop a tree", "steps": 300}}')
     if "Next command?" in text:  # Baseline agent turn: STEVE-1 chops trees, so block breaking is exercised at $0
         return '{"thought": "mock", "command": {"type": "steve", "prompt": "chop a tree", "steps": 300}}'
     if "<visual inference>" in text and "<goal inference>" in text and "craft graph" not in text:

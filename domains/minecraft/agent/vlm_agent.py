@@ -11,6 +11,7 @@ What an experiment adds (environment variables set from the variant tokens by ex
   OPTIMUS_VLM_OREHINT=1       the hidden ore rule in the prompt (GT World Rule)
   OPTIMUS_VLM_PLAN=1          initial planning: sub-goals written before the first turn (agent/planner.py)
   OPTIMUS_VLM_ME              MineEvolve memory (memory/mineevolve_memory.py)
+  OPTIMUS_VLM_O1M             Optimus-1 memory, HDKG + AMEP (memory/optimus1_memory.py); _FROZEN=1: read only
   OPTIMUS_VLM_WK              verified World Knowledge in the prompt (executor/extras.py)
   OPTIMUS_EXPERIMENT          an experiment of experiments/ours_loop.py: the change to try (executor/extras.py)
   OPTIMUS_NOLAVA=1            lava near the agent becomes stone every NOLAVA_EVERY steps (domains/minecraft/world/nolava.py)
@@ -33,6 +34,7 @@ from pathlib import Path
 
 import extras
 import mineevolve_memory
+import optimus1_memory
 import planner
 import prompts as P
 import save
@@ -127,12 +129,17 @@ class VLMAgent(Controller):
             out += P.GRAPH_NOTE.format(graph=self.opts["graph"].strip())
         if self.opts.get("me") is not None:
             out = out.replace(mineevolve_memory.ANSWER_LINE, mineevolve_memory.SUBGOAL_FORMAT) + self.opts["me"].prompt_text()
+        if self.opts.get("o1m") is not None:
+            out = out.replace(optimus1_memory.ANSWER_LINE, optimus1_memory.REFLECT_FORMAT) + self.opts["o1m"].prompt_text()
         return out + extras.prompt_text(self.opts)
 
     def ask(self, client, history, n_turn):
         hist = "\n".join(history[-P.N_HISTORY:]) or "(none yet)"
         text = f"State now: {self.describe()}\n\n" + P.TURN.format(history=hist, n=n_turn)
-        content = [{"type": "text", "text": text}, {"type": "text", "text": "Current view:"}, img(jpeg(self.obs["pov"]))]
+        content = [{"type": "text", "text": text}]
+        if self.opts.get("o1m") is not None:  # Optimus-1 memory: past cases at a periodic check
+            content += self.opts["o1m"].turn_content(self.t)
+        content += [{"type": "text", "text": "Current view:"}, img(jpeg(self.obs["pov"]))]
         if self.last_view is not None:
             content += [{"type": "text", "text": "View at your previous decision:"}, img(jpeg(self.last_view))]
         for label, pov in self.views:
@@ -173,7 +180,7 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
     remaining = max(1, int(env.timeout) - int(env.num_steps))
     if os.environ.get("OPTIMUS_MAX_STEPS"):  # tests; the loop's rollouts (the window)
         remaining = min(remaining, int(os.environ["OPTIMUS_MAX_STEPS"]))
-    opts = {"graph": craft_graph(target), "me": None, "plan": None, "plan_reached": [],
+    opts = {"graph": craft_graph(target), "me": None, "o1m": None, "plan": None, "plan_reached": [],
             "ore_hint": os.environ.get("OPTIMUS_VLM_OREHINT"), "nolava": os.environ.get("OPTIMUS_NOLAVA") == "1",
             **extras.load()}  # World Knowledge, the experiment's change (executor/extras.py)
     save_every = int(os.environ.get("OPTIMUS_CKPT_EVERY") or 0)
@@ -188,6 +195,12 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
         me = opts["me"] = mineevolve_memory.MineEvolve(os.environ["OPTIMUS_VLM_ME"], instruction, task_id, ctx.get("seed"),
                                                        ctx.get("order_id", ""))
         me.start(agent.prev, inv_counts(agent.obs))
+    o1m = None
+    if os.environ.get("OPTIMUS_VLM_O1M"):
+        from client import context
+        ctx = context()
+        o1m = opts["o1m"] = optimus1_memory.Optimus1Memory(os.environ["OPTIMUS_VLM_O1M"], instruction, task_id, target,
+                                                           ctx.get("seed"), ctx.get("order_id", ""))
     client = LLMClient()
     history, n, t0 = [], 0, time.time()
     step0 = int(side["step"]) if side else 0  # episode step of the save this episode starts from
@@ -217,6 +230,8 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
                 if me is not None:
                     frame = jpeg(agent.obs["pov"], (448, 252), 70)
                     me.before_turn(subgoal_of(raw), n, agent.prev, inv0, agent.t)
+                if o1m is not None:
+                    o1m.after_answer(raw, optimus1_memory.frame_bytes(agent.obs["pov"]), agent.prev, inv0, agent.t)
                 try:
                     outcome = agent.execute(cmd, f"t{n}")
                 except Exception as e:  # malformed command fields, helper errors
@@ -241,6 +256,8 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
                     seg = agent.rows[t_start:agent.t]
                     me.after_turn({"turn": n, "cmd": json.dumps(cmd), "outcome": outcome, "effect": eff}, frame, seg,
                                   agent.prev, inv1, agent.t, any(r.get("died") for r in seg), failed)
+                if o1m is not None:
+                    o1m.after_turn(cmd, outcome, inv0, inv1)
                 agent.guard_turn(t_start, s0, inv0, inv1)
                 if next_save is not None and step0 + agent.t >= next_save and not agent.over():
                     sv = {"turn": n, "history": history, "start": agent.start, "pos": agent.prev["pos"],
@@ -262,6 +279,11 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
         with open(out / "mineevolve.jsonl", "w") as f:
             for e in me.events:
                 f.write(json.dumps(e) + "\n")
+    if o1m is not None:  # written after the episode; a crashed attempt never gets here, so it writes nothing
+        o1m.finish(agent.result == "success", agent.prev, inv_counts(agent.obs), agent.t)
+        with open(out / "optimus1_memory.jsonl", "w") as f:
+            for e in o1m.events:
+                f.write(json.dumps(e) + "\n")
     summ = {"success": agent.result == "success", "success_t": agent.success_t, "stop": agent.stop,
             "steps": agent.t, "turns": n, "vlm_calls": agent.calls, "deaths": agent.deaths,
             "recipes": os.environ.get("OPTIMUS_VLM_RECIPES"),
@@ -277,6 +299,12 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
                               "accepted": sum(r["accepted"] for e in ev if e["ev"] == "ingest" for r in e["report"]),
                               "rejected": sum(not r["accepted"] for e in ev if e["ev"] == "ingest" for r in e["report"]),
                               "frozen": me.frozen}
+    if o1m is not None:
+        ev = o1m.events
+        summ["optimus1_memory"] = {"experiences": sum(e["ev"] == "experience" for e in ev),
+                                   "graph_events": sum(e["ev"] == "graph_event" for e in ev),
+                                   "case_retrievals": sum(e["ev"] == "reflect_retrieval" and bool(e["ids"]) for e in ev),
+                                   "target_known": ev[0]["target_known"], "frozen": o1m.frozen}
     (out / "summary.json").write_text(json.dumps(summ, indent=1))
     logger.info(f"[vlmtask] {instruction!r}: {summ}")
     return summ

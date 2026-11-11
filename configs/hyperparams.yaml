@@ -18,3 +18,11 @@ executor:  # the agent (domains/minecraft/agent/)
 world:  # the nolava world (domains/minecraft/world/nolava.py)
   nolava_every: 10             # steps between lava fills
   nolava_radius: 12            # half size of the filled box
+optimus1_memory:  # Optimus-1's HDKG + AMEP on the Baseline agent (memory/optimus1_memory.py)
+  buffer_frames: 16            # AMEP image buffer per experience (paper App. E.1.1)
+  frame_px: [320, 180]         # stored and shown frame size
+  frames_shown: 2              # frames shown per retrieved case: the first and the last (the release's before/now pair)
+  reflect_every_steps: 1200    # periodic check: cases shown and a CONTINUE window closed (the release's 1 game minute)
+  cases_per_verdict: 1         # retrieved cases per verdict (COMPLETE, CONTINUE, REPLAN)
+  min_subgoal_similarity: 0.5  # a case is retrieved only if its sub-goal is at least this similar (difflib ratio)
+  tool_share: 0.5              # HDKG: a tool is shown for a gathered item if it was in the inventory in this share of gathers

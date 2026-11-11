@@ -281,7 +281,7 @@ def already_running(a) -> bool:
     import psutil
     me = os.getpid()
     want = {"--method": a.method, "--world": a.world, "--save": str(a.save) if a.save else "",
-            "--knowledge": a.knowledge or "", "--order": a.order}
+            "--knowledge": a.knowledge or "", "--o1m": a.o1m or "", "--order": a.order}
     for p in psutil.process_iter(["pid", "cmdline"]):
         c = p.info["cmdline"] or []
         # only a python interpreter running chain.py (not wrappers like `timeout`)

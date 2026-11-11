@@ -2,7 +2,7 @@
 level by level, under one budget of played game steps per level (phase1.steps_per_train_task x the level's train
 tasks; configs/hyperparams.yaml). Phase 2 then plays the test tasks with a snapshot of the memory, frozen.
 
-A method without a loop (mineevolve) replays the level's train tasks round-robin, one episode per GPU at a time, every
+A method without a loop (mineevolve, optimus1_memory) replays the level's train tasks round-robin, one episode per GPU at a time, every
 task with its one seed (seeds.yaml), until the level's played steps reach its budget. An episode is launched only while
 the steps played plus the horizons of the episodes in flight stay within the budget, or when none is in flight; so the
 last episode of a level may go over by less than one horizon (the actual steps are reported). Memory carries over: one
@@ -10,6 +10,7 @@ store for the whole run. The store is copied when the run's played steps first r
 the whole budget: run_data/memory/snapshots/<store stem>_<percent>.<suffix>.
 
     python experiments/phase1.py --method mineevolve --store p1me --world nolava --gpus 0,1,2,3,4,5,6,7 --port 29100
+    python experiments/phase1.py --method optimus1_memory --o1m p1om --world nolava --gpus 0,1,2,3,4,5,6,7 --port 29200
 
 Each episode is one chain.py call (--order p1-<store>-k<k> --tasks <task>, k = that task's k-th episode), so results
 are results/<condition>/p1-<store>-k<k>/<task>/<seed>/ and a restarted run resumes from them.
@@ -34,13 +35,14 @@ sys.path.insert(0, str(REPRO / "experiments"))
 import paths  # noqa: E402,F401
 
 from benchmark import RESULTS, RUN_DATA, SEEDS, TASKS, env_o_group  # noqa: E402
-from conditions import Condition, add_args, from_args  # noqa: E402
+from conditions import Condition, add_args  # noqa: E402
 from hyperparams import HP  # noqa: E402
 
 PY = "/opt/conda/envs/mcagent/bin/python"
 MINUTE = 1200  # steps per game minute (chain.py)
 SPLIT = REPRO / "configs" / "suites" / "optimus1" / "phase_split.yaml"
-STORE_ENV = {"mineevolve": "OPTIMUS_VLM_ME"}  # method -> the environment variable naming its memory store
+STORES = {"mineevolve": ("--store", "OPTIMUS_VLM_ME"),  # method -> its store option and the variable naming the store
+          "optimus1_memory": ("--o1m", "OPTIMUS_VLM_O1M")}
 DONE = {"finished", "anomaly", "crashed_final"}
 
 
@@ -60,7 +62,7 @@ class Phase1:
         self.per_task = int(HP["phase1"]["steps_per_train_task"])
         self.budget = {L["name"]: self.per_task * len(L["train"]) for L in self.levels}
         self.total = sum(self.budget.values())
-        self.store = Path(cond.env_vars(RUN_DATA, REPRO)[STORE_ENV[cond.method]])
+        self.store = Path(cond.env_vars(RUN_DATA, REPRO)[STORES[cond.method][1]])
         self.snaps = RUN_DATA / "memory" / "snapshots"
         self.state_f = RUN_DATA / "state" / f"phase1_{a.store}.json"
         self.prefix = f"p1-{a.store}-k"
@@ -106,9 +108,13 @@ class Phase1:
                 continue
             self.snaps.mkdir(parents=True, exist_ok=True)
             dst = self.snaps / f"{self.store.stem}_{round(f * 100)}{self.store.suffix}"
-            with open(str(self.store) + ".lock", "w") as lf:  # the store's own lock (memory/mineevolve_memory.py)
+            is_dir = self.store.is_dir()  # optimus1_memory: a directory; mineevolve: one file
+            with open(self.store / "store.lock" if is_dir else str(self.store) + ".lock", "a") as lf:  # the store's own lock
                 fcntl.flock(lf, fcntl.LOCK_EX)
-                shutil.copy2(self.store, dst)
+                if is_dir:
+                    shutil.copytree(self.store, dst, dirs_exist_ok=True, ignore=shutil.ignore_patterns("store.lock"))
+                else:
+                    shutil.copy2(self.store, dst)
                 fcntl.flock(lf, fcntl.LOCK_UN)
             self.saved.add(f)
             log(f"snapshot {round(f * 100)}% at {played} steps -> {dst}")
@@ -117,7 +123,7 @@ class Phase1:
     def _episode(self, task: str, k: int, gpu: int, port: int) -> dict:
         order = f"{self.prefix}{k}"
         cmd = [PY, str(REPRO / "experiments" / "chain.py"), "--method", self.cond.method, "--world", self.cond.world,
-               "--store", self.a.store, "--order", order, "--tasks", task, "--gpu", str(gpu), "--port", str(port)]
+               STORES[self.cond.method][0], self.a.store, "--order", order, "--tasks", task, "--gpu", str(gpu), "--port", str(port)]
         if self.a.mock:
             cmd.append("--mock")
         log(f"[gpu {gpu}] {task} k{k} start")
@@ -194,9 +200,11 @@ def main() -> int:
     ap.add_argument("--mock", action="store_true", help="LLM_MOCK: no API calls")
     ap.add_argument("--levels", default="", help="comma list of levels to play (tests); default: all, in order")
     a = ap.parse_args()
-    cond = from_args(a)
-    if cond.method not in STORE_ENV or not a.store:
-        ap.error(f"phase1 needs a method with a memory store ({', '.join(STORE_ENV)}) and --store")
+    if a.method not in STORES or not (a.store or a.o1m) or a.frozen:
+        ap.error(f"phase1 needs a method with a memory store ({', '.join(STORES)}), its store name and no --frozen")
+    a.store = a.store or a.o1m  # the run's store name, also used for the orders and the state file
+    cond = Condition(a.method, a.world, a.save, a.knowledge, False,
+                     a.store if a.method == "mineevolve" else None, a.o1m)
     return Phase1(a, cond).run()
 
 
