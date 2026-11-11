@@ -1,22 +1,20 @@
 """Phase 1 (plan 2026-11-11): collect a method's memory on the train tasks of configs/suites/optimus1/phase_split.yaml,
-level by level, under one budget of played game steps per level (phase1.horizons_per_train_task x the level's
-horizon x its train tasks; configs/hyperparams.yaml). Phase 2 then plays the test tasks with a snapshot of the
-memory, frozen.
+level by level. Every train task is played once in each world of phase1.seed_offsets (configs/hyperparams.yaml; the
+seeds of worlds A, B, C), with no budget cut while it runs: a method without a loop (mineevolve, optimus1_memory)
+plays one episode per (task, world). Phase 2 then plays the test tasks with a snapshot of the memory, frozen.
 
-A method without a loop (mineevolve, optimus1_memory) replays the level's train tasks round-robin, one episode per GPU at a time, every
-task with its one seed (seeds.yaml), until the level's played steps reach its budget. An episode is launched only while
-the steps played plus the horizons of the episodes in flight stay within the budget, or when none is in flight; so the
-last episode of a level may go over by less than one horizon (the actual steps are reported). Memory carries over: one
-store for the whole run. After every finished episode the store is copied (frames hard-linked) to
-run_data/memory/snapshots/<store stem>/<n>_<order>/, and the state lists the episodes in the order they finished with
-the run's measures so far: Phase 2 can take the memory at any episode, i.e. at any budget in steps, tokens or $.
+Memory carries over: one store for the whole run, levels in order (a level starts once the previous one is done).
+After every finished episode the store is copied (frames hard-linked) to
+run_data/memory/snapshots/<store stem>/<n>_<episode>/, and the state lists the episodes in the order they finished with
+the run's measures so far (steps, LLM calls, tokens, $, wall time): the budget is cut afterwards, at any episode, in
+any of these measures, and Phase 2 takes the snapshot there.
 
     python experiments/phase1.py --method mineevolve --store p1me --world nolava --plan --gpus 0,1,2,3,4,5,6,7 --port 29100
     python experiments/phase1.py --method optimus1_memory --o1m p1om --world nolava --plan --gpus 0,1,2,3,4,5,6,7 --port 29200
 
-Each episode is one chain.py call (--order p1-<store>-<task>-k<k> --tasks <task>, k = that task's k-th episode; one
-order per episode, since chain.py refuses a second live chain on the same order), so results are
-results/<condition>/p1-<store>-<task>-k<k>/<task>/<seed>/ and a restarted run resumes from them.
+Each episode is one chain.py call (--order p1-<store>-<task>-s<offset> --tasks <task> --seed-offset <offset>; one order
+per episode, since chain.py refuses a second live chain on the same order), so results are
+results/<condition>/p1-<store>-<task>-s<offset>/<task>/<seed>/ and a restarted run skips the finished ones.
 Progress: run_data/state/phase1_<store>.json.
 """
 from __future__ import annotations
@@ -38,12 +36,11 @@ sys.path.insert(0, str(REPRO))
 sys.path.insert(0, str(REPRO / "experiments"))
 import paths  # noqa: E402,F401
 
-from benchmark import RESULTS, RUN_DATA, SEEDS, TASKS, env_o_group  # noqa: E402
+from benchmark import RESULTS, RUN_DATA, SEEDS  # noqa: E402
 from conditions import Condition, add_args  # noqa: E402
 from hyperparams import HP  # noqa: E402
 
 PY = "/opt/conda/envs/mcagent/bin/python"
-MINUTE = 1200  # steps per game minute (chain.py)
 SPLIT = REPRO / "configs" / "suites" / "optimus1" / "phase_split.yaml"
 STORES = {"mineevolve": ("--store", "OPTIMUS_VLM_ME"),  # method -> its store option and the variable naming the store
           "optimus1_memory": ("--o1m", "OPTIMUS_VLM_O1M")}
@@ -54,56 +51,46 @@ def log(msg: str) -> None:
     print(time.strftime("%H:%M:%S"), msg, flush=True)
 
 
-def horizon(task: str) -> int:
-    return int(env_o_group(TASKS[task]["group"])["max_minutes"]) * MINUTE
-
 
 class Phase1:
     def __init__(self, a, cond: Condition):
         import yaml
         self.a, self.cond = a, cond
         self.levels = yaml.safe_load(SPLIT.read_text())["levels"]
-        self.k_hz = HP["phase1"]["horizons_per_train_task"]
-        self.budget = {L["name"]: int(self.k_hz * horizon(L["train"][0])) * len(L["train"]) for L in self.levels}
-        self.total = sum(self.budget.values())
+        self.offsets = [int(o) for o in HP["phase1"]["seed_offsets"]]
         self.store = Path(cond.env_vars(RUN_DATA, REPRO)[STORES[cond.method][1]])
         self.snaps = RUN_DATA / "memory" / "snapshots" / self.store.stem
         self.state_f = RUN_DATA / "state" / f"phase1_{a.store}.json"
         self.prefix = f"p1-{a.store}-"
         self.lock = threading.Condition()
-        self.steps = {L["name"]: 0 for L in self.levels}  # played steps of finished episodes, per level
-        self.episodes = {L["name"]: 0 for L in self.levels}
-        self.k = {}  # task -> episodes started so far
+        self.done = set()  # (task, offset) of finished episodes
         self.ledger = []  # finished episodes in order, each with the run's measures so far and its snapshot
         self._resume()
 
     # ----------------------------------------------------------------- state
+    def _order(self, task: str, off: int) -> str:
+        return f"{self.prefix}{task}-s{off}"
+
+    def _result(self, task: str, off: int) -> Path:
+        return RESULTS / self.cond.name / self._order(task, off) / task / str(SEEDS[task] + off) / "result.json"
+
     def _resume(self) -> None:
-        level_of = {t: L["name"] for L in self.levels for t in L["train"]}
-        root = RESULTS / self.cond.name
-        for d in sorted(root.glob(f"{self.prefix}*-k*")) if root.exists() else []:
-            m = re.fullmatch(re.escape(self.prefix) + r"(.+)-k(\d+)", d.name)
-            if not m or m.group(1) not in level_of:
-                continue
-            t, k = m.group(1), int(m.group(2))
-            self.k[t] = max(self.k.get(t, 0), k)
-            res = d / t / str(SEEDS[t]) / "result.json"
-            if res.exists():
-                r = json.loads(res.read_text())
-                if r.get("status") in DONE:
-                    self.steps[level_of[t]] += int(r.get("steps") or 0)
-                    self.episodes[level_of[t]] += 1
+        for L in self.levels:
+            for t in L["train"]:
+                for off in self.offsets:
+                    res = self._result(t, off)
+                    if res.exists() and json.loads(res.read_text()).get("status") in DONE:
+                        self.done.add((t, off))
         st = json.loads(self.state_f.read_text()) if self.state_f.exists() else {}
         self.ledger = st.get("ledger", [])
 
     def measures(self) -> dict:
-        """Every compute measure per level, summed over the run's finished episodes (result.json): the budget is
-        played steps, the rest is reported beside it."""
+        """Every compute measure per level, summed over the run's finished episodes (result.json)."""
         level_of = {t: L["name"] for L in self.levels for t in L["train"]}
         keys = ("steps", "llm_calls", "tokens_in", "tokens_out_billed", "cost_usd", "wall_time_s")
         out = {L["name"]: dict.fromkeys(("episodes", "successes") + keys, 0) for L in self.levels}
         root = RESULTS / self.cond.name
-        for res in root.glob(f"{self.prefix}*-k*/*/*/result.json") if root.exists() else []:
+        for res in root.glob(f"{self.prefix}*-s*/*/*/result.json") if root.exists() else []:
             r = json.loads(res.read_text())
             t = res.parent.parent.name
             if t not in level_of or r.get("status") not in DONE:
@@ -119,9 +106,8 @@ class Phase1:
     def _write_state(self) -> None:
         self.state_f.parent.mkdir(parents=True, exist_ok=True)
         self.state_f.write_text(json.dumps({
-            "condition": self.cond.name, "store": str(self.store), "horizons_per_train_task": self.k_hz,
-            "budget": self.budget, "steps": self.steps, "episodes": self.episodes,
-            "played_total": sum(self.steps.values()), "budget_total": self.total,
+            "condition": self.cond.name, "store": str(self.store), "seed_offsets": self.offsets,
+            "episodes_done": len(self.done), "episodes_total": sum(len(L["train"]) for L in self.levels) * len(self.offsets),
             "measures": self.measures(), "ledger": self.ledger,
             "updated": time.strftime("%Y-%m-%d %H:%M:%S")}, indent=1))
 
@@ -147,82 +133,70 @@ class Phase1:
                             "after": tot})
 
     # --------------------------------------------------------------- episode
-    def _episode(self, task: str, k: int, gpu: int, port: int) -> dict:
-        order = f"{self.prefix}{task}-k{k}"
+    def _episode(self, task: str, off: int, gpu: int, port: int) -> dict:
+        order = self._order(task, off)
         cmd = [PY, str(REPRO / "experiments" / "chain.py"), "--method", self.cond.method, "--world", self.cond.world,
-               STORES[self.cond.method][0], self.a.store, "--order", order, "--tasks", task, "--gpu", str(gpu), "--port", str(port)]
+               STORES[self.cond.method][0], self.a.store, "--order", order, "--tasks", task, "--seed-offset", str(off),
+               "--gpu", str(gpu), "--port", str(port)]
         if self.cond.plan:
             cmd.append("--plan")
         if self.a.mock:
             cmd.append("--mock")
-        log(f"[gpu {gpu}] {task} k{k} start")
-        out = RUN_DATA / "logs" / f"phase1_{self.a.store}" / f"{order}_{task}.log"
+        log(f"[gpu {gpu}] {task} s{off} start")
+        out = RUN_DATA / "logs" / f"phase1_{self.a.store}" / f"{order}.log"
         out.parent.mkdir(parents=True, exist_ok=True)
         with open(out, "w") as f:
             rc = subprocess.run(cmd, stdout=f, stderr=subprocess.STDOUT).returncode
-        res = RESULTS / self.cond.name / order / task / str(SEEDS[task]) / "result.json"
+        res = self._result(task, off)
         r = json.loads(res.read_text()) if res.exists() else {"status": "missing", "chain_rc": rc}
-        log(f"[gpu {gpu}] {task} k{k} -> {r.get('status')} success={r.get('success')} steps={r.get('steps')} "
+        log(f"[gpu {gpu}] {task} s{off} -> {r.get('status')} success={r.get('success')} steps={r.get('steps')} "
             f"cost={r.get('cost_usd')}")
         return r
 
-    def _worker(self, level: str, tasks: list, nxt: list, inflight: dict, gpu: int, port: int) -> None:
+    def _worker(self, queue: list, gpu: int, port: int) -> None:
         while True:
             with self.lock:
-                while True:
-                    if self.steps[level] >= self.budget[level] or self.stop:
-                        return
-                    task = tasks[nxt[0] % len(tasks)]
-                    if not inflight or self.steps[level] + sum(inflight.values()) + horizon(task) <= self.budget[level]:
-                        break
-                    self.lock.wait()
-                nxt[0] += 1
-                self.k[task] = k = self.k.get(task, 0) + 1
-                inflight[(gpu, task, k)] = horizon(task)
-            r = self._episode(task, k, gpu, port)
+                if self.stop or not queue:
+                    return
+                task, off = queue.pop(0)
+            r = self._episode(task, off, gpu, port)
             with self.lock:
-                del inflight[(gpu, task, k)]
                 if r.get("status") in DONE:
-                    self.steps[level] += int(r.get("steps") or 0)
-                    self.episodes[level] += 1
+                    self.done.add((task, off))
                 elif r.get("status") == "missing":  # chain.py ran no episode: disk, LLM cap, STOP_BUDGET or an error
                     log(f"STOP: chain.py ran no episode (exit {r.get('chain_rc')}); see run_data/logs/phase1_{self.a.store}/")
                     self.stop = True
-                self._snapshot(f"{task}-k{k}", r)
+                self._snapshot(f"{task}-s{off}", r)
                 self._write_state()
-                self.lock.notify_all()
 
     # ------------------------------------------------------------------ main
     def run(self) -> int:
         self.stop = False
-        if not self.ledger and sum(self.episodes.values()):  # resumed from a run without a ledger: one entry for it
-            with self.lock:
-                self._snapshot("resume", None)
         gpus = [int(g) for g in self.a.gpus.split(",")]
-        log(f"{self.cond.name}: store {self.store}, budget {self.total} steps "
-            f"({self.k_hz} horizons per train task), {len(gpus)} GPUs")
+        log(f"{self.cond.name}: store {self.store}, worlds (seed offsets) {self.offsets}, {len(gpus)} workers")
         for L in self.levels:
-            name, tasks = L["name"], L["train"]
+            name = L["name"]
             if self.a.levels and name not in self.a.levels.split(","):
                 continue
-            if self.steps[name] >= self.budget[name]:
-                log(f"level {name}: done earlier ({self.steps[name]}/{self.budget[name]} steps)")
+            queue = [(t, off) for off in self.offsets for t in L["train"] if (t, off) not in self.done]
+            if not queue:
+                log(f"level {name}: done earlier")
                 continue
-            log(f"level {name}: {len(tasks)} train tasks, budget {self.budget[name]} steps "
-                f"({self.steps[name]} played before)")
-            nxt, inflight = [sum(self.k.get(t, 0) for t in tasks)], {}
-            ws = [threading.Thread(target=self._worker, args=(name, tasks, nxt, inflight, g, self.a.port + 10 * i))
-                  for i, g in enumerate(gpus[:len(tasks)])]
+            log(f"level {name}: {len(queue)} episodes to play ({len(L['train'])} train tasks x {len(self.offsets)} worlds)")
+            ws = [threading.Thread(target=self._worker, args=(queue, g, self.a.port + 10 * i))
+                  for i, g in enumerate(gpus[:len(queue)])]
             for w in ws:
                 w.start()
             for w in ws:
                 w.join()
-            log(f"level {name}: {self.steps[name]}/{self.budget[name]} steps in {self.episodes[name]} episodes")
+            m = self.measures()[name]
+            log(f"level {name}: {m['episodes']} episodes, {m['successes']} successes, {m['steps']} steps, ${m['cost_usd']:.2f}")
             if self.stop:
                 return 2
         with self.lock:
             self._write_state()
-        log(f"done: {sum(self.steps.values())} steps played, budget {self.total}")
+        t = self.measures()["total"]
+        log(f"done: {t['episodes']} episodes, {t['steps']} steps, ${t['cost_usd']:.2f}")
         return 0
 
 

@@ -7,8 +7,8 @@ loop:  # the learning-from-failure loop (experiments/ours_loop.py)
   max_experiments: 10          # hypotheses tested per attempt
   tries_per_failure_point: 3   # hypotheses at one failure point before the next one
 phase1:  # memory collection on the train tasks (experiments/phase1.py)
-  horizons_per_train_task: 3   # a level's budget = this x the level's horizon x its train tasks (played steps),
-                               # the same cap for every method; the memory is saved after every episode
+  seed_offsets: [0, 1, 4]      # every train task once per world (A, B, C); no budget cut while it runs, the memory
+                               # is saved after every episode and the budget is cut afterwards
 executor:  # the agent (domains/minecraft/agent/)
   history_turns: 10            # earlier commands shown each turn
   max_tokens: 500              # the agent's answer per turn
