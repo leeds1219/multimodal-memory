@@ -6,6 +6,9 @@ loop:  # the learning-from-failure loop (experiments/ours_loop.py)
   stall_steps: 3000            # a continuation stops after this many steps without a new milestone
   max_experiments: 10          # hypotheses tested per attempt
   tries_per_failure_point: 3   # hypotheses at one failure point before the next one
+phase1:  # memory collection on the train tasks (experiments/phase1.py)
+  steps_per_train_task: 50000  # a level's budget = this x its train tasks, the same cap for every method
+  snapshots: [0.25, 0.5, 1.0]  # fractions of the whole budget at which the memory store is copied
 executor:  # the agent (domains/minecraft/agent/)
   history_turns: 10            # earlier commands shown each turn
   max_tokens: 500              # the agent's answer per turn

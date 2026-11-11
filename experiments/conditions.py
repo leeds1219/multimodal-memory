@@ -6,6 +6,7 @@ variables) and where its results go: <runs>/results/<method>/<world>/<order>/<ta
     Condition("baseline", "nolava", save_every=600)      results/baseline/nolava_save600/
     Condition("ours", "nolava", knowledge="pl1")         results/ours_pl1/nolava/
     Condition("baseline", "nolava", plan=True)           results/baseline_plan/nolava/
+    Condition("mineevolve", "nolava", store="p1")        results/mineevolve_p1/nolava/ (store me_p1.json)
 """
 from __future__ import annotations
 
@@ -39,6 +40,7 @@ class Condition:
     save_every: int = 0  # save the world every N steps (starting points of the replay world)
     knowledge: str | None = None  # method ours: World Knowledge store memory/wk_<name>.json
     plan: bool = False  # initial planning (domains/minecraft/agent/planner.py), on top of any VLM method
+    store: str | None = None  # method mineevolve: its memory store memory/me_<name>.json (default: the method's own)
 
     def __post_init__(self):
         if self.method not in METHODS or self.world not in WORLDS:
@@ -47,11 +49,15 @@ class Condition:
             raise ValueError("--plan needs a method run by the Baseline agent")
         if (self.method == "ours") != bool(self.knowledge):
             raise ValueError("method 'ours' needs --knowledge, and only it takes one")
+        if self.store and not METHODS[self.method].get("mineevolve"):
+            raise ValueError("--store is for method 'mineevolve' only")
 
     @property
     def name(self) -> str:
         """results/<method>/<world>"""
         method = (f"ours_{self.knowledge}" if self.method == "ours" else self.method) + ("_plan" if self.plan else "")
+        if self.store:
+            method += f"_{self.store}"
         world = self.world + (f"_save{self.save_every}" if self.save_every else "")
         return f"{method}/{world}"
 
@@ -70,7 +76,7 @@ class Condition:
         out["OPTIMUS_ISOWORLD"] = "1"  # every episode in its own Minecraft world folder (domains/minecraft/world/private_world.py)
         out["LLM_CONFIG"] = str(repo / "configs" / f"llm_{a.get('llm', 'g38mon')}.yaml")
         if a.get("mineevolve"):
-            out["OPTIMUS_VLM_ME"] = str(runs_root / "memory" / f"me_{a['mineevolve']}.json")
+            out["OPTIMUS_VLM_ME"] = str(runs_root / "memory" / f"me_{self.store or a['mineevolve']}.json")
         if self.save_every:
             out["OPTIMUS_CKPT_EVERY"] = str(self.save_every)
             out["OPTIMUS_SAVEALL_JAR"] = str(runs_root / "infra" / "mcprec-6.13-saveall.jar")
@@ -87,7 +93,8 @@ def add_args(ap) -> None:
     ap.add_argument("--save", type=int, default=0, help="save the world every N steps (replay starting points)")
     ap.add_argument("--knowledge", default=None, help="method ours: World Knowledge store memory/wk_<name>.json")
     ap.add_argument("--plan", action="store_true", help="initial planning: sub-goals written before the first turn")
+    ap.add_argument("--store", default=None, help="method mineevolve: memory store memory/me_<name>.json")
 
 
 def from_args(a) -> Condition:
-    return Condition(a.method, a.world, a.save, a.knowledge, getattr(a, "plan", False))
+    return Condition(a.method, a.world, a.save, a.knowledge, getattr(a, "plan", False), getattr(a, "store", None))
