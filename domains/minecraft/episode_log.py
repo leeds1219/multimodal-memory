@@ -199,6 +199,23 @@ def milestone_held(ep: Path, from_turn: int, milestone: tuple) -> bool:
     return any(_has(inv, milestone) for inv in _held(ep, ts))
 
 
+def success_segment(ep: Path, task: str, prev: tuple | None, target: tuple, max_rows: int) -> str | None:
+    """The turns of episode ep from the turn after `prev` (item, count) was first held (the start when it never was)
+    to the turn where `target` was first held, as turn rows under a heading line; the last max_rows rows when longer.
+    None when ep never held target."""
+    ts = turns_of(Path(ep))
+    held = _held(Path(ep), ts)
+    end = next((i for i, inv in enumerate(held) if _has(inv, target)), None)
+    if end is None:
+        return None
+    start = next((i + 1 for i, inv in enumerate(held[:end]) if prev and _has(inv, prev)), 0)
+    seg = ts[start:end + 1]
+    rows = _merge(_rows(Path(ep), seg), set())
+    cut = f", last {max_rows} rows" if len(rows) > max_rows else ""
+    return "\n".join([f"== Success: {task}, T{seg[0]['turn']}-T{seg[-1]['turn']}, steps {seg[0]['t0']}-{seg[-1]['t1']}, "
+                      f"reached {target[0]} {target[1]}{cut} =="] + rows[-max_rows:])
+
+
 def render(parts: list, milestones: list | None = None, markers: dict | None = None) -> str:
     """The log of a timeline: `parts` [(episode, until_step or None, marker line or None)], each part's turns before
     until_step, the marker printed where the part starts. `milestones` ((item, count), in order): rows grouped by

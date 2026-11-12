@@ -9,7 +9,9 @@ attempt:
      each of a kind (mismatch, missed response, ignored knowledge, judgment). The loop tries them by turn, earliest
      first, skipping turns tried before; after loop.tries_per_failure_point hypotheses at one point, the next one.
   2. Hypothesis: at the failure point, the Designer proposes S, A, R, the change and the prediction, seeing the
-     point's experiment record (designer/hypothesis.py).
+     point's experiment record (designer/hypothesis.py) and, with --success-pool, up to loop.success_segments
+     segments of other episodes in the pool that reached the first milestone not held at the failure point (same
+     task first, then newest; loop.success_rows rows each).
   3. Rollouts: loop.rollouts episodes from the restart point (the last save before the failure point, or the
      beginning of the same world), each ending loop.window_steps after it; the agent gets the change and the
      Supported World Knowledge (executor/extras.py), never the hypothesis or the prediction.
@@ -29,7 +31,9 @@ Everything about the environment goes through the domain (domains/base.py; --dom
 Minecraft's run option.
 
     python experiments/ours_loop.py --name pl1 --episodes eps.txt --world nolava --gpu 0 --port 28300 --store pl1
-eps.txt: one failed episode dir per line (from results/baseline/nolava_save600/). Output:
+        [--plan] [--success-pool pool.txt]
+eps.txt: one failed episode dir per line (from results/baseline/nolava_save600/). pool.txt: episode dirs of the run,
+one per line; the loop appends its own rollouts and continuations to it (experiments/phase1.py). Output:
 <runs>/results/ours_loop/<name>/<task>_<seed>/ (loop.json, system2.jsonl, e<k>_r<i>/ rollouts, e<k>_cont/).
 """
 from __future__ import annotations
@@ -177,12 +181,40 @@ class Loop:
         open_ = [f for f in self.st["failure_points"] if f["search"] == sig and not f["closed"]]
         return min(open_, key=lambda f: f["turn"]) if open_ else None
 
+    # ---------------------------------------------------------------- 2. <success>
+    def success(self, fp: dict) -> str:
+        """<success>: segments of pool episodes that held the first milestone not held at the failure point, from
+        the milestone before it; same task first, then newest; "" when none did or there is no pool."""
+        if not self.a.success_pool or not Path(self.a.success_pool).exists():
+            return ""
+        i, p, ts = self.part_of(fp["turn"])
+        t0 = next(t["t0"] for t in ts if t["turn"] == fp["turn"])
+        upto = [(Path(x["episode"]), x["until"], None) for x in self.st["timeline"][:i]] + [(Path(p["episode"]), t0 + 1, None)]
+        items = self.items()
+        n = self.dom.milestones_reached(upto, items)
+        if n >= len(items):
+            return ""
+        prev, target = (items[n - 1] if n else None), items[n]
+        own = {x["episode"] for x in self.st["timeline"]}
+        eps = [Path(e) for e in dict.fromkeys(Path(self.a.success_pool).read_text().split()) if e not in own]
+        eps = [e for e in eps if (e / "result.json").exists()]
+        eps.sort(key=lambda e: (self.dom.result(e)["task"] == self.task, (e / "result.json").stat().st_mtime), reverse=True)
+        out = []
+        for e in eps:
+            seg = self.dom.success_segment(e, prev, target, L["success_rows"])
+            if seg:
+                out.append(seg)
+            if len(out) == L["success_segments"]:
+                break
+        return "\n\n".join(out)
+
     # ---------------------------------------------------------------- 3. rollouts
     def run_episode(self, name: str, ckpt: str, exp_f: Path, max_steps: int | None,
                     stop_file: Path | None = None) -> tuple[Path, dict]:
         ep = self.dir / name
         opts = {"name": self.a.name, "world": self.a.world, "save_every": L["save_every"], "gpu": self.a.gpu,
-                "port": self.a.port, "mock": self.a.mock, "max_steps": max_steps, "stop_file": stop_file}
+                "port": self.a.port, "mock": self.a.mock, "max_steps": max_steps, "stop_file": stop_file,
+                "plan": self.a.plan}
         for attempt in range(3):
             if ep.exists():
                 ep.rename(ep.with_name(f"{ep.name}.crash{int(time.time())}"))
@@ -193,6 +225,9 @@ class Loop:
                 res = {"status": "crashed", "error": repr(e)}
             log(f"  {name} attempt {attempt + 1}: {res.get('status')} success={res.get('success')} steps={res.get('steps')}")
             if res.get("status") in ("finished", "anomaly"):
+                if self.a.success_pool:  # other attempts may draw <success> segments from it
+                    with open(self.a.success_pool, "a") as f:
+                        f.write(f"{ep}\n")
                 return ep, res
         raise RuntimeError(f"episode {name} crashed 3 times")
 
@@ -283,10 +318,11 @@ class Loop:
         if restart == fp["turn"]:
             markers = {restart: markers[restart] + [f"-- Failure point: T{fp['turn']} --"]}
         state = self.dom.state_line(Path(fp["episode"]), fp["checkpoint_step"], window)
+        success_txt = self.success(fp)
         hyp = hypothesis.propose(self.instruction, self.dom.commands(), self.milestone_lines(), fp, state,
                                  self.dom.log(self.parts(), self.items(), markers), wk.lines(self.knowledge()),
                                  fp["record"], self.dom.plan(self.src), self.events, self.dom.vocabulary,
-                                 self.items())
+                                 self.items(), success_txt)
         if not hyp:
             self.st["done"] = "proposal unparsable"
             return False
@@ -306,7 +342,8 @@ class Loop:
                                                     f": {o['evidence']}" if (o := r["occurrence"]) else
                                                     "no occurrence in the window") for i, r in enumerate(rollouts))
         e = {"k": k, "failure_point": {x: fp[x] for x in ("episode", "turn", "kind")}, **hyp, "rollouts": rollouts,
-             "verdict": verdict, "frequency": [kk, n], "observed": observed, "continuation": None}
+             "verdict": verdict, "frequency": [kk, n], "observed": observed, "continuation": None,
+             "success_segments": [x for x in success_txt.split("\n") if x.startswith("== Success:")]}
         self.st["experiments"].append(e)
         fp["record"].append({x: e[x] for x in ("statement", "change", "prediction", "verdict", "observed")})
         fp["episodes_at_try"] = [x["episode"] for x in self.st["timeline"]]  # episodes played after this try are new
@@ -411,6 +448,8 @@ def main() -> int:
     ap.add_argument("--store", required=True, help="World Knowledge store memory/wk_<store>.json")
     ap.add_argument("--gpu", type=int, required=True)
     ap.add_argument("--port", type=int, required=True)
+    ap.add_argument("--plan", action="store_true", help="loop episodes from the beginning plan first (from a save: its plan)")
+    ap.add_argument("--success-pool", default=None, help="file of episode dirs the <success> segments come from")
     ap.add_argument("--mock", action="store_true", help="LLM_MOCK: no API calls (the Designer and the agent)")
     a = ap.parse_args()
     if a.mock:

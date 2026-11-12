@@ -38,6 +38,9 @@ class Minecraft(Domain):
     def milestone_held(self, ep, from_turn, milestone):
         return episode_log.milestone_held(Path(ep), from_turn, milestone)
 
+    def success_segment(self, ep, prev, target, max_rows):
+        return episode_log.success_segment(Path(ep), self.result(ep)["task"], prev, target, max_rows)
+
     def checkpoints(self, ep):
         return episode_log.checkpoints(Path(ep))
 
@@ -65,13 +68,14 @@ class Minecraft(Domain):
 
     def run_episode(self, task, seed, ep, start_save, extras_file, opts):
         """The Baseline agent (agent/vlm_agent.py) in world opts["world"], saving every opts["save_every"] steps,
-        ending opts["max_steps"] steps after its start when set; opts also holds name (the chain's order is
-        loop_<name>), gpu, port, mock."""
+        ending opts["max_steps"] steps after its start when set, planning first when opts["plan"] (an episode from a
+        save keeps its plan); opts also holds name (the chain's order is loop_<name>), gpu, port, mock."""
         from benchmark import SEEDS
         from chain import Chain
         ns = argparse.Namespace(method="baseline", world=opts["world"], save=opts["save_every"], knowledge=None,
                                 order=f"loop_{opts['name']}", gpu=opts["gpu"], port=opts["port"], retries=2,
-                                stall_min=60.0, mock=opts["mock"], seed_offset=seed - SEEDS[task])
+                                stall_min=60.0, mock=opts["mock"], seed_offset=seed - SEEDS[task],
+                                plan=bool(opts.get("plan")))
         ch = Chain(ns)
         ch.env_vars.update(OPTIMUS_EXPERIMENT=str(extras_file))
         if start_save:

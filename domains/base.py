@@ -19,6 +19,9 @@ An episode is a folder. Whatever is inside is the domain's business; the method 
   state_line(ep, clock, window)
                              the restart point as the Designer is told it (clock, window, state)
   plan(ep)                   the agent's initial plan in ep, or None (planning off)
+  success_segment(ep, prev, target, max_rows)
+                             ep's turn rows from where milestone `prev` was first held to where `target` was, under a
+                             heading line; None when ep never held target
   run_episode(...)           play one episode (see Domain.run_episode)
 """
 from __future__ import annotations
@@ -69,6 +72,11 @@ class Domain:
 
     def plan(self, ep: Path) -> str | None:
         """The sub-goals the agent wrote before its first turn in ep, one per line, or None when it did not plan."""
+        return None
+
+    def success_segment(self, ep: Path, prev: tuple | None, target: tuple, max_rows: int) -> str | None:
+        """The turn rows of ep from where milestone `prev` (item, count) was first held (the start when None or never)
+        to where `target` was, under a heading line; the last max_rows rows when longer. None when ep never held it."""
         return None
 
     def llm_config(self, opts: dict) -> str:

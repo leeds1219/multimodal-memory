@@ -1,6 +1,7 @@
 """The Designer, step 2: one hypothesis at one failure point (designer/terms.py "Hypothesis"): its situation, action
 and result in the words of the log, the change the agent is given, and the prediction (when, what) the rollouts are
-judged by. A retry at the same failure point gets that point's experiment record. The hypothesis sentence goes to
+judged by. A retry at the same failure point gets that point's experiment record; segments of other episodes that
+reached the milestone the failure point's segment did not reach come as <success>. The hypothesis sentence goes to
 World Knowledge with its verdict (stored under "statement").
 """
 from __future__ import annotations
@@ -39,7 +40,11 @@ Input:
     change: start <...>; do <...>; stop <...>
     prediction: when <...>; what <...>
     verdict: <Refuted | Not reached>
-    observed: <what the log of each rollout showed>"""
+    observed: <what the log of each rollout showed>
+- <success>: segments of other episodes that reached the milestone the failure point's segment did not
+  reach, from the previous milestone to that one, in the same turn row layout (may be empty):
+    == Success: <task>, T<first>-T<last>, steps <first>-<last>, reached <item> <count> ==
+    <turn rows>"""
 
 WORK = """
 
@@ -57,7 +62,9 @@ Write, in this order:
    Within the window, the agent must be able to meet the situation and do the action. A hypothesis whose
    test needs longer than the window is the wrong hypothesis: pick a situation and action that come
    sooner. It must not be in <knowledge> or <record>, unless an observation there shows what is
-   different; then say what is different.
+   different; then say what is different. When <success> is not empty, compare it with <log> before
+   choosing: what the successful agents held, where they were and what they sent that this agent did
+   not can be the situation or the action.
 2. change: start, what to do, stop, using <commands>. It brings the agent to the situation and has it do
    the action. The agent is given the change, not the hypothesis or the prediction.
 3. plan: the few steps of the change only; after it the agent goes on with the task on its own.
@@ -74,7 +81,8 @@ Output:
 - change: object with start (string, a situation, not a turn number), do (string), stop (string)
 - plan: string, the few steps of the change
 - prediction: object with when (string) and what (string)
-- differs_from: string, the <knowledge> entry or <record> experiment it revises and how, or "" when none
+- differs_from: string, the <knowledge> entry, <record> experiment or <success> segment it draws on or
+  revises and how, or "" when none
 
 Answer with JSON only:
 {{"hypothesis": "...", "situation": "...", "action": "...", "result": "...", "milestone": "...",
@@ -103,13 +111,14 @@ def record_lines(record: list) -> str:
 
 
 def propose(task: str, commands: str, milestones: str, fp: dict, restart: str, log_text: str, knowledge: str,
-            record: list, plan: str | None, events: list, vocab, items: list, attempts: int = 3) -> dict | None:
+            record: list, plan: str | None, events: list, vocab, items: list, success: str = "",
+            attempts: int = 3) -> dict | None:
     """{hypothesis {situation, action, result}, statement (the hypothesis sentence), milestone ((item, count) of a
     milestone result, else None), change {start, do, stop}, plan, prediction {when, what}, differs_from}; `items`
-    the milestones [(item, count)]. An answer not as Output specifies is asked again, up to `attempts` calls; None
-    if none is."""
+    the milestones [(item, count)], `success` the <success> segments. An answer not as Output specifies is asked
+    again, up to `attempts` calls; None if none is."""
     user = tagged(task=task, commands=commands, milestones=milestones, failure_point=fp_lines(fp), restart=restart,
-                  log=log_text, knowledge=knowledge, record=record_lines(record), plan=plan)
+                  log=log_text, knowledge=knowledge, record=record_lines(record), success=success, plan=plan)
     for _ in range(attempts):
         out = ask_json(propose_system(vocab, bool(plan)), user, events, "propose")
         if valid(out, fp["kind"], items):
