@@ -8,6 +8,9 @@ last one), copied to the store <store>_c<cut> so a cut is a store of its own and
     python experiments/phase2.py --method mineevolve --store p1me --world nolava --plan --gpus 0,1,2,3 --port 29400
     python experiments/phase2.py --method optimus1_memory --o1m p1om --world nolava --plan --gpus 0,1,2,3 --port 29500 [--cut 60]
 
+Transfer to unseen levels: --cut at the last episode of a level (the levels ran in order) and --levels the later ones
+with --with-train, so their train tasks (never played with that memory) count as unseen too.
+
 Each episode is one chain.py call (--order p2-<run>-<task>-s<offset>), so results are
 results/<condition>/p2-<run>-<task>-s<offset>/<task>/<seed>/ and a restarted run skips the finished ones.
 Progress: run_data/state/phase2_<run>.json.
@@ -42,7 +45,7 @@ class Phase2:
         self.a, self.cond = a, cond
         self.levels = yaml.safe_load(SPLIT.read_text())["levels"]
         self.offsets = [int(o) for o in HP["phase1"]["seed_offsets"]]
-        self.state_f = RUN_DATA / "state" / f"phase2_{a.run}.json"
+        self.state_f = RUN_DATA / "state" / f"phase2_{a.run}{'_train' if a.train_only else ''}.json"
         self.prefix = f"p2-{a.run}-"
         self.lock = threading.Lock()
         self.stop = False
@@ -57,12 +60,15 @@ class Phase2:
         res = self._result(task, off)
         return res.exists() and json.loads(res.read_text()).get("status") in DONE
 
+    def tasks(self, L: dict) -> list:
+        return ([] if self.a.train_only else L["test"]) + (L["train"] if self.a.with_train or self.a.train_only else [])
+
     def measures(self) -> dict:
         """Episodes, successes and every compute measure per level, over the run's finished episodes."""
         out = {}
         for L in self.levels:
             m = out[L["name"]] = dict.fromkeys(("episodes", "successes") + KEYS, 0)
-            for t in L["test"]:
+            for t in self.tasks(L):
                 for off in self.offsets:
                     if self._finished(t, off):
                         r = json.loads(self._result(t, off).read_text())
@@ -116,7 +122,7 @@ class Phase2:
     def run(self) -> int:
         gpus = [int(g) for g in self.a.gpus.split(",")]
         queue = [(t, off) for L in self.levels if not self.a.levels or L["name"] in self.a.levels.split(",")
-                 for off in self.offsets for t in L["test"] if not self._finished(t, off)]
+                 for off in self.offsets for t in self.tasks(L) if not self._finished(t, off)]
         log(f"{self.cond.name}: memory {self.a.memory}, {len(queue)} episodes to play, {len(gpus)} workers")
         ws = [threading.Thread(target=self._worker, args=(queue, g, self.a.port + 10 * i))
               for i, g in enumerate(gpus[:len(queue)])]
@@ -155,7 +161,9 @@ def main() -> int:
     ap.add_argument("--port", type=int, required=True, help="first port; worker i uses port + 10 i (and + 1000)")
     ap.add_argument("--cut", type=int, default=0, help="Phase 1 ledger episode whose snapshot is the memory (default: last)")
     ap.add_argument("--mock", action="store_true", help="LLM_MOCK: no API calls")
-    ap.add_argument("--levels", default="", help="comma list of levels to play (tests); default: all")
+    ap.add_argument("--levels", default="", help="comma list of levels to play; default: all")
+    ap.add_argument("--with-train", action="store_true", help="also the levels' train tasks (levels the memory never saw)")
+    ap.add_argument("--train-only", action="store_true", help="only the levels' train tasks (the test tasks played elsewhere)")
     ap.add_argument("--report", action="store_true", help="print the run's measures per level and exit")
     a = ap.parse_args()
     if a.frozen:
