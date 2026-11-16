@@ -1,0 +1,207 @@
+<title>Minecraft Memory Results</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* One column of stage panels: totals first, per-level detail after; conditions keep one color everywhere */
+:root {
+  --bg: #f5f6f4; --panel: #ffffff; --fg: #1d2023; --muted: #5d636a; --line: #dadcd6;
+  --c0: #6b7280; --c1: #2f5aa8; --c2: #b06a1f; --c3: #2e7d4f; --c4: #8fbf9f;
+  --good: #2e7d4f; --bad: #a3302a;
+  --sans: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15171a; --panel: #1e2125; --fg: #e7e8e6; --muted: #a0a5ac; --line: #33363b;
+  --c0: #9aa1ab; --c1: #8fb0f0; --c2: #e0a35e; --c3: #7fcf9b; --c4: #4f7a5e;
+  --good: #7fcf9b; --bad: #f08a83; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #15171a; --panel: #1e2125; --fg: #e7e8e6; --muted: #a0a5ac; --line: #33363b;
+  --c0: #9aa1ab; --c1: #8fb0f0; --c2: #e0a35e; --c3: #7fcf9b; --c4: #4f7a5e;
+  --good: #7fcf9b; --bad: #f08a83; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font: 15px/1.55 var(--sans); }
+main { max-width: 980px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 28px; }
+h1 { font-size: 1.5rem; margin: 0; text-wrap: balance; }
+h2 { font-size: 1.1rem; margin: 0; text-wrap: balance; }
+.sub { color: var(--muted); margin: 4px 0 0; font-size: .9rem; }
+section { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px;
+  display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .88rem; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-weight: 600; white-space: nowrap; }
+td.n, th.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.n small { display: block; color: var(--muted); font-size: .75rem; }
+.best { font-weight: 700; }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: baseline; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .82rem; color: var(--muted); }
+.chart svg { display: block; width: 100%; height: auto; }
+.chart text { fill: var(--muted); font: 11px var(--mono); }
+.chart .lvl { fill: var(--fg); font: 600 12px var(--sans); }
+.note { font-size: .82rem; color: var(--muted); margin: 0; }
+.pill { font-size: .75rem; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--line); white-space: nowrap; }
+.pill.Supported { color: var(--good); border-color: var(--good); }
+.pill.Refuted { color: var(--bad); border-color: var(--bad); }
+</style>
+
+<main>
+  <header>
+    <h1>Minecraft Memory Results</h1>
+    <p class="sub" id="updated"></p>
+  </header>
+
+  <section id="transfer">
+    <h2>Transfer: memory from wooden–gold, played on redstone, diamond, armor</h2>
+    <div class="wrap"><table id="t-transfer-total"></table></div>
+    <div class="legend" id="lg-transfer"></div>
+    <div class="chart" id="c-transfer"></div>
+    <div class="wrap"><table id="t-transfer"></table></div>
+    <p class="note">Cell: successes / runs, then steps and cost. Bold: most successes in the row.</p>
+  </section>
+
+  <section id="phase2">
+    <h2>Phase 2: unseen test tasks, memory after all of Phase 1</h2>
+    <div class="wrap"><table id="t-phase2-total"></table></div>
+    <div class="legend" id="lg-phase2"></div>
+    <div class="chart" id="c-phase2"></div>
+    <div class="wrap"><table id="t-phase2"></table></div>
+  </section>
+
+  <section id="phase1">
+    <h2>Phase 1: train tasks while the memory is built</h2>
+    <div class="wrap"><table id="t-phase1"></table></div>
+    <p class="note">Ours runs: a (task, world) counts as a success when the episode or its loop succeeded; steps and cost include the loop.</p>
+  </section>
+
+  <section id="loops">
+    <h2>Ours loops</h2>
+    <div class="wrap"><table id="t-loops"></table></div>
+  </section>
+
+  <section id="wk">
+    <h2>Ours World Knowledge</h2>
+    <div class="wrap"><table id="t-wk"></table></div>
+  </section>
+</main>
+
+<script>
+const DATA = /*DATA*/null;
+const COLORS = {"Baseline": "var(--c0)", "MineEvolve": "var(--c1)", "Optimus-1 memory": "var(--c2)",
+                "Ours": "var(--c3)", "Ours, previous loop": "var(--c4)"};
+const LEVELS = ["wooden", "stone", "iron", "gold", "redstone", "diamond", "armor"];
+const k = (n) => n >= 1e6 ? (n / 1e6).toFixed(2) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "k" : String(n);
+const el = (tag, attrs = {}, ...kids) => {
+  const e = document.createElement(tag);
+  for (const [a, v] of Object.entries(attrs)) a === "class" ? e.className = v : e.setAttribute(a, v);
+  for (const c of kids) e.append(c instanceof Node ? c : document.createTextNode(c));
+  return e;
+};
+const rows = DATA.results;
+const conds = (stage) => [...new Set(rows.filter((r) => r.stage === stage).map((r) => r.condition))];
+const sw = (c) => el("span", {class: "sw", style: `background:${COLORS[c]}`});
+
+function totals(stage) {
+  const t = el("table");
+  t.append(el("thead", {}, el("tr", {}, el("th", {}, "Condition"), el("th", {class: "n"}, "Success"),
+    el("th", {class: "n"}, "Rate"), el("th", {class: "n"}, "Steps"), el("th", {class: "n"}, "Cost"))));
+  const body = el("tbody");
+  const sums = conds(stage).map((c) => {
+    const rs = rows.filter((r) => r.stage === stage && r.condition === c);
+    const s = (f) => rs.reduce((a, r) => a + r[f], 0);
+    return {c, runs: s("runs"), succ: s("successes"), steps: s("steps"), cost: s("cost_usd"), levels: rs.length};
+  });
+  const full = Math.max(...sums.map((x) => x.levels));
+  const best = Math.max(...sums.filter((x) => x.levels === full).map((x) => x.succ / x.runs));
+  for (const x of sums) {
+    const partial = x.levels < full ? " (in progress)" : "";
+    body.append(el("tr", {}, el("td", {}, sw(x.c), x.c + partial),
+      el("td", {class: "n" + (x.succ / x.runs === best && !partial ? " best" : "")}, `${x.succ} / ${x.runs}`),
+      el("td", {class: "n"}, (100 * x.succ / x.runs).toFixed(0) + "%"),
+      el("td", {class: "n"}, k(x.steps)), el("td", {class: "n"}, "$" + x.cost.toFixed(0))));
+  }
+  t.append(body);
+  document.getElementById(`t-${stage === "Phase 2" ? "phase2" : stage.toLowerCase()}-total`)?.replaceChildren(...t.childNodes);
+}
+
+function perLevel(stage, id) {
+  const cs = conds(stage), lv = LEVELS.filter((l) => rows.some((r) => r.stage === stage && r.level === l));
+  const t = document.getElementById(id);
+  t.replaceChildren(el("thead", {}, el("tr", {}, el("th", {}, "Level"), ...cs.map((c) => el("th", {class: "n"}, sw(c), c)))));
+  const body = el("tbody");
+  for (const l of lv) {
+    const cell = (c) => rows.find((r) => r.stage === stage && r.level === l && r.condition === c);
+    const best = Math.max(...cs.map((c) => cell(c)?.success_rate ?? -1));
+    body.append(el("tr", {}, el("td", {}, l), ...cs.map((c) => {
+      const r = cell(c);
+      if (!r) return el("td", {class: "n"}, "—");
+      return el("td", {class: "n" + (r.success_rate === best ? " best" : "")}, `${r.successes} / ${r.runs}`,
+        el("small", {}, `${k(r.steps)} · $${r.cost_usd.toFixed(0)}`));
+    })));
+  }
+  t.append(body);
+}
+
+function chart(stage, id, lgId) {
+  const cs = conds(stage), lv = LEVELS.filter((l) => rows.some((r) => r.stage === stage && r.level === l));
+  const W = 640, rowH = 13, gap = 14, left = 70, right = 46;
+  const H = lv.length * (cs.length * rowH + gap) + 18;
+  const ns = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(ns, "svg");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", `${stage} success rate per level and condition`);
+  const mk = (tag, a, txt) => { const e = document.createElementNS(ns, tag); for (const [x, v] of Object.entries(a)) e.setAttribute(x, v); if (txt != null) e.textContent = txt; svg.append(e); return e; };
+  const x = (v) => left + v * (W - left - right);
+  for (const v of [0, .5, 1]) {
+    mk("line", {x1: x(v), x2: x(v), y1: 0, y2: H - 16, stroke: "var(--line)"});
+    mk("text", {x: x(v), y: H - 3, "text-anchor": "middle"}, `${v * 100}%`);
+  }
+  lv.forEach((l, i) => {
+    const y0 = i * (cs.length * rowH + gap);
+    mk("text", {x: 0, y: y0 + cs.length * rowH / 2 + 4, class: "lvl"}, l);
+    cs.forEach((c, j) => {
+      const r = rows.find((q) => q.stage === stage && q.level === l && q.condition === c);
+      if (!r) return;
+      const b = mk("rect", {x: x(0), y: y0 + j * rowH + 1, width: Math.max(1, x(r.success_rate) - x(0)), height: rowH - 3, style: `fill:${COLORS[c]}`});
+      const tt = document.createElementNS(ns, "title"); tt.textContent = `${c}, ${l}: ${r.successes}/${r.runs}`; b.append(tt);
+      mk("text", {x: x(r.success_rate) + 4, y: y0 + j * rowH + rowH - 3}, `${r.successes}/${r.runs}`);
+    });
+  });
+  document.getElementById(id).replaceChildren(svg);
+  document.getElementById(lgId).replaceChildren(...cs.map((c) => el("span", {}, sw(c), c)));
+}
+
+function loops() {
+  const t = document.getElementById("t-loops");
+  const hs = ["Task", "World", "Failure points", "Experiments", "Supported", "Refuted", "Not reached", "Outcome", "Cost"];
+  t.replaceChildren(el("thead", {}, el("tr", {}, ...hs.map((h, i) => el("th", {class: i >= 3 && i !== 7 ? "n" : ""}, h)))));
+  const body = el("tbody");
+  for (const r of DATA.ours_loops)
+    body.append(el("tr", {}, el("td", {}, r.task), el("td", {}, r.world), el("td", {}, r.failure_points || "—"),
+      ...["experiments", "supported", "refuted", "not_reached"].map((f) => el("td", {class: "n"}, String(r[f]))),
+      el("td", {}, r.outcome), el("td", {class: "n"}, "$" + r.cost_usd.toFixed(2))));
+  if (!DATA.ours_loops.length) body.append(el("tr", {}, el("td", {colspan: 9}, "No loops yet")));
+  t.append(body);
+}
+
+function wk() {
+  const t = document.getElementById("t-wk");
+  t.replaceChildren(el("thead", {}, el("tr", {}, el("th", {}, "Rule"), el("th", {}, "Verdict"),
+    el("th", {class: "n"}, "Rollouts"), el("th", {}, "From"))));
+  const body = el("tbody");
+  for (const r of DATA.world_knowledge)
+    body.append(el("tr", {}, el("td", {}, r.statement), el("td", {}, el("span", {class: "pill " + r.verdict}, r.verdict)),
+      el("td", {class: "n"}, `${r.k} / ${r.n}`), el("td", {}, r.source || "")));
+  if (!DATA.world_knowledge.length) body.append(el("tr", {}, el("td", {colspan: 4}, "No rules yet")));
+  t.append(body);
+}
+
+document.getElementById("updated").textContent =
+  `Updated ${DATA.updated} UTC. Each (task, world) is one run; worlds are seed offsets 0, 1, 4.`;
+for (const s of ["Transfer", "Phase 2"]) totals(s);
+perLevel("Transfer", "t-transfer"); chart("Transfer", "c-transfer", "lg-transfer");
+perLevel("Phase 2", "t-phase2"); chart("Phase 2", "c-phase2", "lg-phase2");
+perLevel("Phase 1", "t-phase1");
+loops(); wk();
+</script>
