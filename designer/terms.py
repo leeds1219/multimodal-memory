@@ -23,16 +23,10 @@ TERMS = {  # each term as the prompts list it, line breaks included
     'Segment': """\
 - Segment: the turns from one milestone to the next; the last segment ends where the timeline ends.""",
     'Failure point': """\
-- Failure point: a turn whose turn rows show one of the four kinds below. Every one is listed, and each
-  is tested by an experiment.""",
-    'Kinds of failure point': """\
-- Kinds of failure point:
-  - mismatch: what the command did contradicts what the agent's thought said it expected: the decision
-    rested on a wrong belief about the world.
-  - missed response: after a mismatch, the agent goes on as if the command had done what it expected.
-  - ignored knowledge: the agent acts against a Supported entry of World Knowledge it was given.
-  - judgment: none of the above; only the Designer's own knowledge says a better choice was available
-    then.""",
+- Failure point: the first milestone of the timeline the agent never held, with how many of its item it
+  held at the timeline end. Code finds it.""",
+    'Gain': """\
+- Gain: a turn whose changes show one more of an item in the inventory.""",
     'Rollout': """\
 - Rollout: one play from the restart point with the change. Each hypothesis gets {rollouts} rollouts from
   the same restart point, taken as independent trials.""",
@@ -42,12 +36,12 @@ TERMS = {  # each term as the prompts list it, line breaks included
   (the result followed in k of its n rollouts) and no log. Hypotheses Not reached are not in it. The
   agent is given the Supported ones.""",
     'Restart point': """\
-- Restart point: the last save before the failure point; the experiment plays on from there, and
-  everything after it is played again.""",
+- Restart point: the first save after the agent last gained the failure point's item in the timeline;
+  when it never gained one, the first save of the failure point's segment. The experiment plays on from
+  there, and everything after it is played again.""",
     'Window': """\
 - Window: the first {window_steps} steps after the restart point, or fewer if the episode ends first. A
-  rollout ends right after its occurrence (for a milestone result, once the milestone is also reached),
-  or at the end of the window. The continuation, which goes on with the timeline from a rollout, plays on
+  rollout ends once the result follows its occurrence, or at the end of the window. The continuation, which goes on with the timeline from a rollout, plays on
   to the end, or until {stall_steps} steps pass without a new milestone.""",
     'Hypothesis': """\
 - Hypothesis: a rule of this world in three parts, each written in the words the log uses and true
@@ -59,11 +53,7 @@ TERMS = {  # each term as the prompts list it, line breaks included
   not count.
   action: a command, or a short sequence of commands, from the commands list, written short: the
   command's type and its main argument, not its full form.
-  result: one of two kinds.
-    turn result: what the turn rows of the action record: how the command ends and what changes in that
-    turn (an inventory change, a change of height, a death).
-    milestone result, for a failure point of kind judgment only: reaching, within the window, a milestone
-    the agent's own choice delayed, written "reach <item> <count>".
+  result: a gain of the failure point's item within the window, written "gain <item>".
   The result may depend on chance.
   The rule says the result can follow when the agent does the action while the situation holds; how
   often is measured by the rollouts. No turn numbers, steps, positions or anything only this attempt
@@ -77,15 +67,15 @@ TERMS = {  # each term as the prompts list it, line breaks included
 - Prediction: what the log will show if the hypothesis is right.
   When: in each rollout, the first time within the window that the agent does the action while the
   situation holds.
-  What: whether the result follows: a turn result in the action's turn rows, a milestone result by the
-  end of the window. It must be the game's response, never only that the agent did the action.""",
+  What: whether the agent gains the failure point's item after the action, by the end of the window. It
+  must be the game's response, never only that the agent did the action.""",
     'Experiment record': """\
 - Experiment record: every experiment at one failure point: its hypothesis, change, prediction, verdict
   (Supported, Refuted or Not reached), frequency, and what the log of each rollout showed.""",
     'Occurrence': """\
 - Occurrence: the first time in a rollout that the agent does the action while the situation holds. It
-  is marked with whether the result followed; for a milestone result, code checks whether the agent held
-  the milestone's count of the item at the occurrence or after it, within the window.""",
+  is marked with whether the result followed: code checks whether the agent gained the failure point's
+  item at the occurrence or after it, within the window.""",
 }
 
 # The layouts of the inputs, shared by the prompts that get them.
@@ -113,7 +103,7 @@ TIMELINE_LOG = """\
   A turn row:
 """ + TURN_ROW_LAYOUT + """
   A marker, where the timeline goes on in an episode replayed from a save:
-    -- Step <step>: replayed from a save. Failure point tried: T<turn> (<what happened>). Change given to the agent from here: "<change>". Verdict: <verdict> --
+    -- Step <step>: replayed from a save. Failure point tried: <item> <count>, <held> held. Change given to the agent from here: "<change>". Verdict: <verdict> --
 """ + THOUGHT_NOTE
 KNOWLEDGE_LINES = """\
     hypothesis: <in this situation, doing this action leads to this result>

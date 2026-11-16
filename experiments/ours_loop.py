@@ -5,27 +5,29 @@ For each failed episode (run with saves, `experiments/run.py --method baseline -
 attempt:
   0. Milestones: the Designer decides the task's milestones from the first episode's log and the World Knowledge
      (designer/milestones.py); again whenever World Knowledge grows. Code cuts every log into segments at them.
-  1. Failure points: the Designer lists every failure point of the current timeline (designer/failure_point.py),
-     each of a kind (mismatch, missed response, ignored knowledge, judgment). The loop tries them by turn, earliest
-     first, skipping turns tried before; after loop.tries_per_failure_point hypotheses at one point, the next one.
-  2. Hypothesis: at the failure point, the Designer proposes S, A, R, the change and the prediction, seeing the
-     point's experiment record (designer/hypothesis.py) and, with --success-pool, up to loop.success_segments
-     segments of other episodes in the pool that reached the first milestone not held at the failure point (same
-     task first, then newest; loop.success_rows rows each).
-  3. Rollouts: loop.rollouts episodes from the restart point (the last save before the failure point, or the
-     beginning of the same world), each ending loop.window_steps after it; the agent gets the change and the
-     Supported World Knowledge (executor/extras.py), never the hypothesis or the prediction.
+  1. Failure point: code takes the first milestone the current timeline never held and how many of its item it held
+     at the end (designer/terms.py "Failure point"); the restart point is the first save after the item was last
+     gained in the timeline (the first save of that milestone's segment when it never was).
+  2. Hypothesis: at the failure point, the Designer proposes the situation and action under which the agent gains
+     the item (result "gain <item>"), the change and the prediction (designer/hypothesis.py), seeing the point's
+     experiment record and <gains>: the item's gains in this timeline, then, with --success-pool, in the pool's
+     episodes outside it, newest first (loop.gain_rows in all, loop.gains_per_episode per episode).
+  3. Rollouts: loop.rollouts episodes from the restart point, loop.parallel_rollouts at a time (each on its own port,
+     the same GPU), each ending loop.window_steps after it; the agent gets the change and the Supported World
+     Knowledge (executor/extras.py), never the hypothesis or the prediction.
   4. Occurrence: the Designer marks, in each rollout, the first time the agent did A while S held and whether R
-     followed (designer/judge.py); code counts the verdict (Supported if R followed in at least one rollout, Refuted
+     followed (designer/judge.py); code checks whether the item was gained at the occurrence or after it and counts the
+     verdict (Supported if R followed in at least one rollout, Refuted
      if occurrences came and R never followed, Not reached if none came) and the frequency k/n. Supported and
      Refuted go to World Knowledge (memory/world_knowledge.py, <runs>/memory/wk_<store>.json); every experiment goes
-     to the failure point's experiment record.
+     to the failure point's experiment record (one per milestone, kept across timelines).
   5. Supported: the timeline goes on with a rollout where R followed (the one furthest along the milestones at its
      last save; fewer steps on a tie), up to its last save, then a continuation
      episode from that save, whose agent is also given the hypothesis just Supported. It plays to the episode end,
-     or stops once loop.stall_steps have passed without a new milestone; the failure points are listed again in
-     the new timeline.
-  Ends on task success, after loop.max_experiments hypotheses, or when no failure point is left.
+     or stops once loop.stall_steps have passed without a new milestone; the failure point is taken again in the
+     new timeline, with loop.tries_per_failure_point tries again.
+  Ends on task success, after loop.max_experiments hypotheses, when every milestone was held, or after
+  loop.tries_per_failure_point hypotheses at one failure point of one timeline without support.
   A rollout is judged at every world save while it plays and ends at the next turn once its occurrence shows.
 Everything about the environment goes through the domain (domains/base.py; --domain, default minecraft). --world is
 Minecraft's run option.
@@ -41,10 +43,11 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import re
+import queue
 import sys
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 REPRO = Path(__file__).resolve().parents[1]
@@ -52,7 +55,6 @@ sys.path.insert(0, str(REPRO))
 import paths  # noqa: E402,F401
 
 import domains  # noqa: E402
-import failure_point  # noqa: E402
 import hypothesis  # noqa: E402
 import judge  # noqa: E402
 import milestones  # noqa: E402
@@ -83,7 +85,7 @@ class Loop:
             "source": str(self.src), "task": self.task, "seed": self.seed, "settings": dict(L), "done": None,
             "milestones": None, "milestones_wk": None,
             "timeline": [{"episode": str(self.src), "until": None, "marker": None, "start_ckpt": "", "start_step": 0}],
-            "searched": None, "failure_points": [], "experiments": []}
+            "failure_points": [], "experiments": []}
         self.events = []
 
     def save(self):
@@ -119,102 +121,75 @@ class Loop:
         log("  milestones: " + ", ".join(f"{i} {n}" for i, n in self.items()))
         return True
 
-    def part_of(self, turn: int):
-        """(index, part, its turns) of the timeline part that holds `turn`, or None."""
-        for i, p in enumerate(self.st["timeline"]):
-            ts = self.dom.turns(Path(p["episode"]), p["until"])
-            if any(t["turn"] == turn for t in ts):
-                return i, p, ts
-        return None
-
-    # ---------------------------------------------------------------- 1. failure points
-    def reopen(self, old: dict, f: dict, sig: str):
-        """A failure point listed again. It is tried again, with its experiment record, only if its evidence cites a
-        turn of a timeline part added after its last try (the log shows something new there; the stated reason
-        alone is not enough) and it has tries left; its hypotheses count against loop.tries_per_failure_point in
-        total. Every relisting is kept in old["relisted"]."""
-        cited = [int(t) for t in re.findall(r"T(\d+)", f.get("evidence", ""))]
-        seen = set(old.get("episodes_at_try", []))
-        new = [t for t in cited if (w := self.part_of(t)) and w[1]["episode"] not in seen]
-        ok = bool(new) and old["closed"] != "Supported" and len(old["record"]) < L["tries_per_failure_point"]
-        old.setdefault("relisted", []).append({"timeline": [x["episode"] for x in self.st["timeline"]], "kind": f["kind"],
-                                               "differs": f.get("differs", ""), "evidence": f.get("evidence", ""),
-                                               "new_turns_cited": new, "reopened": ok})
-        if ok:
-            old.update(closed=None, search=sig, kind=f["kind"], decision=f["decision"], shown=f["shown"],
-                       knowledge=f["knowledge"], evidence=f["evidence"])
-        log(f"  T{f['turn']} tried before: " + (f"reopened (new turns cited: {new})" if ok else
-                                               "skipped (no turn of a later part cited, or no tries left)"))
-
-    def search(self) -> bool:
-        """List the failure points of the current timeline once; False when the answer was unparsable."""
+    # ---------------------------------------------------------------- 1. the failure point
+    def failure_point(self) -> dict | None:
+        """The failure point of the current timeline: its entry in st["failure_points"] (one per milestone; its
+        experiment record is kept across timelines, its tries start again in a new one). None when every milestone
+        was held."""
         sig = json.dumps(self.st["timeline"])
-        if self.st["searched"] == sig:
-            return True
-        found = failure_point.find(self.instruction, self.dom.commands(), self.milestone_lines(),
-                                   self.dom.log(self.parts(), self.items()), wk.lines(self.knowledge()),
-                                   self.dom.plan(self.src), self.events, self.dom.vocabulary)
-        if found is None:
-            return False
-        self.st["searched"] = sig
-        for f in found:
-            where = self.part_of(f["turn"])
-            if not where:
-                log(f"  T{f['turn']} skipped: not a turn of the timeline")
-                continue
-            i, p, ts = where
-            old = next((x for x in self.st["failure_points"] if x["episode"] == p["episode"] and x["turn"] == f["turn"]),
-                       None)
-            if old:  # tried before: reopened only on evidence from timeline parts added since its last try
-                self.reopen(old, f, sig)
-                continue
-            ck = self.dom.save_before(Path(p["episode"]), f["turn"])
-            if ck == ("", 0) or (ck and ck[1] < p["start_step"]):  # before the part's first save: where it started
-                ck = (p["start_ckpt"], p["start_step"])
-            self.st["failure_points"].append({**f, "episode": p["episode"], "checkpoint": str(ck[0]),
-                                              "checkpoint_step": ck[1], "search": sig, "record": [], "closed": None})
-        log("  failure points: " + (", ".join(f"T{f['turn']} ({f['kind']})" for f in found) or "none"))
-        return True
+        pr = self.dom.progress(self.parts(), self.items())
+        if pr is None:
+            return None
+        m = list(pr["milestone"])
+        fp = next((x for x in self.st["failure_points"] if x["milestone"] == m), None)
+        if fp is None:
+            fp = {"milestone": m, "record": [], "tries": 0, "timeline": None}
+            self.st["failure_points"].append(fp)
+        if fp["timeline"] != sig:
+            i, (ck, step) = self.restart(pr["after"])
+            fp.update(timeline=sig, tries=0, held=pr["held"], segment=list(pr["segment"]), part=i,
+                      episode=self.st["timeline"][i]["episode"], checkpoint=str(ck), checkpoint_step=step)
+            log(f"  failure point: {m[0]} {m[1]}, {pr['held']} held; restart at step {step}")
+        return fp
 
-    def next_point(self) -> dict | None:
-        sig = self.st["searched"]
-        open_ = [f for f in self.st["failure_points"] if f["search"] == sig and not f["closed"]]
-        return min(open_, key=lambda f: f["turn"]) if open_ else None
+    def restart(self, after) -> tuple[int, tuple]:
+        """(timeline part, (save, step)) of the restart point: the part's first save at or after the end of the turn
+        `after` (part index, turn, last step); the last save before it when there is none after; the part's own start
+        when it has neither. `after` None: the start of the timeline."""
+        if after is None:
+            p = self.st["timeline"][0]
+            return 0, (p["start_ckpt"], p["start_step"])
+        i, _, t1 = after
+        p = self.st["timeline"][i]
+        ep = Path(p["episode"])
+        saves = [x for x in self.dom.checkpoints(ep) if x > p["start_step"] and (p["until"] is None or x <= p["until"])]
+        later = [x for x in saves if x >= t1]
+        x = min(later) if later else max((x for x in saves if x < t1), default=None)
+        return i, ((ep / "ckpt" / f"s{x:06d}.zip", x) if x is not None else (p["start_ckpt"], p["start_step"]))
 
-    # ---------------------------------------------------------------- 2. <success>
-    def success(self, fp: dict) -> str:
-        """<success>: segments of pool episodes that held the first milestone not held at the failure point, from
-        the milestone before it; same task first, then newest; "" when none did or there is no pool."""
-        if not self.a.success_pool or not Path(self.a.success_pool).exists():
-            return ""
-        i, p, ts = self.part_of(fp["turn"])
-        t0 = next(t["t0"] for t in ts if t["turn"] == fp["turn"])
-        upto = [(Path(x["episode"]), x["until"], None) for x in self.st["timeline"][:i]] + [(Path(p["episode"]), t0 + 1, None)]
-        items = self.items()
-        n = self.dom.milestones_reached(upto, items)
-        if n >= len(items):
-            return ""
-        prev, target = (items[n - 1] if n else None), items[n]
-        own = {x["episode"] for x in self.st["timeline"]}
-        eps = [Path(e) for e in dict.fromkeys(Path(self.a.success_pool).read_text().split()) if e not in own]
-        eps = [e for e in eps if (e / "result.json").exists()]
-        eps.sort(key=lambda e: (self.dom.result(e)["task"] == self.task, (e / "result.json").stat().st_mtime), reverse=True)
-        out = []
-        for e in eps:
-            seg = self.dom.success_segment(e, prev, target, L["success_rows"])
-            if seg:
-                out.append(seg)
-            if len(out) == L["success_segments"]:
-                break
-        return "\n\n".join(out)
+    # ---------------------------------------------------------------- 2. <gains>
+    def gains(self, item: str) -> str:
+        """<gains>: the gains of `item` in the current timeline (the latest ones), then in the pool's episodes outside
+        it, newest first; loop.gain_rows gains in all, loop.gains_per_episode per pool episode; "" when none."""
+        out, n = [], 0
+        tl = [g for p in self.st["timeline"] for g in self.dom.gains(Path(p["episode"]), item, p["until"])]
+        if tl:
+            tl = tl[-L["gain_rows"]:]
+            out.append(["== this timeline =="] + [r for g in tl for r in g if r])
+            n = len(tl)
+        if self.a.success_pool and Path(self.a.success_pool).exists():
+            own = {x["episode"] for x in self.st["timeline"]}
+            eps = [Path(e) for e in dict.fromkeys(Path(self.a.success_pool).read_text().split()) if e not in own]
+            eps = sorted((e for e in eps if (e / "result.json").exists()),
+                         key=lambda e: (e / "result.json").stat().st_mtime, reverse=True)
+            for e in eps:
+                if n >= L["gain_rows"]:
+                    break
+                gs = self.dom.gains(e, item)[:min(L["gains_per_episode"], L["gain_rows"] - n)]
+                if gs:
+                    out.append([f"== earlier episode of {self.dom.result(e)['task']} =="] + [r for g in gs for r in g if r])
+                    n += len(gs)
+        return "\n\n".join("\n".join(x) for x in out)
 
     # ---------------------------------------------------------------- 3. rollouts
     def run_episode(self, name: str, ckpt: str, exp_f: Path, max_steps: int | None,
-                    stop_file: Path | None = None) -> tuple[Path, dict]:
+                    stop_file: Path | None = None, slot: int = 0) -> tuple[Path, dict]:
+        """One episode on port --port + slot, under a chain order of its own slot, so episodes of different slots can
+        play at the same time."""
         ep = self.dir / name
-        opts = {"name": self.a.name, "world": self.a.world, "save_every": L["save_every"], "gpu": self.a.gpu,
-                "port": self.a.port, "mock": self.a.mock, "max_steps": max_steps, "stop_file": stop_file,
-                "plan": self.a.plan}
+        opts = {"name": f"{self.a.name}_p{slot}", "world": self.a.world, "save_every": L["save_every"],
+                "gpu": self.a.gpu, "port": self.a.port + slot, "mock": self.a.mock, "max_steps": max_steps,
+                "stop_file": stop_file, "plan": self.a.plan}
         for attempt in range(3):
             if ep.exists():
                 ep.rename(ep.with_name(f"{ep.name}.crash{int(time.time())}"))
@@ -225,7 +200,7 @@ class Loop:
                 res = {"status": "crashed", "error": repr(e)}
             log(f"  {name} attempt {attempt + 1}: {res.get('status')} success={res.get('success')} steps={res.get('steps')}")
             if res.get("status") in ("finished", "anomaly"):
-                if self.a.success_pool:  # other attempts may draw <success> segments from it
+                if self.a.success_pool:  # later experiments draw <gains> from it
                     with open(self.a.success_pool, "a") as f:
                         f.write(f"{ep}\n")
                 return ep, res
@@ -240,7 +215,8 @@ class Loop:
                    "result_followed": self.dom.milestone_held(ep, occ["turn"], tuple(hyp["milestone"]))}
         return occ
 
-    def rollout(self, name: str, ckpt: str, exp_f: Path, window: int, hyp: dict) -> tuple[Path, dict, dict | None]:
+    def rollout(self, name: str, ckpt: str, exp_f: Path, window: int, hyp: dict,
+                slot: int = 0) -> tuple[Path, dict, dict | None]:
         """One rollout, judged at every world save while it plays (4.): once its occurrence shows (for a milestone
         result, and the milestone is held), the loop writes the stop file and the episode ends at the next turn;
         otherwise it ends with the window. Returns the episode, its result and the occurrence (judged again on the
@@ -255,11 +231,12 @@ class Loop:
                 return None  # the action came; play on until the milestone or the window end
             return occ
 
-        ep, res = self.watched_episode(name, ckpt, exp_f, window, check)
+        ep, res = self.watched_episode(name, ckpt, exp_f, window, check, slot)
         occ = self.occurrence(ep, hyp, seen.get("occ"))
         return ep, res, occ
 
-    def watched_episode(self, name: str, ckpt: str, exp_f: Path, max_steps: int | None, check) -> tuple[Path, dict]:
+    def watched_episode(self, name: str, ckpt: str, exp_f: Path, max_steps: int | None, check,
+                        slot: int = 0) -> tuple[Path, dict]:
         """run_episode, with `check(episode, saves)` called at every new world save while it plays: once it returns
         something, the loop writes it to the stop file and the episode ends at the next turn."""
         stop = self.dir / f"{name}.stop"
@@ -286,7 +263,7 @@ class Loop:
         th = threading.Thread(target=watch, daemon=True)
         th.start()
         try:
-            return self.run_episode(name, ckpt, exp_f, max_steps, stop)
+            return self.run_episode(name, ckpt, exp_f, max_steps, stop, slot)
         finally:
             done.set()
             th.join()
@@ -308,51 +285,56 @@ class Loop:
 
     def experiment(self, k: int, fp: dict) -> bool:
         """One hypothesis at fp (2.-5.); True when the task succeeded in one of its episodes."""
-        p = self.part_of(fp["turn"])[1]
-        restart = next(t["turn"] for t in self.dom.turns(Path(fp["episode"]), p["until"])
-                       if t["t0"] >= fp["checkpoint_step"])
-        window = min(L["window_steps"], max(1, self.horizon - fp["checkpoint_step"])) if self.horizon \
-            else L["window_steps"]
-        markers = {restart: ["-- Restart point: the experiment starts here --"],
-                   fp["turn"]: [f"-- Failure point: T{fp['turn']} --"]}
-        if restart == fp["turn"]:
-            markers = {restart: markers[restart] + [f"-- Failure point: T{fp['turn']} --"]}
-        state = self.dom.state_line(Path(fp["episode"]), fp["checkpoint_step"], window)
-        success_txt = self.success(fp)
+        p = self.st["timeline"][fp["part"]]
+        ck, item = fp["checkpoint_step"], fp["milestone"][0]
+        restart = next((t["turn"] for t in self.dom.turns(Path(fp["episode"]), p["until"]) if t["t0"] >= ck), None)
+        window = min(L["window_steps"], max(1, self.horizon - ck)) if self.horizon else L["window_steps"]
+        markers = {restart: ["-- Restart point: the experiment starts here --"]} if restart is not None else {}
+        state = self.dom.state_line(Path(fp["episode"]), ck, window)
+        gains_txt = self.gains(item)
         hyp = hypothesis.propose(self.instruction, self.dom.commands(), self.milestone_lines(), fp, state,
                                  self.dom.log(self.parts(), self.items(), markers), wk.lines(self.knowledge()),
-                                 fp["record"], self.dom.plan(self.src), self.events, self.dom.vocabulary,
-                                 self.items(), success_txt)
+                                 fp["record"], self.dom.plan(self.src), self.events, self.dom.vocabulary, gains_txt)
         if not hyp:
             self.st["done"] = "proposal unparsable"
             return False
-        log(f"  e{k} at T{fp['turn']}: {hyp['statement'][:120]}")
+        held = self.dom.count_at(Path(fp["episode"]), ck, item) if fp["checkpoint"] else 0
+        hyp["milestone"] = [item, held + 1]  # the result: one more of the item than at the restart point
+        log(f"  e{k} at {item} {fp['milestone'][1]}: {hyp['statement'][:120]}")
         exp_f = self.dir / f"e{k}_experiment.json"
         exp_f.write_text(json.dumps({"hypothesis": {"change": hyp["change"], "plan": hyp["plan"]},
                                      "knowledge": wk.supported(self.knowledge()),
                                      "from_start": not fp["checkpoint"]}, indent=1, ensure_ascii=False))
-        rollouts, success = [], False
-        for i in range(L["rollouts"]):  # 3.
-            ep, res, occ = self.rollout(f"e{k}_r{i + 1}", fp["checkpoint"], exp_f, window, hyp)  # 4.
-            rollouts.append({"episode": str(ep), "occurrence": occ, "success": bool(res.get("success")),
-                             "steps": res.get("steps")})
-            success = success or bool(res.get("success"))
+        slots = queue.Queue()
+        for j in range(L["parallel_rollouts"]):
+            slots.put(j)
+
+        def one(i):  # 3., 4.
+            j = slots.get()
+            try:
+                ep, res, occ = self.rollout(f"e{k}_r{i + 1}", fp["checkpoint"], exp_f, window, hyp, j)
+            finally:
+                slots.put(j)
+            return {"episode": str(ep), "occurrence": occ, "success": bool(res.get("success")), "steps": res.get("steps")}
+
+        with ThreadPoolExecutor(L["parallel_rollouts"]) as pool:
+            rollouts = list(pool.map(one, range(L["rollouts"])))
+        success = any(r["success"] for r in rollouts)
         verdict, kk, n = judge.verdict([r["occurrence"] for r in rollouts])
         observed = "; ".join(f"rollout {i + 1}: " + (f"T{o['turn']}, R {'followed' if o['result_followed'] else 'did not follow'}"
                                                     f": {o['evidence']}" if (o := r["occurrence"]) else
                                                     "no occurrence in the window") for i, r in enumerate(rollouts))
-        e = {"k": k, "failure_point": {x: fp[x] for x in ("episode", "turn", "kind")}, **hyp, "rollouts": rollouts,
-             "verdict": verdict, "frequency": [kk, n], "observed": observed, "continuation": None,
-             "success_segments": [x for x in success_txt.split("\n") if x.startswith("== Success:")]}
+        e = {"k": k, "failure_point": {x: fp[x] for x in ("milestone", "held", "segment", "episode", "checkpoint_step")},
+             **hyp, "rollouts": rollouts, "verdict": verdict, "frequency": [kk, n], "observed": observed,
+             "continuation": None, "gains": gains_txt.count("\n== ") + bool(gains_txt)}
         self.st["experiments"].append(e)
         fp["record"].append({x: e[x] for x in ("statement", "change", "prediction", "verdict", "observed")})
-        fp["episodes_at_try"] = [x["episode"] for x in self.st["timeline"]]  # episodes played after this try are new
+        fp["tries"] += 1
         log(f"  e{k} {verdict} {kk}/{n}" + ("; task succeeded in a rollout" if success else ""))
         if verdict in ("Supported", "Refuted"):
             wk.add(self.store, {"statement": hyp["statement"], **hyp["hypothesis"], "verdict": verdict, "k": kk, "n": n,
                                 "source": f"{self.task}_{self.seed}/e{k}"})
         if verdict == "Supported" and not success:  # 5.
-            fp["closed"] = "Supported"
             r, last = self.best_rollout(fp, rollouts)
             e["continued_from"] = r["episode"]
             cont_ckpt = str(Path(r["episode"]) / "ckpt" / f"s{last:06d}.zip") if last is not None else fp["checkpoint"]
@@ -369,14 +351,12 @@ class Loop:
             e["continuation_stalled"] = json.loads(stop.read_text()) if stop.exists() else None
             success = bool(res.get("success"))
             self.extend_timeline(fp, r["episode"], last, cont, hyp)
-        elif len(fp["record"]) >= L["tries_per_failure_point"]:
-            fp["closed"] = f"{len(fp['record'])} hypotheses without support"
         return success
 
     def head(self, fp: dict) -> list:
         """The timeline parts up to fp's restart point."""
-        i, p, _ = self.part_of(fp["turn"])
-        ck = fp["checkpoint_step"]
+        i, ck = fp["part"], fp["checkpoint_step"]
+        p = self.st["timeline"][i]
         return self.st["timeline"][:i] + ([{**p, "until": ck}] if ck > p["start_step"] else [])
 
     def best_rollout(self, fp: dict, rollouts: list) -> tuple[dict, int | None]:
@@ -401,7 +381,8 @@ class Loop:
         """The timeline up to the restart point, then the rollout up to its last save, then the continuation."""
         ck = fp["checkpoint_step"]
         head = self.head(fp)
-        marker = (f"-- Step {ck}: replayed from a save. Failure point tried: T{fp['turn']} ({fp['shown'][:150]}). "
+        marker = (f"-- Step {ck}: replayed from a save. Failure point tried: {fp['milestone'][0]} {fp['milestone'][1]}, "
+                  f"{fp['held']} held. "
                   f"Change given to the agent from here: \"{change_text(hyp['change'])}\". Verdict: Supported --")
         if last is None:  # no save in the rollout: the continuation replays from the restart point itself
             self.st["timeline"] = head + [{"episode": str(cont), "until": None, "marker": marker,
@@ -420,13 +401,13 @@ class Loop:
             if not self.ensure_milestones():
                 self.st["done"] = "milestones unparsable"
                 break
-            if not self.search():  # 1.
-                self.st["done"] = "failure point answer unparsable"
-                break
+            fp = self.failure_point()  # 1.
             self.save()
-            fp = self.next_point()
             if fp is None:
-                self.st["done"] = "no failure point left"
+                self.st["done"] = "every milestone held"
+                break
+            if fp["tries"] >= L["tries_per_failure_point"]:
+                self.st["done"] = f"{fp['tries']} hypotheses without support at {fp['milestone'][0]} {fp['milestone'][1]}"
                 break
             succeeded = self.experiment(len(self.st["experiments"]) + 1, fp)
             self.save()
@@ -449,7 +430,7 @@ def main() -> int:
     ap.add_argument("--gpu", type=int, required=True)
     ap.add_argument("--port", type=int, required=True)
     ap.add_argument("--plan", action="store_true", help="loop episodes from the beginning plan first (from a save: its plan)")
-    ap.add_argument("--success-pool", default=None, help="file of episode dirs the <success> segments come from")
+    ap.add_argument("--success-pool", default=None, help="file of episode dirs the <gains> rows come from")
     ap.add_argument("--mock", action="store_true", help="LLM_MOCK: no API calls (the Designer and the agent)")
     a = ap.parse_args()
     if a.mock:

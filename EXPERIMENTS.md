@@ -69,24 +69,19 @@ In the nolava world, lava near the agent becomes stone, so that deaths in lava d
 | Learning loop on its failures | `ours_loop.py --name <name> --episodes <list> --store <name>` | `results/ours_loop/<name>/` |
 | Evaluation with the knowledge | `run.py --method ours --knowledge <name> --world nolava` | `results/ours_<name>/nolava/` |
 
-The learning loop runs on each failed episode:
-1. The Designer lists the failure points (`designer/failure_point.py`): turns whose decision was a mistake from what the
-   agent could know then (or its response to an effect it did not decide, such as an item lost) and that likely
-   caused the failure. The loop takes them earliest first.
-2. It proposes a hypothesis (`designer/hypothesis.py`), seeing the other failure points of the list as well as the
-   agent's own turns around this one (8 before, 3 after): the problem the decision caused later, the belief about
-   how to avoid it, the change that tests the belief there, the moment the belief is checked at (the next time the
-   agent needs what the problem was about) and what it predicts then.
-3. The game restarts from the last save before that turn (saves are 600 steps apart), and the agent tries the
-   change. It is told the change and how to make it, not the prediction (`domains/minecraft/world/replay.py`).
-4. The Designer judges the experiment (`designer/judge.py`) from what the game recorded, not the agent's thoughts:
-   Not reached (the check moment never came), Supported or Refuted (what the log shows at the first check
-   moment). Task success does not decide it. A Supported problem and belief go to World Knowledge.
-5. Otherwise the loop proposes again at the same failure point, with the hypotheses tested there and what their
-   experiments showed; after 3 experiments there without support, it moves to the next failure point of the list.
-   If it was supported, the loop lists the failure points again, in the experiment's log. When the failure points
-   of a list are used up, it lists them again in the latest experiment's log. The loop stops on task success or
-   after 10 experiments (or when the latest experiment's log has no failure point).
+The learning loop runs on each failed episode (`experiments/ours_loop.py`; terms in `designer/terms.py`):
+1. The Designer decides the task's milestones: items and counts on the way to the task item (`designer/milestones.py`).
+2. The failure point is the first milestone the agent never held, for example diamond 7 with 4 held. Code finds it
+   and restarts from the first save after the agent last gained that item.
+3. The Designer proposes a hypothesis (`designer/hypothesis.py`): the situation and action under which the agent
+   gains the item. It sees the item's gains in this episode and in earlier Ours episodes, with the turn before each.
+   Failures are counted per milestone, not per turn, because what makes a long task fail is a stretch that gathers
+   too slowly, and the gains are where that stretch went right.
+4. Five rollouts play from the restart point at once, with the change. The Designer marks where the agent met the
+   situation and did the action (`designer/judge.py`); code checks whether the item was gained after it. Supported
+   (gained in at least one rollout) and Refuted rules go to World Knowledge.
+5. After a Supported rule the episode goes on from the best rollout, and the failure point is taken again. The loop
+   stops on task success, after 10 experiments, or after 3 unsupported hypotheses at one failure point.
 
 ## 7. Baseline + Optimus-1 memory
 

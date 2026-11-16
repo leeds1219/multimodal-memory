@@ -3,7 +3,7 @@ level by level. Every train task is played once in each world of phase1.seed_off
 seeds of worlds A, B, C), with no budget cut while it runs: a method without a loop (mineevolve, optimus1_memory)
 plays one episode per (task, world). Ours plays one episode per (task, world) with the World Knowledge so far and
 world saves; if it fails, the learning-from-failure loop (experiments/ours_loop.py) runs on it, and its
-experiments' <success> segments come from the episodes this run played so far (run_data/state/phase1_<store>_pool.txt).
+experiments' <gains> rows come from the episodes this run played so far (run_data/state/phase1_<store>_pool.txt).
 Phase 2 then plays the test tasks with a snapshot of the memory, frozen.
 
 Memory carries over: one store for the whole run, levels in order (a level starts once the previous one is done).
@@ -69,7 +69,7 @@ class Phase1:
         self.snaps = RUN_DATA / "memory" / "snapshots" / self.store.stem
         self.state_f = RUN_DATA / "state" / f"phase1_{a.store}.json"
         self.prefix = f"p1-{a.store}-"
-        self.pool = RUN_DATA / "state" / f"phase1_{a.store}_pool.txt"  # Ours: episodes the <success> segments come from
+        self.pool = RUN_DATA / "state" / f"phase1_{a.store}_pool.txt"  # Ours: episodes the <gains> rows come from
         self.lock = threading.Condition()
         self.done = set()  # (task, offset) of finished episodes
         self.ledger = []  # finished episodes in order, each with the run's measures so far and its snapshot

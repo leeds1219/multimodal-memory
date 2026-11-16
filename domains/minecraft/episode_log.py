@@ -199,21 +199,58 @@ def milestone_held(ep: Path, from_turn: int, milestone: tuple) -> bool:
     return any(_has(inv, milestone) for inv in _held(ep, ts))
 
 
-def success_segment(ep: Path, task: str, prev: tuple | None, target: tuple, max_rows: int) -> str | None:
-    """The turns of episode ep from the turn after `prev` (item, count) was first held (the start when it never was)
-    to the turn where `target` was first held, as turn rows under a heading line; the last max_rows rows when longer.
-    None when ep never held target."""
-    ts = turns_of(Path(ep))
-    held = _held(Path(ep), ts)
-    end = next((i for i, inv in enumerate(held) if _has(inv, target)), None)
-    if end is None:
+def _count(inv: dict, item: str) -> int:
+    return sum(v for k, v in inv.items() if _is(k, item))
+
+
+def count_at(ep: Path, step: int, item: str) -> int:
+    """How many of `item` the agent held at step `step` of ep."""
+    inv = {}
+    for d in _trajectory(Path(ep)):
+        if d["t"] > step:
+            break
+        inv = d.get("inv", inv)
+    return _count(inv, item)
+
+
+def progress(parts: list, milestones: list) -> dict | None:
+    """Where the timeline of the parts [(episode dir, until_step, marker)] stands on its milestones ((item, count), in
+    order), at its first milestone never held: {"milestone", "held" (how many of its item at the timeline end),
+    "segment" (number, first turn, last turn of the segment the timeline ends in; turns None when it is empty),
+    "after" ((part index, turn, last step) of the turn the item was last gained in; of the turn before that segment
+    when it never was; None when the segment starts the timeline)}. None when every milestone was held."""
+    rows = []
+    for i, (ep, until, _) in enumerate(parts):
+        ts = turns_of(Path(ep), until)
+        rows += [(i, t, inv) for t, inv in zip(ts, _held(Path(ep), ts))]
+    n = max((j + 1 for _, _, inv in rows for j, m in enumerate(milestones) if _has(inv, m)), default=0)
+    if n >= len(milestones):
         return None
-    start = next((i + 1 for i, inv in enumerate(held[:end]) if prev and _has(inv, prev)), 0)
-    seg = ts[start:end + 1]
-    rows = _merge(_rows(Path(ep), seg), set())
-    cut = f", last {max_rows} rows" if len(rows) > max_rows else ""
-    return "\n".join([f"== Success: {task}, T{seg[0]['turn']}-T{seg[-1]['turn']}, steps {seg[0]['t0']}-{seg[-1]['t1']}, "
-                      f"reached {target[0]} {target[1]}{cut} =="] + rows[-max_rows:])
+    item = milestones[n][0]
+    segs = segments([t for _, t, _ in rows], [inv for _, _, inv in rows], milestones)
+    tail = segs[-1][0] if segs and segs[-1][1] is None else []
+    gains = [k for k in range(len(rows)) if _count(rows[k][2], item) > (_count(rows[k - 1][2], item) if k else 0)]
+    k = gains[-1] if gains else len(rows) - len(tail) - 1
+    return {"milestone": milestones[n], "held": _count(rows[-1][2], item) if rows else 0,
+            "segment": (len(segs) if tail else len(segs) + 1, tail[0]["turn"] if tail else None,
+                        tail[-1]["turn"] if tail else None),
+            "after": (rows[k][0], rows[k][1]["turn"], rows[k][1]["t1"]) if k >= 0 else None}
+
+
+def gains(ep: Path, item: str, until: int | None = None) -> list:
+    """The gains of `item` in the turns of ep that started before `until`: [(log line of the turn before, log line of
+    the gain)], "" for the turn before the first one."""
+    ts = turns_of(Path(ep), until)
+    if not ts:
+        return []
+    lines = [" | ".join(d) for _, d in _rows(Path(ep), ts)]
+    out, prev = [], count_at(Path(ep), ts[0]["t0"], item)
+    for k, inv in enumerate(_held(Path(ep), ts)):
+        c = _count(inv, item)
+        if c > prev:
+            out.append((lines[k - 1] if k else "", lines[k]))
+        prev = c
+    return out
 
 
 def render(parts: list, milestones: list | None = None, markers: dict | None = None) -> str:

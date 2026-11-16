@@ -38,8 +38,14 @@ class Minecraft(Domain):
     def milestone_held(self, ep, from_turn, milestone):
         return episode_log.milestone_held(Path(ep), from_turn, milestone)
 
-    def success_segment(self, ep, prev, target, max_rows):
-        return episode_log.success_segment(Path(ep), self.result(ep)["task"], prev, target, max_rows)
+    def progress(self, parts, milestones):
+        return episode_log.progress(parts, milestones)
+
+    def gains(self, ep, item, until=None):
+        return episode_log.gains(Path(ep), item, until)
+
+    def count_at(self, ep, clock, item):
+        return episode_log.count_at(Path(ep), clock, item)
 
     def checkpoints(self, ep):
         return episode_log.checkpoints(Path(ep))

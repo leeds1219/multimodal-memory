@@ -14,7 +14,7 @@ how ore appears (ENVIRONMENT.md). The Designer's terms are defined once in `desi
 
 ```
 executor/       what the method adds to any agent: World Knowledge and the experiment's change (extras.py)
-designer/       reasoning over episode logs: terms.py (the shared terms), milestones.py, failure_point.py,
+designer/       reasoning over episode logs: terms.py (the shared terms), milestones.py,
                 hypothesis.py, judge.py (domain-free prompts)
 memory/         World Knowledge store, MineEvolve memory
 experiments/    conditions.py (method x world), run.py (start a condition), chain.py (episodes on one GPU),

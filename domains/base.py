@@ -19,9 +19,10 @@ An episode is a folder. Whatever is inside is the domain's business; the method 
   state_line(ep, clock, window)
                              the restart point as the Designer is told it (clock, window, state)
   plan(ep)                   the agent's initial plan in ep, or None (planning off)
-  success_segment(ep, prev, target, max_rows)
-                             ep's turn rows from where milestone `prev` was first held to where `target` was, under a
-                             heading line; None when ep never held target
+  progress(parts, milestones) where a timeline stands at its first milestone never held: the milestone, how many of its
+                             item are held at the end, the segment it ends in, the turn the item was last gained in
+  gains(ep, item, until)     ep's turns that gained one more of `item`, each as (log line before, log line)
+  count_at(ep, clock, item)  how many of `item` the agent held at `clock` of ep
   run_episode(...)           play one episode (see Domain.run_episode)
 """
 from __future__ import annotations
@@ -74,10 +75,19 @@ class Domain:
         """The sub-goals the agent wrote before its first turn in ep, one per line, or None when it did not plan."""
         return None
 
-    def success_segment(self, ep: Path, prev: tuple | None, target: tuple, max_rows: int) -> str | None:
-        """The turn rows of ep from where milestone `prev` (item, count) was first held (the start when None or never)
-        to where `target` was, under a heading line; the last max_rows rows when longer. None when ep never held it."""
-        return None
+    def progress(self, parts: list, milestones: list) -> dict | None:
+        """At the first milestone the parts (as in log) never held: {"milestone", "held" (its item's count at the end),
+        "segment" (number, first turn, last turn), "after" ((part index, turn, last clock) of the turn the item was
+        last gained in, else of the turn before that segment; None at the timeline start)}; None when all were held."""
+        raise NotImplementedError
+
+    def gains(self, ep: Path, item: str, until: int | None = None) -> list:
+        """The turns of ep before `until` that gained one more of `item`: [(log line of the turn before, its line)]."""
+        raise NotImplementedError
+
+    def count_at(self, ep: Path, clock: int, item: str) -> int:
+        """How many of `item` the agent held at `clock` of ep."""
+        raise NotImplementedError
 
     def llm_config(self, opts: dict) -> str:
         """The LLM config file (configs/llm_*.yaml) the domain's episodes run with."""

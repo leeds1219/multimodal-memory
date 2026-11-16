@@ -5,7 +5,10 @@ loop:  # the learning-from-failure loop (experiments/ours_loop.py)
   save_every: 600              # world saves in every loop episode (the restart points)
   stall_steps: 3000            # a continuation stops after this many steps without a new milestone
   max_experiments: 1           # hypotheses tested per attempt
-  tries_per_failure_point: 3   # hypotheses at one failure point before the next one
+  tries_per_failure_point: 3   # hypotheses without support at one failure point of one timeline; then the attempt ends
+  parallel_rollouts: 2         # rollouts of one hypothesis played at the same time (each on its own port, the same GPU)
+  gain_rows: 30                # <gains>: gains of the failure point's item shown to the Designer, in all
+  gains_per_episode: 10        # <gains>: at most this many from one earlier episode
 executor:  # the agent (domains/minecraft/agent/)
   history_turns: 10            # earlier commands shown each turn
   max_tokens: 500              # the agent's answer per turn
