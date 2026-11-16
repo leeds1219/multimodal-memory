@@ -7,9 +7,12 @@ last one), copied to the store <store>_c<cut> so a cut is a store of its own and
     python experiments/phase2.py --method baseline --world nolava --plan --gpus 0,1,2,3 --port 29300
     python experiments/phase2.py --method mineevolve --store p1me --world nolava --plan --gpus 0,1,2,3 --port 29400
     python experiments/phase2.py --method optimus1_memory --o1m p1om --world nolava --plan --gpus 0,1,2,3 --port 29500 [--cut 60]
+    python experiments/phase2.py --method ours --knowledge p1ours2 --world nolava --plan --gpus 4,5,6,7 --port 29600
 
 Transfer to unseen levels: --cut at the last episode of a level (the levels ran in order) and --levels the later ones
 with --with-train, so their train tasks (never played with that memory) count as unseen too.
+
+Ours' agent only reads its World Knowledge (the loop writes it, and Phase 2 runs no loop), so its store needs no --frozen.
 
 Each episode is one chain.py call (--order p2-<run>-<task>-s<offset>), so results are
 results/<condition>/p2-<run>-<task>-s<offset>/<task>/<seed>/ and a restarted run skips the finished ones.
@@ -90,7 +93,7 @@ class Phase2:
         cmd = [PY, str(REPRO / "experiments" / "chain.py"), "--method", self.cond.method, "--world", self.cond.world,
                "--order", order, "--tasks", task, "--seed-offset", str(off), "--gpu", str(gpu), "--port", str(port)]
         if self.cond.method in STORES:
-            cmd += [STORES[self.cond.method][0], self.a.cut_store, "--frozen"]
+            cmd += [STORES[self.cond.method][0], self.a.cut_store] + ([] if self.cond.method == "ours" else ["--frozen"])
         if self.cond.plan:
             cmd.append("--plan")
         if self.a.mock:
@@ -147,8 +150,8 @@ def cut_store(a) -> tuple[str, str]:
         if not dst.exists():
             shutil.copytree(snap, dst)
             (dst / "store.lock").touch()
-    else:
-        dst = RUN_DATA / "memory" / f"me_{name}.json"
+    else:  # mineevolve, ours: one file
+        dst = RUN_DATA / "memory" / f"{'wk' if a.method == 'ours' else 'me'}_{name}.json"
         if not dst.exists():
             shutil.copy2(next(snap.glob("*.json")), dst)
     return name, str(snap)
@@ -168,15 +171,15 @@ def main() -> int:
     a = ap.parse_args()
     if a.frozen:
         ap.error("phase2 freezes the memory itself; no --frozen")
-    a.store = a.store or a.o1m
+    a.store = a.store or a.o1m or a.knowledge
     if a.method in STORES:
         if not a.store:
             ap.error(f"method {a.method} needs its Phase 1 store name")
         a.cut_store, a.memory = cut_store(a)
         a.run = a.cut_store + ("_mock" if a.mock else "")
-        cond = Condition(a.method, a.world, a.save, a.knowledge, a.plan,
+        cond = Condition(a.method, a.world, a.save, a.cut_store if a.method == "ours" else None, a.plan,
                          a.cut_store if a.method == "mineevolve" else None,
-                         a.cut_store if a.method == "optimus1_memory" else None, True)
+                         a.cut_store if a.method == "optimus1_memory" else None, a.method != "ours")
     else:
         a.memory, a.run = None, a.method + ("_mock" if a.mock else "")
         cond = Condition(a.method, a.world, a.save, a.knowledge, a.plan)
