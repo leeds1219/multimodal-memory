@@ -239,7 +239,7 @@ def progress(parts: list, milestones: list) -> dict | None:
 
 def gains(ep: Path, item: str, until: int | None = None) -> list:
     """The gains of `item` in the turns of ep that started before `until`: [(log line of the turn before, log line of
-    the gain)], "" for the turn before the first one."""
+    the gain)], "" for the turn before the first one or when it is the previous gain (already listed)."""
     ts = turns_of(Path(ep), until)
     if not ts:
         return []
@@ -248,7 +248,7 @@ def gains(ep: Path, item: str, until: int | None = None) -> list:
     for k, inv in enumerate(_held(Path(ep), ts)):
         c = _count(inv, item)
         if c > prev:
-            out.append((lines[k - 1] if k else "", lines[k]))
+            out.append((lines[k - 1] if k and not (out and out[-1][1] == lines[k - 1]) else "", lines[k]))
         prev = c
     return out
 
