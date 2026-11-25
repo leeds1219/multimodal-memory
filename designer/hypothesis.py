@@ -46,8 +46,8 @@ WORK = """
 Write, in this order:
 1. hypothesis: the situation and action under which the agent gains the failure point's item, and
    the result "gain <item>". Read <gains> first: what held at the gains (the height, what was held, the
-   commands before them), and what did not hold in the turns of <log> after the last gain, where the
-   agent went on without one. When <gains> is empty, use <log> and your own knowledge.
+   commands before them), and what did not hold in the turns of <log> of the failure point's segment,
+   where the agent fell short of the milestone. When <gains> is empty, use <log> and your own knowledge.
    Within the window, the agent must be able to meet the situation and do the action. A hypothesis whose
    test needs longer than the window is the wrong hypothesis: pick a situation and action that come
    sooner. It must not be in <knowledge> or <record>, unless an observation there shows what is

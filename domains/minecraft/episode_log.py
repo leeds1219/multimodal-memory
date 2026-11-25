@@ -217,8 +217,8 @@ def progress(parts: list, milestones: list) -> dict | None:
     """Where the timeline of the parts [(episode dir, until_step, marker)] stands on its milestones ((item, count), in
     order), at its first milestone never held: {"milestone", "held" (how many of its item at the timeline end),
     "segment" (number, first turn, last turn of the segment the timeline ends in; turns None when it is empty),
-    "after" ((part index, turn, last step) of the turn the item was last gained in; of the turn before that segment
-    when it never was; None when the segment starts the timeline)}. None when every milestone was held."""
+    "before" ((part index, step) of the first step the previous milestone was held at; None for the first
+    milestone)}. None when every milestone was held."""
     rows = []
     for i, (ep, until, _) in enumerate(parts):
         ts = turns_of(Path(ep), until)
@@ -229,12 +229,26 @@ def progress(parts: list, milestones: list) -> dict | None:
     item = milestones[n][0]
     segs = segments([t for _, t, _ in rows], [inv for _, _, inv in rows], milestones)
     tail = segs[-1][0] if segs and segs[-1][1] is None else []
-    gains = [k for k in range(len(rows)) if _count(rows[k][2], item) > (_count(rows[k - 1][2], item) if k else 0)]
-    k = gains[-1] if gains else len(rows) - len(tail) - 1
+    before = None
+    if n:
+        i, t, _ = next(r for r in rows if _has(r[2], milestones[n - 1]))
+        h = held_from(parts[i][0], milestones[n - 1], t["t0"])
+        before = (i, t["t1"] if h is None else h)
     return {"milestone": milestones[n], "held": _count(rows[-1][2], item) if rows else 0,
             "segment": (len(segs) if tail else len(segs) + 1, tail[0]["turn"] if tail else None,
                         tail[-1]["turn"] if tail else None),
-            "after": (rows[k][0], rows[k][1]["turn"], rows[k][1]["t1"]) if k >= 0 else None}
+            "before": before}
+
+
+def held_from(ep: Path, milestone: tuple, step: int) -> int | None:
+    """The first step at or after `step` of ep at which the agent held `milestone`; None when the trajectory never
+    shows it."""
+    inv = {}
+    for d in _trajectory(Path(ep)):
+        inv = d.get("inv", inv)
+        if d["t"] >= step and _has(inv, milestone):
+            return d["t"]
+    return None
 
 
 def gains(ep: Path, item: str, until: int | None = None) -> list:

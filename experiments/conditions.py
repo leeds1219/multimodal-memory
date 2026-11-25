@@ -12,6 +12,7 @@ variables) and where its results go: <runs>/results/<method>/<world>/<order>/<ta
 """
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -22,7 +23,9 @@ METHODS = {
         ("OPTIMUS_LOGFIX", "1"), ("OPTIMUS_CRAFTFIX", "1"), ("OPTIMUS_TAGFIX", "1"), ("OPTIMUS_PROMPTFIX", "1"),
         ("OPTIMUS_REPLANFIX", "1"), ("OPTIMUS_ESCAPEFIX", "1")], "memfix": True},
     "baseline": {"switches": VLM},
+    "baseline_qwen": {"switches": VLM, "llm": "qwen"},  # Baseline agent, local Qwen via vLLM (configs/llm_qwen.yaml)
     "mineevolve": {"switches": VLM, "mineevolve": "mineevolve"},  # store run_data/memory/me_mineevolve.json
+    "mineevolve_ours": {"switches": VLM, "mineevolve": "mineevolve"},  # MineEvolve skills/remedies + Ours World Knowledge
     "optimus1_memory": {"switches": VLM},  # + the store run_data/memory/o1m_<name>/, Condition(o1m=..., frozen=...)
     "gt_recipe": {"switches": VLM + [("OPTIMUS_VLM_RECIPES", "fixed")]},
     "gt_world_rule": {"switches": VLM + [("OPTIMUS_VLM_OREHINT", "1")]},  # the rule in short
@@ -33,6 +36,9 @@ WORLDS = {
     "standard": [],  # Optimus-1's env as released (with its hidden ore rule)
     "nolava": [("OPTIMUS_NOLAVA", "1")],  # lava near the agent becomes stone
     "nolava_equipfix": [("OPTIMUS_NOLAVA", "1"), ("OPTIMUS_EQUIPFIX", "1")],  # + equip drops nothing (domains/minecraft/agent/tools/craft_helpers.py)
+    # + hidden rule: ore mined in the dark (light < 10) drops nothing (setup/build_darkore_jar.py); always night and no
+    # mobs, so sky light never lights ore (a shaft dug straight down is lit by the sky in daytime): only a torch does
+    "nolava_darkore": [("OPTIMUS_NOLAVA", "1"), ("OPTIMUS_NIGHT", "1")],
 }
 
 
@@ -52,8 +58,8 @@ class Condition:
             raise ValueError(f"unknown method {self.method!r} or world {self.world!r}")
         if self.plan and ("OPTIMUS_VLMTASK", "1") not in METHODS[self.method]["switches"]:
             raise ValueError("--plan needs a method run by the Baseline agent")
-        if (self.method == "ours") != bool(self.knowledge):
-            raise ValueError("method 'ours' needs --knowledge, and only it takes one")
+        if (self.method in ("ours", "mineevolve_ours")) != bool(self.knowledge):
+            raise ValueError("methods 'ours' and 'mineevolve_ours' need --knowledge, and only they take one")
         if self.store and not METHODS[self.method].get("mineevolve"):
             raise ValueError("--store is for method 'mineevolve' only")
         if (self.method == "optimus1_memory") != bool(self.o1m) or (self.frozen and not (self.o1m or self.store)):
@@ -63,6 +69,8 @@ class Condition:
     def name(self) -> str:
         """results/<method>/<world>"""
         method = (f"ours_{self.knowledge}" if self.method == "ours" else
+                  f"mineevolve_{self.store}_ours_{self.knowledge}" + ("_frozen" if self.frozen else "")
+                  if self.method == "mineevolve_ours" else
                   f"optimus1_memory_{self.o1m}" + ("_frozen" if self.frozen else "") if self.o1m else
                   f"mineevolve_{self.store}" + ("_frozen" if self.frozen else "") if self.store else
                   self.method) + ("_plan" if self.plan else "")
@@ -82,7 +90,8 @@ class Condition:
         a = METHODS[self.method]
         out = dict(a["switches"]) | dict(WORLDS[self.world])
         out["OPTIMUS_ISOWORLD"] = "1"  # every episode in its own Minecraft world folder (domains/minecraft/world/private_world.py)
-        out["LLM_CONFIG"] = str(repo / "configs" / f"llm_{a.get('llm', 'g38mon')}.yaml")
+        # $LLM_CONFIG set by the caller (e.g. LLM_CONFIG=configs/llm_qwen.yaml python experiments/phase1.py ...) wins
+        out["LLM_CONFIG"] = os.environ.get("LLM_CONFIG") or str(repo / "configs" / f"llm_{a.get('llm', 'g38mon')}.yaml")
         if a.get("mineevolve"):
             out["OPTIMUS_VLM_ME"] = str(runs_root / "memory" / f"me_{self.store or a['mineevolve']}.json")
             if self.frozen:
@@ -90,6 +99,8 @@ class Condition:
         if self.save_every:
             out["OPTIMUS_CKPT_EVERY"] = str(self.save_every)
             out["OPTIMUS_SAVEALL_JAR"] = str(runs_root / "infra" / "mcprec-6.13-saveall.jar")
+        if self.world == "nolava_darkore":  # the darkore jar is a copy of the saveall jar, so /save-all still works
+            out["OPTIMUS_SAVEALL_JAR"] = str(runs_root / "infra" / "mcprec-6.13-darkore.jar")
         if self.knowledge:
             out["OPTIMUS_VLM_WK"] = str(runs_root / "memory" / f"wk_{self.knowledge}.json")
         if self.plan:

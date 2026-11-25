@@ -36,8 +36,8 @@ TERMS = {  # each term as the prompts list it, line breaks included
   (the result followed in k of its n rollouts) and no log. Hypotheses Not reached are not in it. The
   agent is given the Supported ones.""",
     'Restart point': """\
-- Restart point: the first save after the agent last gained the failure point's item in the timeline;
-  when it never gained one, the first save of the failure point's segment. The experiment plays on from
+- Restart point: the last save before the agent held the milestone before the failure point, the end of
+  the previous segment; for the first milestone, the start of the timeline. The experiment plays on from
   there, and everything after it is played again.""",
     'Window': """\
 - Window: the first {window_steps} steps after the restart point, or fewer if the episode ends first. A
@@ -67,15 +67,15 @@ TERMS = {  # each term as the prompts list it, line breaks included
 - Prediction: what the log will show if the hypothesis is right.
   When: in each rollout, the first time within the window that the agent does the action while the
   situation holds.
-  What: whether the agent gains the failure point's item after the action, by the end of the window. It
-  must be the game's response, never only that the agent did the action.""",
+  What: whether the agent holds the failure point's milestone after the action, by the end of the
+  window. It must be the game's response, never only that the agent did the action.""",
     'Experiment record': """\
 - Experiment record: every experiment at one failure point: its hypothesis, change, prediction, verdict
   (Supported, Refuted or Not reached), frequency, and what the log of each rollout showed.""",
     'Occurrence': """\
 - Occurrence: the first time in a rollout that the agent does the action while the situation holds. It
-  is marked with whether the result followed: code checks whether the agent gained the failure point's
-  item at the occurrence or after it, within the window.""",
+  is marked with whether the result followed: code checks whether the agent held the failure point's
+  milestone at the occurrence or after it, within the window.""",
 }
 
 # The layouts of the inputs, shared by the prompts that get them.

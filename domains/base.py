@@ -77,8 +77,8 @@ class Domain:
 
     def progress(self, parts: list, milestones: list) -> dict | None:
         """At the first milestone the parts (as in log) never held: {"milestone", "held" (its item's count at the end),
-        "segment" (number, first turn, last turn), "after" ((part index, turn, last clock) of the turn the item was
-        last gained in, else of the turn before that segment; None at the timeline start)}; None when all were held."""
+        "segment" (number, first turn, last turn), "before" ((part index, clock) the previous milestone was first
+        held at; None for the first milestone)}; None when all were held."""
         raise NotImplementedError
 
     def gains(self, ep: Path, item: str, until: int | None = None) -> list:

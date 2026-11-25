@@ -15,6 +15,7 @@ What an experiment adds (environment variables set from the variant tokens by ex
   OPTIMUS_VLM_WK              verified World Knowledge in the prompt (executor/extras.py)
   OPTIMUS_EXPERIMENT          an experiment of experiments/ours_loop.py: the change to try (executor/extras.py)
   OPTIMUS_NOLAVA=1            lava near the agent becomes stone every NOLAVA_EVERY steps (domains/minecraft/world/nolava.py)
+  OPTIMUS_NIGHT=1             midnight for the whole episode, no mob spawning (world nolava_darkore: no sky light for ore)
   OPTIMUS_CKPT_EVERY=N        the world is saved every N steps (domains/minecraft/world/save.py)
   OPTIMUS_MAX_STEPS=N         the episode ends N steps after its start (tests; the loop's rollouts: the window)
   OPTIMUS_STOP_FILE           the episode ends at the next turn once this file exists (a rollout whose occurrence came)
@@ -188,6 +189,8 @@ def run_task(cfg, env, obs, instruction, mon, ep: Path, logger, target: str | No
     (out / "frames").mkdir(parents=True, exist_ok=True)
     lines = []
     agent = VLMAgent(_Env(env), cfg, remaining, lambda m: lines.append(m), obs, mon, instruction, opts)
+    if os.environ.get("OPTIMUS_NIGHT") == "1":  # after the release's reset commands (/time set 0)
+        agent.chat += ["/time set 18000", "/gamerule doMobSpawning false", "/kill @e[type=!player]"]
     me = None
     if os.environ.get("OPTIMUS_VLM_ME"):
         from client import context

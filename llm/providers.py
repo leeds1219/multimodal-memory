@@ -83,6 +83,12 @@ class OpenAICompat(Provider):
                 return m.group(1)
         raise RuntimeError(f"{var} not set and not found in {f}")
 
+    def prepare(self, kw):
+        # Thinking models (Gemini, Qwen3.x) count thinking tokens against max_tokens; the methods' max_tokens bound the visible answer.
+        if kw.get("max_tokens") is not None and self.cfg.get("thinking_headroom_tokens"):
+            kw["max_tokens"] = int(kw["max_tokens"]) + int(self.cfg["thinking_headroom_tokens"])
+        return kw
+
     def create(self, kw: dict):
         return self.raw.chat.completions.create(**kw)
 
@@ -97,12 +103,6 @@ class OpenAICompat(Provider):
 class Gemini(OpenAICompat):
     name = "gemini"
     default_key_env = "GOOGLE_API_KEY"
-
-    def prepare(self, kw):
-        # Gemini counts thinking tokens against max_tokens; the methods' max_tokens bound the visible answer.
-        if kw.get("max_tokens") is not None and self.cfg.get("thinking_headroom_tokens"):
-            kw["max_tokens"] = int(kw["max_tokens"]) + int(self.cfg["thinking_headroom_tokens"])
-        return kw
 
     def usage(self, resp):
         n_in, n_vis, n_out = super().usage(resp)

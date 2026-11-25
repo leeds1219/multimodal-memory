@@ -172,16 +172,17 @@ def main() -> int:
     if a.frozen:
         ap.error("phase2 freezes the memory itself; no --frozen")
     a.store = a.store or a.o1m or a.knowledge
+    world_tag = "" if a.world == "nolava" else f"_{a.world}"  # keeps runs in other worlds off the nolava state files
     if a.method in STORES:
         if not a.store:
             ap.error(f"method {a.method} needs its Phase 1 store name")
         a.cut_store, a.memory = cut_store(a)
-        a.run = a.cut_store + ("_mock" if a.mock else "")
+        a.run = a.cut_store + world_tag + ("_mock" if a.mock else "")
         cond = Condition(a.method, a.world, a.save, a.cut_store if a.method == "ours" else None, a.plan,
                          a.cut_store if a.method == "mineevolve" else None,
                          a.cut_store if a.method == "optimus1_memory" else None, a.method != "ours")
     else:
-        a.memory, a.run = None, a.method + ("_mock" if a.mock else "")
+        a.memory, a.run = None, a.method + world_tag + ("_mock" if a.mock else "")
         cond = Condition(a.method, a.world, a.save, a.knowledge, a.plan)
     p = Phase2(a, cond)
     if a.report:

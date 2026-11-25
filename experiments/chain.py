@@ -201,6 +201,8 @@ class Chain:
                     break
         kill_tree(server)
         free_port(self.a.port)
+        for f in (self.wd / "logs").glob("mc_*.log"):  # Minecraft server stdout (stats every tick); nothing reads it
+            f.unlink(missing_ok=True)
         res_f = ep / "result.json"
         if res_f.exists():
             return json.loads(res_f.read_text())

@@ -6,8 +6,8 @@ attempt:
   0. Milestones: the Designer decides the task's milestones from the first episode's log and the World Knowledge
      (designer/milestones.py); again whenever World Knowledge grows. Code cuts every log into segments at them.
   1. Failure point: code takes the first milestone the current timeline never held and how many of its item it held
-     at the end (designer/terms.py "Failure point"); the restart point is the first save after the item was last
-     gained in the timeline (the first save of that milestone's segment when it never was).
+     at the end (designer/terms.py "Failure point"); the restart point is the last save before the previous milestone
+     was first held (the start of the timeline for the first milestone).
   2. Hypothesis: at the failure point, the Designer proposes the situation and action under which the agent gains
      the item (result "gain <item>"), the change and the prediction (designer/hypothesis.py), seeing the point's
      experiment record and <gains>: the item's gains in this timeline, then, with --success-pool, in the pool's
@@ -16,7 +16,7 @@ attempt:
      the same GPU), each ending loop.window_steps after it; the agent gets the change and the Supported World
      Knowledge (executor/extras.py), never the hypothesis or the prediction.
   4. Occurrence: the Designer marks, in each rollout, the first time the agent did A while S held and whether R
-     followed (designer/judge.py); code checks whether the item was gained at the occurrence or after it and counts the
+     followed (designer/judge.py); code checks whether the milestone was held at the occurrence or after it and counts the
      verdict (Supported if R followed in at least one rollout, Refuted
      if occurrences came and R never followed, Not reached if none came) and the frequency k/n. Supported and
      Refuted go to World Knowledge (memory/world_knowledge.py, <runs>/memory/wk_<store>.json); every experiment goes
@@ -136,25 +136,24 @@ class Loop:
             fp = {"milestone": m, "record": [], "tries": 0, "timeline": None}
             self.st["failure_points"].append(fp)
         if fp["timeline"] != sig:
-            i, (ck, step) = self.restart(pr["after"])
+            i, (ck, step) = self.restart(pr["before"])
             fp.update(timeline=sig, tries=0, held=pr["held"], segment=list(pr["segment"]), part=i,
                       episode=self.st["timeline"][i]["episode"], checkpoint=str(ck), checkpoint_step=step)
             log(f"  failure point: {m[0]} {m[1]}, {pr['held']} held; restart at step {step}")
         return fp
 
-    def restart(self, after) -> tuple[int, tuple]:
-        """(timeline part, (save, step)) of the restart point: the part's first save at or after the end of the turn
-        `after` (part index, turn, last step); the last save before it when there is none after; the part's own start
-        when it has neither. `after` None: the start of the timeline."""
-        if after is None:
+    def restart(self, before) -> tuple[int, tuple]:
+        """(timeline part, (save, step)) of the restart point: the part's last save before `before` (part index, step
+        the previous milestone was first held at); the part's own start when it has none. `before` None: the start
+        of the timeline."""
+        if before is None:
             p = self.st["timeline"][0]
             return 0, (p["start_ckpt"], p["start_step"])
-        i, _, t1 = after
+        i, h = before
         p = self.st["timeline"][i]
         ep = Path(p["episode"])
-        saves = [x for x in self.dom.checkpoints(ep) if x > p["start_step"] and (p["until"] is None or x <= p["until"])]
-        later = [x for x in saves if x >= t1]
-        x = min(later) if later else max((x for x in saves if x < t1), default=None)
+        saves = [x for x in self.dom.checkpoints(ep) if p["start_step"] < x < h and (p["until"] is None or x <= p["until"])]
+        x = max(saves, default=None)
         return i, ((ep / "ckpt" / f"s{x:06d}.zip", x) if x is not None else (p["start_ckpt"], p["start_step"]))
 
     # ---------------------------------------------------------------- 2. <gains>
@@ -189,7 +188,7 @@ class Loop:
         ep = self.dir / name
         opts = {"name": f"{self.a.name}_p{slot}", "world": self.a.world, "save_every": L["save_every"],
                 "gpu": self.a.gpu, "port": self.a.port + slot, "mock": self.a.mock, "max_steps": max_steps,
-                "stop_file": stop_file, "plan": self.a.plan}
+                "stop_file": stop_file, "plan": self.a.plan, "env": dict(e.split("=", 1) for e in self.a.env)}
         for attempt in range(3):
             if ep.exists():
                 ep.rename(ep.with_name(f"{ep.name}.crash{int(time.time())}"))
@@ -298,8 +297,7 @@ class Loop:
         if not hyp:
             self.st["done"] = "proposal unparsable"
             return False
-        held = self.dom.count_at(Path(fp["episode"]), ck, item) if fp["checkpoint"] else 0
-        hyp["milestone"] = [item, held + 1]  # the result: one more of the item than at the restart point
+        hyp["milestone"] = list(fp["milestone"])  # the result is checked as the failure point's milestone held
         log(f"  e{k} at {item} {fp['milestone'][1]}: {hyp['statement'][:120]}")
         exp_f = self.dir / f"e{k}_experiment.json"
         exp_f.write_text(json.dumps({"hypothesis": {"change": hyp["change"], "plan": hyp["plan"]},
@@ -432,6 +430,7 @@ def main() -> int:
     ap.add_argument("--plan", action="store_true", help="loop episodes from the beginning plan first (from a save: its plan)")
     ap.add_argument("--success-pool", default=None, help="file of episode dirs the <gains> rows come from")
     ap.add_argument("--mock", action="store_true", help="LLM_MOCK: no API calls (the Designer and the agent)")
+    ap.add_argument("--env", action="append", default=[], help="KEY=VALUE for every loop episode (repeatable)")
     a = ap.parse_args()
     if a.mock:
         os.environ["LLM_MOCK"] = "1"

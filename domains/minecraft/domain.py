@@ -88,6 +88,7 @@ class Minecraft(Domain):
             ch.env_vars.update(OPTIMUS_LOAD_CKPT=str(Path(start_save).resolve()))
         if opts.get("max_steps"):  # a rollout: the episode ends this many steps after its start
             ch.env_vars.update(OPTIMUS_MAX_STEPS=str(opts["max_steps"]))
+        ch.env_vars.update(opts.get("env") or {})  # e.g. a read-only MineEvolve store (method mineevolve_ours)
         if opts.get("stop_file"):  # a rollout: the episode ends once the loop writes this file
             ch.env_vars.update(OPTIMUS_STOP_FILE=str(opts["stop_file"]))
         return ch.run_episode(task, Path(ep))

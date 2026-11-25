@@ -49,8 +49,18 @@ from hyperparams import HP  # noqa: E402
 PY = "/opt/conda/envs/mcagent/bin/python"
 SPLIT = REPRO / "configs" / "suites" / "optimus1" / "phase_split.yaml"
 STORES = {"mineevolve": ("--store", "OPTIMUS_VLM_ME"),  # method -> its store option and the variable naming the store
-          "optimus1_memory": ("--o1m", "OPTIMUS_VLM_O1M"), "ours": ("--knowledge", "OPTIMUS_VLM_WK")}
+          "optimus1_memory": ("--o1m", "OPTIMUS_VLM_O1M"), "ours": ("--knowledge", "OPTIMUS_VLM_WK"),
+          "mineevolve_ours": ("--store", "OPTIMUS_VLM_ME")}  # + its World Knowledge store (--knowledge)
+LOOP = ("ours", "mineevolve_ours")  # methods whose failed episodes get the learning-from-failure loop
 DONE = {"finished", "anomaly", "crashed_final"}
+
+
+def drop_worlds(*dirs: Path) -> None:
+    """Empty the world saves under dirs once no loop will restart from them. The empty s<step>.zip files stay, so the
+    save steps the analysis reads (episode_log.checkpoints) are unchanged."""
+    for d in dirs:
+        for z in Path(d).rglob("ckpt/s*.zip"):
+            z.open("w").close()
 KEYS = ("steps", "llm_calls", "tokens_in", "tokens_out_billed", "cost_usd", "wall_time_s")
 
 
@@ -67,6 +77,8 @@ class Phase1:
         self.offsets = [int(o) for o in HP["phase1"]["seed_offsets"]]
         self.store = Path(cond.env_vars(RUN_DATA, REPRO)[STORES[cond.method][1]])
         self.snaps = RUN_DATA / "memory" / "snapshots" / self.store.stem
+        # mineevolve_ours: the World Knowledge store, snapshotted next to the MineEvolve store
+        self.wk = Path(cond.env_vars(RUN_DATA, REPRO)["OPTIMUS_VLM_WK"]) if cond.method == "mineevolve_ours" else None
         self.state_f = RUN_DATA / "state" / f"phase1_{a.store}.json"
         self.prefix = f"p1-{a.store}-"
         self.pool = RUN_DATA / "state" / f"phase1_{a.store}_pool.txt"  # Ours: episodes the <gains> rows come from
@@ -167,6 +179,11 @@ class Phase1:
                     dst.mkdir()
                     shutil.copy2(self.store, dst / self.store.name)
                 fcntl.flock(lf, fcntl.LOCK_UN)
+            if self.wk and self.wk.exists():
+                with open(self.wk.with_suffix(".lock"), "a") as lf:
+                    fcntl.flock(lf, fcntl.LOCK_EX)
+                    shutil.copy2(self.wk, dst / self.wk.name)
+                    fcntl.flock(lf, fcntl.LOCK_UN)
         tot = self.measures()["total"]
         task, off = label.rsplit("-s", 1)
         u = self.unit(task, int(off)) or {}
@@ -180,6 +197,8 @@ class Phase1:
         cmd = [PY, str(REPRO / "experiments" / "chain.py"), "--method", self.cond.method, "--world", self.cond.world,
                STORES[self.cond.method][0], self.a.store, "--order", order, "--tasks", task, "--seed-offset", str(off),
                "--gpu", str(gpu), "--port", str(port)]
+        if self.cond.method == "mineevolve_ours":
+            cmd += ["--knowledge", self.a.knowledge]
         if self.cond.save_every:
             cmd += ["--save", str(self.cond.save_every)]
         if self.cond.plan:
@@ -195,22 +214,28 @@ class Phase1:
         r = json.loads(res.read_text()) if res.exists() else {"status": "missing", "chain_rc": rc}
         log(f"[gpu {gpu}] {task} s{off} -> {r.get('status')} success={r.get('success')} steps={r.get('steps')} "
             f"cost={r.get('cost_usd')}")
-        if self.cond.method == "ours" and r.get("status") in DONE:
+        if self.cond.method in LOOP and r.get("status") in DONE:
             with open(self.pool, "a") as f:
                 f.write(f"{res.parent}\n")
             if not r.get("success") and r.get("status") == "finished":
-                self._loop(task, off, res.parent, gpu, port)
+                if self._loop(task, off, res.parent, gpu, port):
+                    drop_worlds(res.parent, self._loop_dir(task, off))
+            else:
+                drop_worlds(res.parent)
         return r
 
-    def _loop(self, task: str, off: int, ep: Path, gpu: int, port: int) -> None:
-        """Ours: the learning-from-failure loop on the failed episode, with this run's World Knowledge store."""
+    def _loop(self, task: str, off: int, ep: Path, gpu: int, port: int) -> str | None:
+        """Ours: the learning-from-failure loop on the failed episode, with this run's World Knowledge store.
+        Returns loop.json's `done` (None if the loop did not finish)."""
         order = self._order(task, off)
         eps = RUN_DATA / "state" / f"phase1_{self.a.store}" / f"{order}.txt"
         eps.parent.mkdir(parents=True, exist_ok=True)
         eps.write_text(f"{ep}\n")
         cmd = [PY, str(REPRO / "experiments" / "ours_loop.py"), "--name", order, "--episodes", str(eps),
-               "--world", self.cond.world, "--store", self.a.store, "--gpu", str(gpu), "--port", str(port),
-               "--success-pool", str(self.pool)]
+               "--world", self.cond.world, "--store", self.a.knowledge or self.a.store, "--gpu", str(gpu),
+               "--port", str(port), "--success-pool", str(self.pool)]
+        if self.cond.method == "mineevolve_ours":  # the loop's episodes read the MineEvolve store and never write it
+            cmd += ["--env", f"OPTIMUS_VLM_ME={self.store}", "--env", "OPTIMUS_VLM_ME_FROZEN=1"]
         if self.cond.plan:
             cmd.append("--plan")
         if self.a.mock:
@@ -223,6 +248,7 @@ class Phase1:
         u = self.unit(task, off) or {}
         log(f"[gpu {gpu}] {task} s{off} loop -> {done or f'exit {rc}'}; {u.get('episodes')} episodes, "
             f"{u.get('steps')} steps, ${u.get('cost_usd', 0):.2f}")
+        return done
 
     def _worker(self, queue: list, gpu: int, port: int) -> None:
         while True:
@@ -284,11 +310,13 @@ def main() -> int:
     a = ap.parse_args()
     if a.method not in STORES or not (a.store or a.o1m or a.knowledge) or a.frozen:
         ap.error(f"phase1 needs a method with a memory store ({', '.join(STORES)}), its store name and no --frozen")
-    if a.method == "ours" and not a.save:
-        ap.error("ours needs --save (the loop's restart points)")
+    if a.method in LOOP and not a.save:
+        ap.error(f"{a.method} needs --save (the loop's restart points)")
+    if a.method == "mineevolve_ours" and not (a.store and a.knowledge):
+        ap.error("mineevolve_ours needs --store (MineEvolve) and --knowledge (World Knowledge)")
     a.store = a.store or a.o1m or a.knowledge  # the run's store name, also used for the orders and the state file
     cond = Condition(a.method, a.world, a.save, a.knowledge, a.plan,
-                     a.store if a.method == "mineevolve" else None, a.o1m)
+                     a.store if a.method in ("mineevolve", "mineevolve_ours") else None, a.o1m)
     if a.report:
         print(json.dumps(Phase1(a, cond).measures(), indent=1))
         return 0
